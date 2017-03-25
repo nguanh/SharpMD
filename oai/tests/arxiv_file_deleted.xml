@@ -1,0 +1,12 @@
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">'
+            <responseDate>2017-02-15T13:32:45Z</responseDate>
+<request verb="GetRecord" identifier="oai:arXiv.org:0901.4014" metadataPrefix="arXiv">http://export.arxiv.org/oai2</request>
+<GetRecord>
+<record>
+<header status="deleted">
+<identifier>oai:arXiv.org:0901.4014</identifier>
+<datestamp>2009-02-20</datestamp>
+</header>
+</record>
+</GetRecord>
+</OAI-PMH>

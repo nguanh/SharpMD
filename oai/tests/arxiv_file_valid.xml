@@ -1,0 +1,49 @@
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<responseDate>2017-02-15T13:34:34Z</responseDate>
+<request verb="GetRecord" identifier="oai:arXiv.org:0704.0001" metadataPrefix="arXiv">http://export.arxiv.org/oai2</request>
+<GetRecord>
+<record>
+<header>
+<identifier>oai:arXiv.org:0704.0001</identifier>
+<datestamp>2008-11-26</datestamp>
+<setSpec>physics:hep-ph</setSpec>
+</header>
+<metadata>
+<arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ http://arxiv.org/OAI/arXiv.xsd">
+<id>0704.0001</id>
+<created>2007-04-02</created>
+<updated>2007-07-24</updated>
+<authors>
+<author>
+<keyname>Balázs</keyname>
+<forenames>C.</forenames>
+</author>
+<author>
+<keyname>Berger</keyname>
+<forenames>E. L.</forenames>
+</author>
+<author>
+<keyname>Nadolsky</keyname>
+<forenames>P. M.</forenames>
+</author>
+<author>
+<keyname>Yuan</keyname>
+<forenames>C. -P.</forenames>
+</author>
+</authors>
+<title>
+Calculation of prompt diphoton production cross sections at Tevatron and LHC energies
+</title>
+<categories>hep-ph</categories>
+<comments>37 pages, 15 figures; published version</comments>
+<report-no>ANL-HEP-PR-07-12</report-no>
+<journal-ref>Phys.Rev.D76:013009,2007</journal-ref>
+<doi>10.1103/PhysRevD.76.013009</doi>
+<abstract>
+A fully differential calculation in perturbative quantum chromodynamics is presented for the production of massive photon pairs at hadron colliders. All next-to-leading order perturbative contributions from quark-antiquark, gluon-(anti)quark, and gluon-gluon subprocesses are included, as well as all-orders resummation of initial-state gluon radiation valid at next-to-next-to-leading logarithmic accuracy. The region of phase space is specified in which the calculation is most reliable. Good agreement is demonstrated with data from the Fermilab Tevatron, and predictions are made for more detailed tests with CDF and DO data. Predictions are shown for distributions of diphoton pairs produced at the energy of the Large Hadron Collider (LHC). Distributions of the diphoton pairs from the decay of a Higgs boson are contrasted with those produced from QCD processes at the LHC, showing that enhanced sensitivity to the signal can be obtained with judicious selection of events.
+</abstract>
+</arXiv>
+</metadata>
+</record>
+</GetRecord>
+</OAI-PMH>

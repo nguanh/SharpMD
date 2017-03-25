@@ -1,0 +1,21 @@
+{% extends "admin/index.html" %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">Home</a>
+&rsaquo;<a href="{% url 'admin:app_list' app_label="harvester" %}">{{ " Harvester" }}</a>
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+    <h1>Harvester: {{ harvester_name }} </h1>
+    <textarea rows="10" cols="50">
+    {{ log_text }}
+    </textarea>
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
