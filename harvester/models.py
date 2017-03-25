@@ -67,13 +67,20 @@ class Config(models.Model):
     # wird aufgerufen, sobald ein neuer Harvester erstellt wird, oder verändert wird
     def save(self, *args, **kwargs):
         #create django celery beat periodic task
-        self.celery_task= PeriodicTask(
+        task,created= PeriodicTask.objects.get_or_create(name="{}-Task".format(self.name),
+            interval=self.schedule.schedule,
+            task=self.task,
+            args=self.task_parameter,)
+        '''
+            PeriodicTask(
             name="{}-Task".format(self.name),
             interval=self.schedule.schedule,
             task=self.task,
             args=json.dumps(self.task_parameter),
         )
         self.celery_task.save()
+        '''
+        self.celery_task= task
         # self.task = PeriodicTask()
 
        # schedule, created = IntervalSchedule.objects.get_or_create(every = 10,period = IntervalSchedule.SECONDS)
