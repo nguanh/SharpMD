@@ -8,23 +8,6 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from kombu.utils.json import loads
 
-"""
-class ConfigAdmin(AdminRowActionsMixin, admin.ModelAdmin):
-    def get_row_actions(self, obj):
-        row_actions = [
-            {
-                'label': 'Log',
-                'url': reverse('Harvester:config_log', args=[obj.id]),
-                'enabled': True,
-                'tooltip': "Display Harvester Log"
-            }
-        ]
-        row_actions += super(ConfigAdmin, self).get_row_actions(obj)
-        return row_actions
-
-
-admin.site.register(Config, ConfigAdmin)
-"""
 
 class ConfigForm(forms.ModelForm):
     """Form that lets you create and modify periodic tasks."""
@@ -85,7 +68,6 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
             {
                 'label': 'Log',
                 'url': reverse('harvester:config_log', args=[obj.id]),
-                #'url':"http://google.de",
                 'enabled': True,
                 'tooltip': "Display Harvester Log"
             }

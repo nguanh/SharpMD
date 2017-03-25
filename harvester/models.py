@@ -40,7 +40,7 @@ class Schedule(models.Model):
 class Config(models.Model):
     # Name of the harvester for identification
     # name of harvester for logger
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     # table used by harvester
     table_name = models.CharField(max_length=200)
     #start and end date for selective harvesting, set implicitly by selecting a schedule
@@ -66,8 +66,19 @@ class Config(models.Model):
 
     # wird aufgerufen, sobald ein neuer Harvester erstellt wird, oder verändert wird
     def save(self, *args, **kwargs):
+        # save object to get its id
+        """
+        #TODO unique error
+        #TODO pass config id as third task parameter
+        if self.id is None:
+            super(Config, self).save(*args, **kwargs)  # Call the "real" save() method.
+
+
+        # append id to task_parameter list
+        """
         try:
             obj = PeriodicTask.objects.get(name="{}-Task".format(self.name))
+            print(obj.id)
         except PeriodicTask.DoesNotExist:
             obj = PeriodicTask(
                 name="{}-Task".format(self.name),
