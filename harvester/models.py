@@ -53,13 +53,12 @@ class Config(models.Model):
     url = models.URLField()
     # addition config parameters set as json
     extra_config = models.TextField(blank=True, default='{}')
-    # extra parameter  for tasks
-    task_parameter= models.TextField(blank=True, default='{}')
-
+    module_path = models.CharField(max_length=200, default=None)
+    module_name = models.CharField(max_length=200, default=None)
     # task is not visible on creation
     schedule = models.ForeignKey(Schedule, default=None)
     task = models.CharField(_('task name'), max_length=200)
-    celery_task = models.ForeignKey(PeriodicTask,default=None, null=True, blank=True)
+    celery_task = models.ForeignKey(PeriodicTask,default=None, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -67,27 +66,28 @@ class Config(models.Model):
     # wird aufgerufen, sobald ein neuer Harvester erstellt wird, oder verändert wird
     def save(self, *args, **kwargs):
         # save object to get its id
-        """
         #TODO unique error
         #TODO pass config id as third task parameter
         if self.id is None:
             super(Config, self).save(*args, **kwargs)  # Call the "real" save() method.
 
-
-        # append id to task_parameter list
-        """
-        try:
-            obj = PeriodicTask.objects.get(name="{}-Task".format(self.name))
-            print(obj.id)
-        except PeriodicTask.DoesNotExist:
+        # join module path,name and id
+        task_args = [self.module_path, self.module_name, self.id]
+        if self.celery_task is not None:
+            setattr(self.celery_task, 'name', "{}-Task".format(self.name))
+            setattr(self.celery_task,'interval',self.schedule.schedule)
+            setattr(self.celery_task,'task', self.task)
+            setattr(self.celery_task,'args', json.dumps(task_args))
+            self.celery_task.save()
+        else:
             obj = PeriodicTask(
                 name="{}-Task".format(self.name),
                 interval=self.schedule.schedule,
                 task=self.task,
-                args=json.dumps(self.task_parameter),
+                args=json.dumps(task_args),
             )
             obj.save()
-        self.celery_task = obj
+            self.celery_task = obj
         super(Config, self).save(*args, **kwargs) # Call the "real" save() method.
 
 

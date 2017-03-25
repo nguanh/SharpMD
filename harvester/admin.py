@@ -53,9 +53,6 @@ class ConfigForm(forms.ModelForm):
     def clean_extra_config(self):
         return self._clean_json('extra_config')
 
-    def clean_task_parameter(self):
-        return self._clean_json('task_parameter')
-
 
 class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
     form = ConfigForm
@@ -81,7 +78,7 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
             'classes': ('extrapretty', 'wide'),
         }),
         ('Schedule', {
-            'fields': ('schedule', 'regtask','task', 'task_parameter'),
+            'fields': ('schedule', 'regtask','task', 'module_path','module_name'),
             'classes': ('extrapretty', 'wide', ),
         }),
     )
