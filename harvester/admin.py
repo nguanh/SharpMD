@@ -53,6 +53,16 @@ class ConfigForm(forms.ModelForm):
     def clean_extra_config(self):
         return self._clean_json('extra_config')
 
+    def clean_module_name(self):
+        try:
+            mod = __import__(self.cleaned_data["module_path"], fromlist=[self.cleaned_data["module_name"]])
+            getattr(mod, self.cleaned_data["module_name"])
+        except ImportError:
+            raise forms.ValidationError(
+                _('Invalid module path and name'),
+            )
+        return self.cleaned_data["module_name"]
+
 
 class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
     form = ConfigForm
