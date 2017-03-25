@@ -123,3 +123,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# user django db as celery result backend using django_celery_results
+CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_RESULT_BACKEND = 'django-cache'
+CELERY_IMPORTS = ('harvester.tasks','ingester.tasks')
