@@ -66,25 +66,17 @@ class Config(models.Model):
 
     # wird aufgerufen, sobald ein neuer Harvester erstellt wird, oder verändert wird
     def save(self, *args, **kwargs):
-        #create django celery beat periodic task
-        task,created= PeriodicTask.objects.get_or_create(name="{}-Task".format(self.name),
-            interval=self.schedule.schedule,
-            task=self.task,
-            args=self.task_parameter,)
-        '''
-            PeriodicTask(
-            name="{}-Task".format(self.name),
-            interval=self.schedule.schedule,
-            task=self.task,
-            args=json.dumps(self.task_parameter),
-        )
-        self.celery_task.save()
-        '''
-        self.celery_task= task
-        # self.task = PeriodicTask()
-
-       # schedule, created = IntervalSchedule.objects.get_or_create(every = 10,period = IntervalSchedule.SECONDS)
-        #self.task = schedule
+        try:
+            obj = PeriodicTask.objects.get(name="{}-Task".format(self.name))
+        except PeriodicTask.DoesNotExist:
+            obj = PeriodicTask(
+                name="{}-Task".format(self.name),
+                interval=self.schedule.schedule,
+                task=self.task,
+                args=json.dumps(self.task_parameter),
+            )
+            obj.save()
+        self.celery_task = obj
         super(Config, self).save(*args, **kwargs) # Call the "real" save() method.
 
 
