@@ -7,10 +7,10 @@ from .exception import IHarvest_Disabled,IHarvest_Exception
 from .harvest_task import harvest_task
 
 
-@shared_task()
-def test():
+@shared_task
+def test(a,b,c):
+    print(a)
     print ("Hello")
-
 
 @shared_task
 def harvestsource(package, class_name, name):
