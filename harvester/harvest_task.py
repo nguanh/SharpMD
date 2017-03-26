@@ -1,24 +1,29 @@
 from .exception import IHarvest_Exception, IHarvest_Disabled
 from .IHarvester import IHarvest
 from celery.utils.log import get_task_logger
+from .models import Config
 import logging
 import sys
 import os
 
+PROJECT_DIR = os.path.dirname(__file__)
 
-def harvest_task(package, class_name, name, path=None, **parameters):
-        """
-        :param package: relative path to package
-        :param class_name: class name in package
-        :param name: name of the harvester (important for config)
-        :param parameters: parameters for harvester as dict parameters
-        :return:
-        """
+def harvest_task(package, class_name,config_id):
+        #load config files
+        try:
+            config = Config.objects.get(id=config_id)
+            print(config.name)
+        except Config.DoesNotExist:
+            raise IHarvest_Exception(config_id+ " is invalid config_id")
+
+        name = config.name
+        log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
+        log_file = os.path.join(log_dir, "{}.log").format(config.name)
         # init logger, generate logger for every tasks
         logger = get_task_logger(name)
         logger.setLevel(logging.INFO)
         # create the logging file handler
-        fh = logging.FileHandler("{}.log".format(name))
+        fh = logging.FileHandler(log_file)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
         # add handler to logger object
@@ -36,7 +41,7 @@ def harvest_task(package, class_name, name, path=None, **parameters):
             logger.error(e)
             raise
         try:
-            source = imported_class(logger, name, path, **parameters)
+            source = imported_class(config_id)
             if isinstance(source, IHarvest) is False:
                 raise IHarvest_Exception(class_name + " is not an instance of IHarvest")
             if source.init():

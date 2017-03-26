@@ -18,18 +18,16 @@ def test(package,class_name,config_id):
 
 
 @shared_task
-def harvestsource(package, class_name, name):
-    pass
+def harvestsource(package, class_name, config_id):
     """
 
     :param package: relative path to package
     :param class_name: class name in package
-    :param name: name of the harvester (important for config)
-    :param parameters: parameters for harvester as dict parameters
+    :param config_id: id of config model containing all config related data
     :return:
     """
     try:
-        harvest_task(package, class_name, name, None)
+        harvest_task(package, class_name, config_id)
     except ImportError as e:
         harvestsource.update_state(
             state=states.FAILURE,

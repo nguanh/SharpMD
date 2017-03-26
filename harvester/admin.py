@@ -49,17 +49,18 @@ class ConfigForm(forms.ModelForm):
                 _('Unable to parse JSON: %s') % exc,
             )
         return value
-
+    """
     def clean_extra_config(self):
         return self._clean_json('extra_config')
+    """
 
     def clean_module_name(self):
         try:
             mod = __import__(self.cleaned_data["module_path"], fromlist=[self.cleaned_data["module_name"]])
             getattr(mod, self.cleaned_data["module_name"])
-        except ImportError:
+        except Exception as e:
             raise forms.ValidationError(
-                _('Invalid module path and name'),
+                _(e),
             )
         return self.cleaned_data["module_name"]
 

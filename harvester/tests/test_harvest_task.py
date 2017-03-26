@@ -1,7 +1,8 @@
-from unittest import TestCase, mock
 from harvester.harvest_task import harvest_task
 from harvester.exception import IHarvest_Disabled,IHarvest_Exception
 from harvester.IHarvester import IHarvest
+from django.test import TestCase, mock
+from harvester.models import Schedule,PeriodicTask
 
 
 class MockHarvester(IHarvest):
@@ -15,6 +16,10 @@ class MockHarvester(IHarvest):
         pass
 
 class TestHarvest_task(TestCase):
+
+    def setUp(self):
+        pass
+
 
     def test_success(self):
         self.assertTrue(harvest_task("harvester.tests.test_harvest_task", "MockHarvester", "DBLP_HARVESTER",

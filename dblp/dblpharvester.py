@@ -3,25 +3,28 @@ from .queries import DBLP_ARTICLE
 from harvester.exception import IHarvest_Exception
 from .xml_parser import parse_xml
 from fileDownloader.fileDownloader import download_file
+import urllib.parse
 import subprocess
-
+import os
 
 class DblpHarvester(IHarvest):
-    def __init__(self, logger, name, path=None):
+    def __init__(self, config_id):
         # call constructor of base class for initiating values
-        IHarvest.__init__(self, logger, name, path)
+        IHarvest.__init__(self, config_id)
 
         # get config values
         # required values
         try:
-            self.xml_path = self.configValues["xml_path"]
-            self.dtd_path = self.configValues["dtd_path"]
-            self.tags = self.configValues["tags"]
-            self.table_name = self.configValues["table_name"]
+            self.tags = self.extra["tags"]
             # file download requirements
-            self.xml_url = self.configValues["xml_url"]
-            self.dtd_url = self.configValues["dtd_url"]
-            self.extraction_path = self.configValues["extraction_path"]
+            self.xml_url = urllib.parse.urljoin(self.url, self.extra["xml_name"])
+            self.dtd_url = urllib.parse.urljoin(self.url, self.extra["dtd_name"])
+
+            if os.path.isdir(self.extra["extraction_path"]) is False:
+                raise IHarvest_Exception("Invalid DBLP extraction path")
+            self.extraction_path = self.extra["extraction_path"]
+            self.xml_path = os.path.join(self.extraction_path, self.extra["xml_name"])
+            self.dtd_path = os.path.join(self.extraction_path, self.extra["dtd_name"])
         except KeyError as e:
             self.logger.critical("Config value %s missing", e)
             raise IHarvest_Exception("Error: config value {} not found".format(e))
@@ -37,8 +40,8 @@ class DblpHarvester(IHarvest):
             return False
         # download files
         try:
-            xml_result = download_file(self.xml_url,self.extraction_path)
-            dtd_result = download_file(self.dtd_url,self.extraction_path)
+            xml_result = download_file(self.xml_url, self.extraction_path)
+            dtd_result = download_file(self.dtd_url, self.extraction_path)
         except:
             self.logger.critical("files could not be downloaded")
             return False

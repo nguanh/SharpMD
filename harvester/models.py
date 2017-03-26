@@ -3,7 +3,7 @@ from django_celery_beat.models import IntervalSchedule,PeriodicTask
 import os
 from django.utils.translation import ugettext_lazy as _
 import json
-
+import jsonfield
 # Create your models here.
 #TODO überlegen, wie das ganze als DBLP harvester benutzt werden kann
 
@@ -52,7 +52,7 @@ class Config(models.Model):
     # source url
     url = models.URLField()
     # addition config parameters set as json
-    extra_config = models.TextField(blank=True, default='{}')
+    extra_config = jsonfield.JSONField()
     module_path = models.CharField(max_length=200, default=None)
     module_name = models.CharField(max_length=200, default=None)
     # task is not visible on creation
@@ -88,6 +88,7 @@ class Config(models.Model):
             )
             obj.save()
             self.celery_task = obj
+        print(self.extra_config["blubb"])
         super(Config, self).save(*args, **kwargs) # Call the "real" save() method.
 
 
