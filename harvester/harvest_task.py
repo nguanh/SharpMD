@@ -54,6 +54,7 @@ def harvest_task(package, class_name, config_id):
                 print("Finished {}".format(name))
                 source.cleanup()
                 print("Cleanup {}".format(name))
+                #TODO set new schedule
                 return True
             else:
                 logger.error("Initialization of %s failed", name)

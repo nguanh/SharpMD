@@ -9,6 +9,46 @@ from django.utils.translation import ugettext_lazy as _
 from kombu.utils.json import loads
 
 
+class ScheduleForm(forms.ModelForm):
+
+    class Meta:
+        model= Schedule
+        exclude = ()
+
+    def clean_max_date(self):
+        min_date = self.cleaned_data["min_date"]
+        max_date = self.cleaned_data["max_date"]
+        if min_date is None or max_date is None:
+            return max_date
+        if max_date < min_date:
+            raise forms.ValidationError(
+                _("Max Date cannot be before Min Date")
+            )
+        return max_date
+
+    def clean_time_interval(self):
+        time_interval = self.cleaned_data["time_interval"]
+        min_date = self.cleaned_data["min_date"]
+
+        if time_interval == "all":
+            return time_interval
+
+        if min_date is None:
+            raise forms.ValidationError(
+                _("Please choose a minimum date")
+            )
+        return time_interval
+
+
+class ScheduleAdmin(AdminRowActionsMixin,admin.ModelAdmin):
+    form = ScheduleForm
+    model = Schedule
+    # welche attribute sollen in der listenansicht gezeigt werden
+    list_display = ('__str__', 'schedule','time_interval')
+    """Admin-interface for Harvester Configs."""
+
+
+
 class ConfigForm(forms.ModelForm):
     """Form that lets you create and modify periodic tasks."""
 
@@ -40,28 +80,22 @@ class ConfigForm(forms.ModelForm):
             raise exc
         return data
 
-    def _clean_json(self, field):
-        value = self.cleaned_data[field]
-        try:
-            loads(value)
-        except ValueError as exc:
+    def clean_limit(self):
+        limit = int(self.cleaned_data["limit"])
+        if limit >= 0:
+            return limit
+        else:
             raise forms.ValidationError(
-                _('Unable to parse JSON: %s') % exc,
+                _("Limit cannot be negative"),
             )
-        return value
-    """
-    def clean_extra_config(self):
-        return self._clean_json('extra_config')
-    """
 
     def clean_module_name(self):
         try:
             mod = __import__(self.cleaned_data["module_path"], fromlist=[self.cleaned_data["module_name"]])
             getattr(mod, self.cleaned_data["module_name"])
         except Exception as e:
-            print(e)
             raise forms.ValidationError(
-                _("Invalid Module Name"),
+                _(str(e)),
             )
         return self.cleaned_data["module_name"]
 
@@ -95,5 +129,5 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
         }),
     )
 
-admin.site.register(Schedule)
+admin.site.register(Schedule, ScheduleAdmin)
 admin.site.register(Config, ConfigAdmin)

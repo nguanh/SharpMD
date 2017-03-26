@@ -1,23 +1,9 @@
 from django.db import models
-from django_celery_beat.models import IntervalSchedule,PeriodicTask
-import os
+from django_celery_beat.models import IntervalSchedule, PeriodicTask
 from django.utils.translation import ugettext_lazy as _
 import json
 import jsonfield
-# Create your models here.
-#TODO überlegen, wie das ganze als DBLP harvester benutzt werden kann
 
-'''
-Mit der Erstellung der Config, soll
-- Config gibt den Pfad des Harvester Moduls an
-- Config muss überprüfen, ob dieses Modul überhaupt Existiert und eine unterklasse von Iharvest ist
-- Task angelegt werden
-- Es soll ein ConfigLogger Modell erstellt werden
-- Der Configlogger soll einfach nur den Log der Config darstellen
-- Dazu liest es die Log Datei ein und stellt sie dar
-- Zusätzliche Felder: Crontab (wie häufig) und task name
-https://github.com/celery/django-celery-beat
-'''
 
 class Schedule(models.Model):
     """
@@ -27,11 +13,19 @@ class Schedule(models.Model):
     If both are empty, the harvester will harvest all data on every execution
 
     """
+
+    INTERVAL_CHOICES = (
+        ("all", "All Data"),
+        ("month", "Monthly"),
+        ("week", "Weekly"),
+        ("day", "Daily"),
+    )
     # total date range of Harvester can both be empty
     name= models.CharField(max_length=200, default=None)
-    min_date = models.DateField('Min Date', blank=True, null=True)
-    max_date = models.DateField('Max Date', blank=True, null=True)
+    min_date = models.DateField('Min Date', blank=True, null=True, default=None)
+    max_date = models.DateField('Max Date', blank=True, null=True, default= None)
     schedule = models.ForeignKey(IntervalSchedule, default=None)
+    time_interval = models.CharField(max_length=200, default="all", null=True, choices=INTERVAL_CHOICES)
 
     def __str__(self):
         return self.name
@@ -43,11 +37,11 @@ class Config(models.Model):
     name = models.CharField(max_length=200, unique=True)
     # table used by harvester
     table_name = models.CharField(max_length=200)
-    #start and end date for selective harvesting, set implicitly by selecting a schedule
+    # start and end date for selective harvesting, set implicitly by selecting a schedule
     start_date = models.DateField('Start Date', blank=True, null=True, editable=False)
-    end_date = models.DateField('End Date',blank=True, null=True, editable=False)
+    end_date = models.DateField('End Date', blank=True, null=True, editable=False)
     # amount of publications added per harvest
-    limit = models.IntegerField(default=0)
+    limit = models.IntegerField(default=None)
     enabled = models.BooleanField(default=True)
     # source url
     url = models.URLField()
@@ -58,7 +52,7 @@ class Config(models.Model):
     # task is not visible on creation
     schedule = models.ForeignKey(Schedule, default=None)
     task = models.CharField(_('task name'), max_length=200)
-    celery_task = models.ForeignKey(PeriodicTask,default=None, null=True, blank=True, on_delete=models.CASCADE)
+    celery_task = models.ForeignKey(PeriodicTask, default=None, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -66,18 +60,18 @@ class Config(models.Model):
     # wird aufgerufen, sobald ein neuer Harvester erstellt wird, oder verändert wird
     def save(self, *args, **kwargs):
         # save object to get its id
-        #TODO unique error
-        #TODO pass config id as third task parameter
+        # pass config id as third task parameter
         if self.id is None:
             super(Config, self).save(*args, **kwargs)  # Call the "real" save() method.
 
+        print(self.schedule.time_interval)
         # join module path,name and id
         task_args = [self.module_path, self.module_name, self.id]
         if self.celery_task is not None:
             setattr(self.celery_task, 'name', "{}-Task".format(self.name))
-            setattr(self.celery_task,'interval',self.schedule.schedule)
-            setattr(self.celery_task,'task', self.task)
-            setattr(self.celery_task,'args', json.dumps(task_args))
+            setattr(self.celery_task, 'interval', self.schedule.schedule)
+            setattr(self.celery_task, 'task', self.task)
+            setattr(self.celery_task, 'args', json.dumps(task_args))
             self.celery_task.save()
         else:
             obj = PeriodicTask(
@@ -88,7 +82,7 @@ class Config(models.Model):
             )
             obj.save()
             self.celery_task = obj
-        super(Config, self).save(*args, **kwargs) # Call the "real" save() method.
+        super(Config, self).save(*args, **kwargs)  # Call the "real" save() method.
 
 
 

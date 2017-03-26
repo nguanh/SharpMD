@@ -66,7 +66,6 @@ class DblpHarvester(IHarvest):
                          self.tags, self.start_date, self.end_date, self.limit)
 
     def cleanup(self):
-        print("cleanup")
         if os.path.isfile(self.xml_path):
             os.remove(self.xml_path)
             self.logger.info("Xml files removed")
@@ -74,6 +73,11 @@ class DblpHarvester(IHarvest):
         if os.path.isfile(self.dtd_path):
             os.remove(self.dtd_path)
             self.logger.info("DTD files removed")
+        #try to close mysql connection if not already closed
+        try:
+            self.connector.close_connection()
+        except:
+            pass
 
 
 
