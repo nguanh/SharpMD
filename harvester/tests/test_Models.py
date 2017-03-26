@@ -172,6 +172,41 @@ class TestIHarvest(TestCase):
         self.assertEqual(test.start_date, datetime.date(2011, 5, 1))
         self.assertEqual(test.end_date, datetime.date(2011, 5, 2))
 
+        def test_update(self):
+            schedule, created = Schedule.objects.get_or_create(
+                name="test_schedule1",
+                time_interval="day",
+                schedule=self.interval,
+                min_date=datetime.date(2011, 5, 1),
+                max_date=datetime.date(2011, 5, 3),
+
+            )
+            test = Config.objects.create(
+                id=self.config_id + 1,
+                name="Test Harvester2",
+                table_name="Test_Table",
+                enabled=True,
+                url="http://google.de",
+                module_path="dblp.dblpharvester",
+                module_name="DblpHarvester",
+                task="harvester.tasks.test",
+                schedule=schedule,
+                extra_config={"a": 1}
+            )
+
+            test.save()
+            self.assertEqual(test.start_date, datetime.date(2011, 5, 1))
+            self.assertEqual(test.end_date, datetime.date(2011, 5, 2))
+
+            newconfig = Config.objects.get(id= self.config_id)
+            newconfig.start_date = datetime.date(2012,1,1)
+            newconfig.end_date = datetime.date(2013,5,5)
+            newconfig.save()
+
+            newnewconfig = Config.objects.get(id= self.config_id)
+            self.assertEqual(newnewconfig.start_date,datetime.date(2012,1,1))
+            self.assertEqual(newnewconfig.end_date,datetime.date(2013,5,5))
+
 
 
 
