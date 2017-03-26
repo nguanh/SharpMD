@@ -59,8 +59,9 @@ class ConfigForm(forms.ModelForm):
             mod = __import__(self.cleaned_data["module_path"], fromlist=[self.cleaned_data["module_name"]])
             getattr(mod, self.cleaned_data["module_name"])
         except Exception as e:
+            print(e)
             raise forms.ValidationError(
-                _(e),
+                _("Invalid Module Name"),
             )
         return self.cleaned_data["module_name"]
 
