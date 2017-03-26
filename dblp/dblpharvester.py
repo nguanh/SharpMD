@@ -6,6 +6,7 @@ from fileDownloader.fileDownloader import download_file
 import urllib.parse
 import subprocess
 import os
+import datetime
 
 
 class DblpHarvester(IHarvest):
@@ -62,8 +63,10 @@ class DblpHarvester(IHarvest):
 
     # time_begin and time_end are always valid datetime objects
     def run(self):
+        start = None if self.start_date is None else datetime.datetime.combine(self.start_date, datetime.time.min)
+        end = None if self.end_date is None else datetime.datetime.combine(self.end_date, datetime.time.min)
         return parse_xml(self.xml_path, self.dtd_path, self.connector, self.logger,
-                         self.tags, self.start_date, self.end_date, self.limit)
+                         self.tags, start, end, self.limit)
 
     def cleanup(self):
         if os.path.isfile(self.xml_path):
