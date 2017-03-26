@@ -18,6 +18,7 @@ class DblpHarvester(IHarvest):
             self.tags = self.extra["tags"]
             # file download requirements
             self.xml_url = urllib.parse.urljoin(self.url, self.extra["zip_name"])
+            print(self.xml_url)
             self.dtd_url = urllib.parse.urljoin(self.url, self.extra["dtd_name"])
 
             if os.path.isdir(self.extra["extraction_path"]) is False:
