@@ -78,9 +78,9 @@ def harvest_task(package, class_name, config_id):
                 if start_date is not None:
                     config.start_date = end_date + datetime.timedelta(days=1)
                     config.end_date = min(max_date, config.start_date + datetime.timedelta(days=days))
-                    logger.info("Updating dates: {}-{}".format(
-                                config.start_date.strftime("%Y-%m-%d"),
-                                config.end_date.strftime("%Y-%m-%d")))
+                    logger.info("Updating dates: {} - {}".format(
+                                config.start_date.strftime("%Y.%m.%d"),
+                                config.end_date.strftime("%Y.%m.%d")))
 
                 config.save()
                 return True
