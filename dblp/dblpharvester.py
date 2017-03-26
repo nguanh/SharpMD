@@ -28,9 +28,13 @@ class DblpHarvester(IHarvest):
         except KeyError as e:
             self.logger.critical("Config value %s missing", e)
             raise IHarvest_Exception("Error: config value {} not found".format(e))
+        ex
 
         # convert tags to tuple
-        self.tags = tuple(self.tags.split(","))
+        if isinstance(self.tags,list):
+            self.tags = tuple(self.tags)
+        else:
+            raise IHarvest_Exception("Invalid Tags")
 
     def init(self):
         if self.connector.createTable(self.table_name, DBLP_ARTICLE):

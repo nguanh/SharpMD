@@ -14,4 +14,6 @@ sudo pip3 install msgpack-python
 sudo pip3 install django-celery-beat
 sudo pip3 install django-celery-results
 sudo pip3 install django-admin-row-actions
+sudo pip3 install lxml
+sudo pip3 install jsonfield
 
