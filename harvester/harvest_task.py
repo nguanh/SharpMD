@@ -19,7 +19,8 @@ def harvest_task(package, class_name, config_id):
 
         name = config.name
         log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
-        log_file = os.path.join(log_dir, "{}.log").format(config.name)
+        log_name = config.name.strip().replace(" ", "_")
+        log_file = os.path.join(log_dir, "{}.log").format(log_name)
         # init logger, generate logger for every tasks
         logger = get_task_logger(name)
         logger.setLevel(logging.INFO)

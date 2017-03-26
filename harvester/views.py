@@ -34,8 +34,9 @@ def tail( f, lines=20 ):
 
 def log(request,config_id):
     config = get_object_or_404(Config, pk=config_id)
-    log_dir = os.path.join(os.path.dirname(PROJECT_DIR),"logs")
-    log_file = os.path.join(log_dir,"{}.log").format(config.name)
+    log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
+    log_name = config.name.strip().replace(" ", "_")
+    log_file = os.path.join(log_dir, "{}.log").format(log_name)
     log_exists = os.path.isfile(os.path.join(log_file))
     if log_exists:
         with open(log_file, 'r') as f:
