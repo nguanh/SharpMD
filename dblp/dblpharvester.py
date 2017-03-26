@@ -7,7 +7,9 @@ import urllib.parse
 import subprocess
 import os
 
+
 class DblpHarvester(IHarvest):
+
     def __init__(self, config_id):
         # call constructor of base class for initiating values
         IHarvest.__init__(self, config_id)
@@ -31,7 +33,7 @@ class DblpHarvester(IHarvest):
             raise IHarvest_Exception("Error: config value {} not found".format(e))
 
         # convert tags to tuple
-        if isinstance(self.tags,list):
+        if isinstance(self.tags, list):
             self.tags = tuple(self.tags)
         else:
             raise IHarvest_Exception("Invalid Tags")
@@ -62,6 +64,15 @@ class DblpHarvester(IHarvest):
     def run(self):
         return parse_xml(self.xml_path, self.dtd_path, self.connector, self.logger,
                          self.tags, self.start_date, self.end_date, self.limit)
+
+    def cleanup(self):
+        if os.path.isfile(self.xml_path):
+            os.remove(self.xml_path)
+            self.logger.info("Xml files removed")
+
+        if os.path.isfile(self.dtd_path):
+            os.remove(self.dtd_path)
+            self.logger.info("DTD files removed")
 
 
 

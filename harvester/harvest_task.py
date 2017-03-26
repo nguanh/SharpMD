@@ -8,7 +8,8 @@ import os
 
 PROJECT_DIR = os.path.dirname(__file__)
 
-def harvest_task(package, class_name,config_id):
+
+def harvest_task(package, class_name, config_id):
         #load config files
         try:
             config = Config.objects.get(id=config_id)
@@ -49,6 +50,8 @@ def harvest_task(package, class_name,config_id):
                 logger.info("Starting Task %s", name)
                 result = source.run()
                 print("Finishing", name)
+                source.cleanup()
+                print("Cleanup", name)
                 return True
             else:
                 logger.error("Initialization of %s failed", name)

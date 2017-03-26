@@ -47,3 +47,7 @@ class IHarvest(ABC):
     @abstractmethod
     def run(self):
         pass
+
+    @abstractmethod
+    def cleanup(self):
+        pass
