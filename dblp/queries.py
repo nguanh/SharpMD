@@ -55,6 +55,6 @@ ADD_DBLP_ARTICLE = ("INSERT INTO dblp_article"
                     "type =VALUES(type)"
                      )
 
-# TODO über joins an mehr informationen kommen und mehr Daten einbeziehen
+
 INGESTION = "SELECT * FROM {} WHERE last_harvested = 0"
 

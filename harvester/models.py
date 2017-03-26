@@ -3,6 +3,7 @@ from django_celery_beat.models import IntervalSchedule, PeriodicTask
 from django.utils.translation import ugettext_lazy as _
 import json
 import jsonfield
+import datetime
 
 
 class Schedule(models.Model):
@@ -64,7 +65,21 @@ class Config(models.Model):
         if self.id is None:
             super(Config, self).save(*args, **kwargs)  # Call the "real" save() method.
 
-        print(self.schedule.time_interval)
+        # set initial start and end date depending on schedule
+        time_interval = self.schedule.time_interval
+        self.start_date = self.schedule.min_date
+        if time_interval == "all":
+            self.end_date = self.schedule.max_date
+        elif time_interval == "month":
+            new_date = self.schedule.min_date + datetime.timedelta(days=30)
+            self.end_date = min(new_date, self.schedule.max_date)
+        elif time_interval == "week":
+            new_date = self.schedule.min_date + datetime.timedelta(days=7)
+            self.end_date = min(new_date, self.schedule.max_date)
+        elif time_interval == "day":
+            new_date = self.schedule.min_date + datetime.timedelta(days=1)
+            self.end_date = min(new_date, self.schedule.max_date)
+
         # join module path,name and id
         task_args = [self.module_path, self.module_name, self.id]
         if self.celery_task is not None:
