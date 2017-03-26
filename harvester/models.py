@@ -88,7 +88,6 @@ class Config(models.Model):
             )
             obj.save()
             self.celery_task = obj
-        print(self.extra_config["blubb"])
         super(Config, self).save(*args, **kwargs) # Call the "real" save() method.
 
 
