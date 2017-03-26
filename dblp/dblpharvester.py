@@ -28,7 +28,6 @@ class DblpHarvester(IHarvest):
         except KeyError as e:
             self.logger.critical("Config value %s missing", e)
             raise IHarvest_Exception("Error: config value {} not found".format(e))
-        ex
 
         # convert tags to tuple
         if isinstance(self.tags,list):
