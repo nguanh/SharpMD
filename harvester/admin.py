@@ -81,6 +81,9 @@ class ConfigForm(forms.ModelForm):
         return data
 
     def clean_limit(self):
+        if self.cleaned_data["limit"] is None:
+            return None
+
         limit = int(self.cleaned_data["limit"])
         if limit >= 0:
             return limit

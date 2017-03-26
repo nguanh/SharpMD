@@ -1,10 +1,11 @@
 from .exception import IHarvest_Exception, IHarvest_Disabled
 from .IHarvester import IHarvest
 from celery.utils.log import get_task_logger
-from .models import Config
+from .models import Config, Schedule
 import logging
 import sys
 import os
+import datetime
 
 PROJECT_DIR = os.path.dirname(__file__)
 
@@ -54,7 +55,29 @@ def harvest_task(package, class_name, config_id):
                 print("Finished {}".format(name))
                 source.cleanup()
                 print("Cleanup {}".format(name))
-                #TODO set new schedule
+
+                end_date = config.end_date
+                max_date = config.schedule.max_date or datetime.date.today()
+                interval = config.schedule.time_interval
+                #
+                if interval == "all":
+                    # no data left to read, deactivate this config
+                    config.enabled = False
+                    logger.info("{} scheduler is finished. Deactivating", name)
+                elif interval == "month":
+                    days = 30
+                elif interval == "week":
+                    days = 7
+                else:
+                    days = 1
+                # set new start and end dates by shifting the interval for X days
+                # end date cannot be in the future so maximum is today
+                config.start_date = end_date
+                config.end_date = min(max_date, end_date + datetime.timedelta(days=days))
+                config.save()
+                logger.info("Updating dates: {}-{}",
+                            config.start_date.strftime("%Y-%m-%d"),
+                            config.end_date.strftime("%Y-%m-%d"))
                 return True
             else:
                 logger.error("Initialization of %s failed", name)
