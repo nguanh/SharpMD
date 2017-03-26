@@ -45,7 +45,7 @@ def harvest_task(package, class_name, config_id):
         try:
             source = imported_class(config_id)
             if isinstance(source, IHarvest) is False:
-                raise IHarvest_Exception(class_name + " is not an instance of IHarvest")
+                raise ImportError(class_name + " is not an instance of IHarvest")
             if source.init():
                 print("Starting", name)
                 logger.info("Starting Task %s", name)
@@ -59,9 +59,12 @@ def harvest_task(package, class_name, config_id):
                 raise IHarvest_Exception()
         except IHarvest_Exception as e:
             logger.critical(e)
+            source.cleanup()
             raise
         except IHarvest_Disabled:
             # task is disabled
             print("Skipping Task", name)
             logger.info("Task %s is disabled and skipped", name)
             raise
+        except ImportError as e:
+            raise IHarvest_Exception(e)

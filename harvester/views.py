@@ -32,7 +32,7 @@ def tail( f, lines=20 ):
     return '\n'.join(all_read_text.splitlines()[-total_lines_wanted:])
 
 
-def log(request,config_id):
+def log(request, config_id):
     config = get_object_or_404(Config, pk=config_id)
     log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
     log_name = config.name.strip().replace(" ", "_")
