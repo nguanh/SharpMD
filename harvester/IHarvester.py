@@ -10,9 +10,8 @@ import logging
 
 
 class IHarvest(ABC):
-    HARVESTER_PATH = "configs/harvester.ini"
 
-    def __init__(self,config_id):
+    def __init__(self, config_id):
         # get values from config object
         config = Config.objects.get(id=config_id)
         self.name = config.name
@@ -28,6 +27,7 @@ class IHarvest(ABC):
 
         # connect to database
         try:
+            #TODO read database from config
             self.connector = MariaDb(db="harvester")
             self.logger.debug("MariaDB connection successful")
         except Exception as err:

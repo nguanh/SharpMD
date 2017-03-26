@@ -20,7 +20,6 @@ class DblpHarvester(IHarvest):
             self.tags = self.extra["tags"]
             # file download requirements
             self.xml_url = urllib.parse.urljoin(self.url, self.extra["zip_name"])
-            print(self.xml_url)
             self.dtd_url = urllib.parse.urljoin(self.url, self.extra["dtd_name"])
 
             if os.path.isdir(self.extra["extraction_path"]) is False:
@@ -53,6 +52,7 @@ class DblpHarvester(IHarvest):
             return False
         if xml_result and dtd_result:
             self.logger.info("Files were created")
+            self.logger.info("Extracting .gz file")
             result = subprocess.call(["gunzip", xml_result])
             if result == 0:
                 self.logger.info("Files were extracted")
@@ -66,6 +66,7 @@ class DblpHarvester(IHarvest):
                          self.tags, self.start_date, self.end_date, self.limit)
 
     def cleanup(self):
+        print("cleanup")
         if os.path.isfile(self.xml_path):
             os.remove(self.xml_path)
             self.logger.info("Xml files removed")

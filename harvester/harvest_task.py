@@ -46,19 +46,21 @@ def harvest_task(package, class_name, config_id):
             source = imported_class(config_id)
             if isinstance(source, IHarvest) is False:
                 raise ImportError(class_name + " is not an instance of IHarvest")
+            print("Init {}".format(name))
             if source.init():
-                print("Starting", name)
+                print("Starting {}".format(name))
                 logger.info("Starting Task %s", name)
                 result = source.run()
-                print("Finishing", name)
+                print("Finished {}".format(name))
                 source.cleanup()
-                print("Cleanup", name)
+                print("Cleanup {}".format(name))
                 return True
             else:
                 logger.error("Initialization of %s failed", name)
                 raise IHarvest_Exception()
         except IHarvest_Exception as e:
             logger.critical(e)
+            print("Cleanup {}".format(name))
             source.cleanup()
             raise
         except IHarvest_Disabled:
