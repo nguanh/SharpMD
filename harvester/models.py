@@ -39,8 +39,8 @@ class Config(models.Model):
     # table used by harvester
     table_name = models.CharField(max_length=200)
     # start and end date for selective harvesting, set implicitly by selecting a schedule
-    start_date = models.DateField('Start Date', blank=True, null=True)
-    end_date = models.DateField('End Date', blank=True, null=True)
+    start_date = models.DateField('Start Date', blank=True, null=True, default = None)
+    end_date = models.DateField('End Date', blank=True, null=True, default= None)
     # amount of publications added per harvest
     limit = models.IntegerField(default=None, blank=True, null=True)
     enabled = models.BooleanField(default=True)
@@ -66,20 +66,21 @@ class Config(models.Model):
             super(Config, self).save(*args, **kwargs)  # Call the "real" save() method.
 
         # set initial start and end date depending on schedule
-        time_interval = self.schedule.time_interval
-        self.start_date = self.schedule.min_date
-        max_date = self.schedule.max_date or datetime.date.today()
-        if time_interval == "all":
-            self.end_date = self.schedule.max_date
-        elif time_interval == "month":
-            new_date = self.schedule.min_date + datetime.timedelta(days=30)
-            self.end_date = min(new_date, max_date)
-        elif time_interval == "week":
-            new_date = self.schedule.min_date + datetime.timedelta(days=7)
-            self.end_date = min(new_date, max_date)
-        elif time_interval == "day":
-            new_date = self.schedule.min_date + datetime.timedelta(days=1)
-            self.end_date = min(new_date, max_date)
+        if self.start_date is None:
+            time_interval = self.schedule.time_interval
+            self.start_date = self.schedule.min_date
+            max_date = self.schedule.max_date or datetime.date.today()
+            if time_interval == "all":
+                self.end_date = self.schedule.max_date
+            elif time_interval == "month":
+                new_date = self.schedule.min_date + datetime.timedelta(days=30)
+                self.end_date = min(new_date, max_date)
+            elif time_interval == "week":
+                new_date = self.schedule.min_date + datetime.timedelta(days=7)
+                self.end_date = min(new_date, max_date)
+            elif time_interval == "day":
+                new_date = self.schedule.min_date + datetime.timedelta(days=1)
+                self.end_date = min(new_date, max_date)
 
         # join module path,name and id
         task_args = [self.module_path, self.module_name, self.id]
