@@ -90,13 +90,12 @@ DATABASES = {
 # settings.py
 DATABASES = {
     'default': {
-        'HOST': "127.0.0.1",
+        'HOST': "localhost",
         'USER': "root",
         'PASSWORD': "master",
         'NAME': "storage",
-        'CHARSET': "utf8mb4",
-        'COLLATION': "utf8mb4_general_ci",
         'ENGINE': 'django.db.backends.mysql',
+        'PORT': '',
 
     }
 }
