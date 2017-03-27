@@ -94,12 +94,10 @@ DATABASES = {
         'USER': "root",
         'PASSWORD': "master",
         'NAME': "storage",
-        'CHARSET' : "utf8mb4",
-        'collation' : "utf8mb4_general_ci",
+        'CHARSET': "utf8mb4",
+        'COLLATION': "utf8mb4_general_ci",
         'ENGINE': 'django.db.backends.mysql',
-        'OPTIONS': {
-            'init_command': 'SET default_storage_engine=INNODB',
-        },
+
     }
 }
 
