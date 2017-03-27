@@ -101,6 +101,7 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
         tup = dict_to_tuple(dataset)
         element.clear()
 
+
         try:
             sql_connector.execute(tup)
         except Exception as e:
@@ -108,6 +109,11 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
         else:
             success_count += 1
             logger.debug("%s: %s", success_count,element.get('key'))
+
+        if success_count % 10000 == 0:
+            logger.info(success_count)
+
+
 
     logger.info("Final Count %s/%s", success_count, overall_count)
     sql_connector.close_connection()
