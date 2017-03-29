@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     "django_celery_beat",
     'django_admin_row_actions',
     'harvester.apps.HarvesterConfig',
+    'ingester.apps.IngesterConfig',
+
 ]
 
 MIDDLEWARE = [

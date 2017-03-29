@@ -1,32 +1,44 @@
 from .Iingester import Iingester
 from .exception import IIngester_Exception, IIngester_Disabled
-from .constants import DATABASE_NAME, CONFIG_PATH
+from .constants import DATABASE_NAME
 from .ingester import ingest_data2
-import configparser
+from .models import Config
 import logging
 import sys
 import os
 
+PROJECT_DIR = os.path.dirname(__file__)
 
-def ingest_task(package, class_name, config_path=CONFIG_PATH, **parameters):
+
+def ingest_task(package, class_name, config_id):
         """
         :param package: relative path to package
         :param class_name: class name in package
-        :param name: name of the harvester (important for config)
-        :param parameters: parameters for harvester as dict parameters
+        :param config_id: id of config used for this ingester
         :return:
         """
-
+        # ---------------------------------------LOAD CONFIG FROM DB----------------------------------------------------
+        try:
+            config = Config.objects.get(id=config_id)
+            print(config.name)
+        except Config.DoesNotExist:
+            raise IIngester_Exception("{} is invalid config_id".format(config_id))
+        # ------------------------------------- INIT LOGGER-------------------------------------------------------------
+        name = config.name
+        log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
+        log_name = config.name.strip().replace(" ", "_")
+        log_file = os.path.join(log_dir, "ingester.{}.log").format(log_name)
         # init logger, generate logger for every tasks
         logger = logging.getLogger("ingester")
         logger.setLevel(logging.DEBUG)
         # create the logging file handler
-        fh = logging.FileHandler("{}.log".format("ingester"))
+        fh = logging.FileHandler(log_file)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
         # add handler to logger object
         logger.addHandler(fh)
 
+        # ---------------------------------------LOAD MODULE----------------------------------------------------------
         try:
             # add path to system
             file_path = os.path.realpath(__file__)
@@ -44,26 +56,15 @@ def ingest_task(package, class_name, config_path=CONFIG_PATH, **parameters):
             raise
 
         try:
-            source = imported_class(DATABASE_NAME, "harvester", **parameters)
+            source = imported_class(name)
             if isinstance(source, Iingester) is False:
                 raise IIngester_Exception(class_name + " is not an instance of IIngest")
-            name = source.get_name()
             print("Starting ingestion of ", name)
-            # get config
-            config = configparser.ConfigParser()
-            config.read(config_path)
-            config[name].getboolean("enabled")
             # check enable status
-            enabled = config[name].getboolean("enabled")
-            if enabled is None:
-                raise IIngester_Exception("Error %s has no enable status set", name)
-            if enabled is False:
+            if config.enabled is False:
                 raise IIngester_Disabled()
-            config[name].getboolean("enabled")
             # set limit in Iingester
-            if "limit" in config[name]:
-                limit = int(config[name]["limit"])
-                source.set_limit(limit)
+            source.set_limit(config.limit)
             logger.info("Initialize custom ingester %s", name)
             result = ingest_data2(source, DATABASE_NAME)
             print(result)

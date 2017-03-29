@@ -18,6 +18,7 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/harvester/', include('harvester.urls')),  # harvester admin
+    url(r'^admin/ingester/', include('ingester.urls')),
     url(r'^admin/', admin.site.urls),
 
 ]

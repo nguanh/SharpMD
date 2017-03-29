@@ -9,9 +9,9 @@ from .constants import CONFIG_PATH
 
 
 @shared_task
-def ingestsource(package, class_name):
+def ingestsource(package, class_name,config_id):
     try:
-        ingest_task(package, class_name, config_path=CONFIG_PATH)
+        ingest_task(package, class_name, config_id)
     except ImportError as e:
         ingestsource.update_state(
             state=states.FAILURE,
