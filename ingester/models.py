@@ -17,8 +17,6 @@ class Config(models.Model):
     # task is not visible on creation
     ingester_task = models.ForeignKey(PeriodicTask, default=None, null=True, blank=True,
                                       related_name="ingester_task", on_delete=models.CASCADE)
-    id_pass = jsonfield.JSONField()
-
     def save(self, *args, **kwargs):
         # save object to get its id
         # pass config id as third task parameter
