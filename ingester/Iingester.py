@@ -3,11 +3,14 @@ from .exception import IIngester_Exception
 
 
 class Iingester(ABC):
-    def __init__(self):
+    def __init__(self, name):
         self.query = ""
         self.limit = None
+        self.name = name
 
     def set_limit(self, limit):
+        if limit is None:
+            return
         if isinstance(limit, int):
             self.limit = limit
         else:
@@ -32,9 +35,8 @@ class Iingester(ABC):
     def update_harvested(self):
         pass
 
-    @abstractmethod
     def get_name(self):
-        pass
+        return self.name
 
     @staticmethod
     def generate_empty_mapping():
