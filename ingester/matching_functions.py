@@ -1,15 +1,15 @@
 from .helper import *
-from .queries import *
-def match_author(authors, connector):
+from .models import authors_model,author_aliases
+
+def match_author(authors):
     results = []
     # iterate through all authors
     for author_index, author_dict in enumerate(authors):
         name_block = get_name_block(author_dict["parsed_name"])
         # find matching existing author with name block
-        author_block_match = connector.fetch_one((name_block,), COUNT_AUTHORS)
-
+        author_block_match = authors_model.objects.filter(block_name= name_block)
         # case 0 matching name blocks: create new  publication author
-        if author_block_match == 0:
+        if author_block_match.count() == 0:
             results.append({
                 "status": Status.SAFE,
                 "match": Match.NO_MATCH,
@@ -17,9 +17,9 @@ def match_author(authors, connector):
                 "reason": None,
             })
         # case 1 matching name blocks: include author names as possible alias
-        elif author_block_match == 1:
+        elif author_block_match.count() == 1:
             # get authors id
-            author_id = connector.fetch_one((name_block,), CHECK_AUTHORS)
+            author_id = author_block_match.first().id
             results.append({
                 "status": Status.SAFE,
                 "match": Match.SINGLE_MATCH,
@@ -29,11 +29,9 @@ def match_author(authors, connector):
         # case more than 1 matching name blocks:  match by alias
         else:
             # count possible matching name blocks by matching alias
-            alias_count_match = connector.fetch_one((name_block, author_dict["original_name"]),
-                                                    COUNT_MATCH_AUTHOR_BY_ALIAS)
-            if alias_count_match == 1:
-                author_id = connector.fetch_one((name_block, author_dict["original_name"]),
-                                                MATCH_AUTHOR_BY_ALIAS)
+            alias_count_match = author_aliases.objects.filter(author=author_dict["original_name"])
+            if alias_count_match.count() == 1:
+                author_id = alias_count_match.first().id
                 results.append({
                     "status": Status.SAFE,
                     "match": Match.MULTI_MATCH,

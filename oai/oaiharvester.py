@@ -21,8 +21,8 @@ class OaiHarvester(IHarvest):
 
     # time_begin and time_end are always valid datetime objects
     def run(self):
-        start = None if self.start_date is None else datetime.datetime.combine(self.start_date, datetime.time.min)
-        end = None if self.end_date is None else datetime.datetime.combine(self.end_date, datetime.time.min)
+        start = None if self.start_date is None else self.start_date.strftime("%Y-%m-%d")
+        end = None if self.end_date is None else self.end_date.strftime("%Y-%m-%d")
         return harvestOAI(self.url, self.connector, self.logger,
                           startDate=start,
                           endDate=end,
