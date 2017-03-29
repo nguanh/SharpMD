@@ -89,6 +89,8 @@ class Config(models.Model):
             setattr(self.celery_task, 'interval', self.schedule.schedule)
             setattr(self.celery_task, 'task', self.task)
             setattr(self.celery_task, 'args', json.dumps(task_args))
+            setattr(self.celery_task, 'enabled',self.enabled)
+
             self.celery_task.save()
         else:
             obj = PeriodicTask(
@@ -96,6 +98,7 @@ class Config(models.Model):
                 interval=self.schedule.schedule,
                 task=self.task,
                 args=json.dumps(task_args),
+                enabled=self.enabled
             )
             obj.save()
             self.celery_task = obj

@@ -1,6 +1,6 @@
 from .Iingester import Iingester
 from .exception import IIngester_Exception, IIngester_Disabled
-from .constants import DATABASE_NAME
+from conf.config import get_config
 from .ingester import ingest_data2
 from .models import Config
 import logging
@@ -66,7 +66,7 @@ def ingest_task(package, class_name, config_id):
             # set limit in Iingester
             source.set_limit(config.limit)
             logger.info("Initialize custom ingester %s", name)
-            result = ingest_data2(source, DATABASE_NAME)
+            result = ingest_data2(source, get_config("DATABASES")["ingester"])
             print(result)
             logger.info("Included %s", result)
             logger.info("Ingestion finished %s", name)

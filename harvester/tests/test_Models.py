@@ -45,7 +45,7 @@ class TestIHarvest(TestCase):
             id=self.config_id +1,
             name="Test Harvester2",
             table_name="Test_Table",
-            enabled=True,
+            enabled=False,
             url="http://google.de",
             module_path="dblp.dblpharvester",
             module_name="DblpHarvester",
@@ -58,6 +58,7 @@ class TestIHarvest(TestCase):
         self.assertEqual(test.schedule.schedule,task.interval)
         self.assertEqual(test.task,task.task)
         self.assertEqual(task.args,json.dumps(["dblp.dblpharvester","DblpHarvester",self.config_id+1]))
+        self.assertEqual(task.enabled, False)
 
     def test_update_celery_task(self):
         self.config.name = "New Harvester"
@@ -69,6 +70,7 @@ class TestIHarvest(TestCase):
         self.assertEqual(task.name, "New Harvester-Task")
         self.assertEqual(task.args,json.dumps(["newpath","newname",self.config_id]))
         self.assertEqual(task.task,self.config.task)
+        self.assertEqual(task.enabled, True)
 
     def test_time_interval_all(self):
         schedule,created = Schedule.objects.get_or_create(
