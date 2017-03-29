@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from django.db import models
 from django_celery_beat.models import PeriodicTask,IntervalSchedule
+from .helper import get_name_block
 import jsonfield
 import json
 
@@ -49,3 +50,47 @@ class Config(models.Model):
 class global_url(models.Model):
     domain = models.TextField(unique=True)
     url = models.URLField()
+
+class local_url(models.Model):
+    global_url = models.ForeignKey(global_url, default=None)
+    #auto set date on creation
+    last_updated = models.DateTimeField(auto_now_add=True)
+    url = models.CharField(max_length=150)
+
+
+#Visible on admin interface for editing
+class authors_model(models.Model):
+    main_name = models.TextField()
+    block_name = models.TextField(blank=True)
+    website = models.TextField(blank=True, null=True, default=None)
+    contact = models.TextField(blank=True, null=True, default=None)
+    about = models.TextField(blank=True, null=True, default=None)
+    orcid_id = models.CharField(max_length=200)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.block_name
+
+    def save(self, *args, **kwargs):
+        #auto normalize author name
+        self.block_name = get_name_block(self.main_name)
+        super(authors_model, self).save(*args, **kwargs)
+
+
+class publication_author(models.Model):
+    url = models.ForeignKey(local_url)
+    author = models.ForeignKey(authors_model)
+    priority = models.IntegerField()
+
+
+class author_aliases(models.Model):
+    alias = models.CharField(max_length=200 )
+    author = models.ForeignKey(authors_model)
+    class Meta:
+        unique_together=('alias','author')
+
+class author_alias_source(models.Model):
+    alias = models.ForeignKey(author_aliases)
+    url = models.ForeignKey(local_url)
+    class Meta:
+        unique_together = ("alias","url")
