@@ -48,7 +48,8 @@ class Config(models.Model):
 # =====================================================================================================================
 
 class global_url(models.Model):
-    domain = models.TextField(unique=True)
+    id = models.AutoField(primary_key=True)
+    domain = models.CharField(max_length=150)
     url = models.URLField()
 
 class local_url(models.Model):

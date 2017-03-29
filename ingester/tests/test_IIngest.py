@@ -18,7 +18,7 @@ class H1 (Iingester):
         pass
 
 
-class TestIHarvest(TestCase):
+class TestIIngest(TestCase):
     def test_init(self):
         x= H1("Hello")
         self.assertEqual(x.query,"SELECT * FROM test")

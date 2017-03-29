@@ -20,6 +20,7 @@ class DblpIngester(Iingester):
             url='http://dblp.uni-trier.de/rec/xml/',
         )
         self.global_url = g_url.id
+
         self.harvester_db = get_config("DATABASES")["harvester"]
         self.query = ("SELECT * FROM {}.dblp_article WHERE last_harvested = 0").format(self.harvester_db)
 

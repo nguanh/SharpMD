@@ -44,8 +44,6 @@ class IHarvest(ABC):
             self.connector.close_connection()
             raise IHarvest_Disabled()
 
-
-
     @abstractmethod
     def init(self):
         pass
