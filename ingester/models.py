@@ -42,3 +42,10 @@ class Config(models.Model):
             obj.save()
             self.ingester_task = obj
         super(Config, self).save(*args, **kwargs)  # Call the "real" save() method.
+# =====================================================================================================================
+# ================================INGESTER DATABASE STRUCTURE==========================================================
+# =====================================================================================================================
+
+class global_url(models.Model):
+    domain = models.TextField(unique=True)
+    url = models.URLField()
