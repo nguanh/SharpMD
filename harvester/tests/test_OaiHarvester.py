@@ -45,7 +45,7 @@ class TestIHarvest(TestCase):
         self.assertEqual(x.table_name,"Test_Table")
         self.assertEqual(x.url,"http://citeseerx.ist.psu.edu/oai2")
 
-    def test_valid_init(self,func,func2):
+    def test_valid_init(self):
         x = OaiHarvester(self.config_id)
         self.assertEqual(x.init(), True)
 
