@@ -31,7 +31,8 @@ def match_author(authors):
         # case more than 1 matching name blocks:  match by alias
         else:
             # count possible matching name blocks by matching alias
-            alias_count_match = author_aliases.objects.filter(alias=author_dict["original_name"])
+            alias_count_match = author_aliases.objects.filter(alias=author_dict["original_name"],
+                                                              author__block_name= name_block)
             if alias_count_match.count() == 1:
                 author_id = alias_count_match.first().author.id
                 results.append({
@@ -90,6 +91,36 @@ def match_title(title):
         }
     return result
 
+
+def match_pub_medium(mapping, url):
+    if mapping["key"] is None:
+        return None
+    normalized_key = normalize_title(mapping["key"])
+    mapping["block_name"] = normalized_key
+    mapping["main_name"] = mapping["key"]
+    del mapping["key"]
+    medium_match = pub_medium.objects.filter(block_name=normalized_key)
+    count_match = medium_match.count()
+    if count_match == 0:
+        pub_source_id = pub_medium.objects.create(**mapping)
+    elif count_match == 1:
+        pub_source_id = pub_medium.objects.get(block_name=normalized_key)
+    else:
+        # count possible matching name blocks by matching alias
+        alias_match=pub_medium_alias.objects.filter(alias=mapping["main_name"],
+                                                    medium__block_name=mapping["block_name"])
+        alias_count_match = alias_match.count()
+        if alias_count_match == 1:
+            pub_source_id = alias_match.first().medium
+        else:
+            # create pub source
+            pub_source_id = pub_medium.objects.create(**mapping)
+    # create alias and alias source
+    alias, created = pub_medium_alias.objects.get_or_create(alias=mapping["main_name"], medium=pub_source_id)
+    pub_alias_source.objects.get_or_create(alias=alias, url=url)
+    return pub_source_id
+
+
 #TODO
 """
 def match_type(type):
@@ -99,3 +130,4 @@ def match_type(type):
         return connector.fetch_one(('misc',), CHECK_TYPE)
     return type_id
 """
+

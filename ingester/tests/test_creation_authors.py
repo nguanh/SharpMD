@@ -1,17 +1,13 @@
-from datetime import datetime
 from django.test import TestCase
-from django.forms.models import model_to_dict
 from ingester.helper import *
 from ingester.creation_functions import create_authors
 from ingester.models import *
-
-from .ingester_tools import get_table_set
 
 
 class TestCreateAuthors(TestCase):
 
     def test_success(self):
-        gurl = global_url.objects.create(id=5, domain="http://dummy.de",url="http://dummy.de")
+        gurl = global_url.objects.create(id=5, domain="http://dummy.de", url="http://dummy.de")
         lurl = local_url.objects.create(id=1, url="a", global_url=gurl)
         authors_model.objects.bulk_create([
             authors_model(id=1, main_name="Nina Nonsense", block_name="nonsense,n"),
@@ -19,13 +15,13 @@ class TestCreateAuthors(TestCase):
             authors_model(id=3, main_name="Orna Otter", block_name="otter,o"),
         ])
         author_aliases.objects.bulk_create([
-            author_aliases(id=1, alias= "Nina Nonsense", author=authors_model.objects.get(id=1)),
+            author_aliases(id=1, alias="Nina Nonsense", author=authors_model.objects.get(id=1)),
             author_aliases(id=2, alias="Otto Otter", author=authors_model.objects.get(id=2)),
             author_aliases(id=3, alias="Orna Otter", author=authors_model.objects.get(id=3))
             ]
         )
 
-        authors_list=[{
+        authors_list = [{
             "original_name": "Melvin Master",
             "parsed_name": "Melvin Master",
             "website": None,
@@ -53,7 +49,7 @@ class TestCreateAuthors(TestCase):
                 "orcid_id": None,
             }
         ]
-        matching_list=[
+        matching_list = [
             {
                 "status": Status.SAFE,
                 "match": Match.NO_MATCH,
@@ -82,13 +78,10 @@ class TestCreateAuthors(TestCase):
         self.assertEqual(author_alias_source.objects.count(), 3)
 
         self.assertEqual(author_aliases.objects.count(), 4)
-        self.assertEqual(authors_model.objects.get(id=4).main_name,"Melvin Master")
+        self.assertEqual(authors_model.objects.get(id=4).main_name, "Melvin Master")
         self.assertEqual(authors_model.objects.get(id=4).block_name, "master,m")
 
         self.assertEqual(publication_author.objects.get(priority=0).author.main_name, "Melvin Master")
         self.assertEqual(publication_author.objects.get(priority=1).author.main_name, "Nina Nonsense")
         self.assertEqual(publication_author.objects.get(priority=2).author.main_name, "Otto Otter")
-
-
-
 

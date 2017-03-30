@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from django.db import models
 from django_celery_beat.models import PeriodicTask,IntervalSchedule
-from .helper import get_name_block
+from .helper import get_name_block,normalize_title
 import jsonfield
 import json
 
@@ -121,8 +121,48 @@ class publication(models.Model):
     volume = models.CharField(max_length=20, null=True, default=None)
     number = models.CharField(max_length=20, null=True, default=None)
 
+# ==================================== PUBLICATION MEDIUM =============================================================
 
-# ===========================================NON-HARVEST================================================================
+class pub_medium(models.Model):
+    main_name = models.TextField()
+    block_name = models.TextField(blank=True)
+    series = models.CharField( max_length=200,blank=True, null=True, default=None)
+    edition = models.CharField( max_length=200,blank=True, null=True, default=None)
+    location = models.CharField( max_length=200,blank=True, null=True, default=None)
+    publisher = models.CharField( max_length=200,blank=True, null=True, default=None)
+    institution = models.CharField( max_length=200,blank=True, null=True, default=None)
+    school = models.CharField( max_length=200,blank=True, null=True, default=None)
+    address = models.CharField( max_length=200,blank=True, null=True, default=None)
+    isbn = models.CharField( max_length=200,blank=True, null=True, default=None)
+    howpublished = models.CharField( max_length=200,blank=True, null=True, default=None)
+    book_title = models.CharField( max_length=200,blank=True, null=True, default=None)
+    journal = models.CharField( max_length=200,blank=True, null=True, default=None)
+
+    def __str__(self):
+        return self.block_name
+
+    def save(self, *args, **kwargs):
+        # auto normalize author name
+        self.block_name = normalize_title(self.main_name)
+        super(pub_medium, self).save(*args, **kwargs)
+
+
+class pub_medium_alias(models.Model):
+    alias = models.CharField(max_length=200)
+    medium = models.ForeignKey(pub_medium)
+
+    class Meta:
+        unique_together = ('alias','medium')
+
+
+class pub_alias_source(models.Model):
+    alias = models.ForeignKey(pub_medium_alias)
+    url = models.ForeignKey(local_url)
+
+    class Meta:
+        unique_together = ("alias", "url")
+
+# ===========================================NON-HARVEST===============================================================
 # the values in these tables are not harvested but set by users or admin
 
 
