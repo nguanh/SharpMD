@@ -5,7 +5,6 @@ from ingester.matching_functions import match_title
 from ingester.models import cluster,publication, global_url,local_url
 
 
-
 class TestMatchTitle(TestCase):
 
     def setUp(self):

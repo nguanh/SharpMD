@@ -5,7 +5,31 @@ from ingester.setup_database import setup_database
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 
+from django.forms.models import model_to_dict
+
+
 TESTDB = "ingester_test"
+
+
+def get_table_set(django_model, null_dates = True):
+    """
+    transform a django model (which is a mysql table)into a set of tuples for easier comparision
+    :param model_dict:
+    :param null_dates: ignore dates in case of last modified dates
+    :return:
+    """
+    result = set()
+    for entry in django_model.objects.all():
+        tmp = ()
+        print(model_to_dict(entry))
+        for key,element in model_to_dict(entry).items():
+            if null_dates and isinstance(element, datetime.datetime):
+                tmp += (datetime.datetime(1990, 1, 1, 1, 1, 1),)
+            else:
+                tmp += (element,)
+        result.add(tmp)
+    return result
+
 
 def get_table_data(table, null_dates = True):
     credentials = dict(get_config("MARIADB"))
@@ -13,10 +37,12 @@ def get_table_data(table, null_dates = True):
     connector = MariaDb(credentials)
     connector.connector.database = TESTDB
     # fetch everything
-    query = "SELECT * FROM {}".format(table)
+    query = "SELECT * FROM test_storage.{}".format(table)
     connector.cursor.execute(query)
+    print(query)
     result = set()
     for dataset in connector.cursor:
+        print(dataset)
         tmp = ()
         for element in dataset:
             # overwrite timestamps with generic date for easier testing
@@ -32,7 +58,7 @@ def get_table_data(table, null_dates = True):
 def compare_tables(self, comp_object, ignore_id = True):
     # TODO ignore
     for key,value in comp_object.items():
-        data = get_table_data(key, TESTDB)
+        data = get_table_data(key)
         self.assertEqual(data, value)
 
 

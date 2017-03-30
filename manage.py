@@ -8,7 +8,7 @@ if __name__ == "__main__":
         from django.core.management import execute_from_command_line
     except ImportError:
         # The above import may fail for some other reason. Ensure that the
-        # issue is really that Django is missing to avoid masking other
+        # issue is really that Django is missing to avoid masking othermak
         # exceptions on Python 2.
         try:
             import django

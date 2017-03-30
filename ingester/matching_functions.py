@@ -1,5 +1,5 @@
 from .helper import *
-from .models import authors_model, author_aliases, cluster, publication
+from .models import *
 
 
 def match_author(authors):
@@ -89,3 +89,13 @@ def match_title(title):
             "reason": Reason.AMB_CLUSTER
         }
     return result
+
+#TODO
+"""
+def match_type(type):
+    type_id = connector.fetch_one((type,), CHECK_TYPE)
+    if type_id is None:
+        # if type is not available, set type is miscellaneous,
+        return connector.fetch_one(('misc',), CHECK_TYPE)
+    return type_id
+"""

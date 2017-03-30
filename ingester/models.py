@@ -68,7 +68,7 @@ class authors_model(models.Model):
     website = models.TextField(blank=True, null=True, default=None)
     contact = models.TextField(blank=True, null=True, default=None)
     about = models.TextField(blank=True, null=True, default=None)
-    orcid_id = models.CharField(max_length=200)
+    orcid_id = models.CharField(max_length=200,blank=True, null=True, default=None)
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -120,3 +120,17 @@ class publication(models.Model):
     date_published = models.DateField(null=True,default=None)
     volume = models.CharField(max_length=20, null=True, default=None)
     number = models.CharField(max_length=20, null=True, default=None)
+
+
+# ===========================================NON-HARVEST================================================================
+# the values in these tables are not harvested but set by users or admin
+
+
+class publication_type(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True,null=True,default=None)
+
+
+class study_field(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True, default=None)
