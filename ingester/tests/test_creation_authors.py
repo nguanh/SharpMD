@@ -74,32 +74,6 @@ class TestCreateAuthors(TestCase):
             }
         ]
 
-        #resulting databasecontent
-        test_success = {
-            "authors_model": {
-                (1, "Nina Nonsense", "", None, None, None, None),
-                (2, "Otto Otter", "", None, None, None, None),
-                (3, "Orna Otter", "", None, None, None, None),
-                (4, "Melvin Master", "", None, None, None, None),
-            },
-            "ingester_author_aliases": {
-                (1, "Nina Nonsense", 1),
-                (2, "Otto Otter", 2),
-                (3, "Orna Otter", 3),
-                (4, "Melvin Master", 4),
-            },
-            "ingester_author_alias_source": {
-                (3, 1, 1),
-                (5, 2, 1),
-                (1, 4, 1),
-            },
-            "ingester_publication_author": {
-                (1, 0, 4, 1),
-                (2, 1, 1, 1),
-                (3, 2, 2, 1),
-            }
-
-        }
         result = create_authors(matching_list, authors_list, lurl)
         self.assertEqual(result[0].id, 4)
         self.assertEqual(result[1].id, 1)

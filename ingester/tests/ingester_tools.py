@@ -11,26 +11,6 @@ from django.forms.models import model_to_dict
 TESTDB = "ingester_test"
 
 
-def get_table_set(django_model, null_dates = True):
-    """
-    transform a django model (which is a mysql table)into a set of tuples for easier comparision
-    :param model_dict:
-    :param null_dates: ignore dates in case of last modified dates
-    :return:
-    """
-    result = set()
-    for entry in django_model.objects.all():
-        tmp = ()
-        print(model_to_dict(entry))
-        for key,element in model_to_dict(entry).items():
-            if null_dates and isinstance(element, datetime.datetime):
-                tmp += (datetime.datetime(1990, 1, 1, 1, 1, 1),)
-            else:
-                tmp += (element,)
-        result.add(tmp)
-    return result
-
-
 def get_table_data(table, null_dates = True):
     credentials = dict(get_config("MARIADB"))
     # connect to database

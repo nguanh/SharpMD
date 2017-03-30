@@ -1,4 +1,4 @@
-from .models import author_aliases,authors_model,author_alias_source, local_url,publication_author
+from .models import *
 from .helper import *
 
 def create_authors(matching_list, author_list, local_url):
@@ -37,3 +37,12 @@ def create_authors(matching_list, author_list, local_url):
         result.append(author_id)
         priority += 1
     return result
+
+
+def create_title(matching, cluster_name):
+    if matching["match"] == Match.NO_MATCH:
+        cluster_id = cluster.objects.create(name= cluster_name)
+        cluster_id = cluster_id.id
+    else:
+        cluster_id = matching["id"]
+    return cluster_id
