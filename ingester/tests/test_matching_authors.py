@@ -2,9 +2,7 @@ from django.test import TestCase
 
 from ingester.helper import *
 from ingester.matching_functions import match_author
-from mysqlWrapper.mariadb import MariaDb
-from .ingester_tools import TESTDB, delete_database, insert_data, get_pub_source, compare_tables
-from ingester.models import authors_model,author_aliases,author_alias_source
+from ingester.models import authors_model, author_aliases, author_alias_source
 
 
 

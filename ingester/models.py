@@ -47,6 +47,7 @@ class Config(models.Model):
 # ================================INGESTER DATABASE STRUCTURE==========================================================
 # =====================================================================================================================
 
+# ======================================= URL =========================================================================
 class global_url(models.Model):
     id = models.AutoField(primary_key=True)
     domain = models.CharField(max_length=150)
@@ -59,6 +60,7 @@ class local_url(models.Model):
     url = models.CharField(max_length=150)
 
 
+# ======================================= AUTHORS =====================================================================
 #Visible on admin interface for editing
 class authors_model(models.Model):
     main_name = models.TextField()
@@ -95,3 +97,26 @@ class author_alias_source(models.Model):
     url = models.ForeignKey(local_url)
     class Meta:
         unique_together = ("alias","url")
+
+# ======================================= PUBLICATIONS ================================================================
+
+
+class cluster(models.Model):
+    name= models.TextField()
+    #TODO zusätzliche indizes für bessere Suche?
+
+
+class publication(models.Model):
+    url = models.ForeignKey(local_url)
+    cluster = models.ForeignKey(cluster)
+    differences = models.TextField(null=True, default= None)
+    title = models.TextField()
+    pages = models.CharField(max_length=20, null=True, default=None)
+    note = models.TextField(null=True, default=None)
+    doi = models.TextField(null=True, default=None)
+    abstract = models.TextField(null=True, default=None)
+    copyright = models.TextField(null=True, default=None)
+    date_added = models.DateField(null=True,default=None)
+    date_published = models.DateField(null=True,default=None)
+    volume = models.CharField(max_length=20, null=True, default=None)
+    number = models.CharField(max_length=20, null=True, default=None)

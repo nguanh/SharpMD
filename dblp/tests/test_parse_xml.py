@@ -6,7 +6,7 @@ from dblp.xml_parser import parse_xml
 from harvester.exception import IHarvest_Exception
 from mysqlWrapper.tests.Mariadb_stub import Mariadb_test
 
-
+#TODO set paths relative
 class TestParse_xml(TestCase):
     valid_dtd = "test.dtd"
     valid_xml = "valid.xml"

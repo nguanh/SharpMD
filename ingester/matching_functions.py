@@ -1,5 +1,6 @@
 from .helper import *
-from .models import authors_model,author_aliases
+from .models import authors_model, author_aliases, cluster, publication
+
 
 def match_author(authors):
     results = []
@@ -48,3 +49,43 @@ def match_author(authors):
                     "reason": Reason.AMB_ALIAS
                 })
     return results
+
+
+def match_title(title):
+    cluster_name = normalize_title(title)
+    # check for matching cluster (so far ONLY COMPLETE MATCH) TODO levenshtein distance
+    cluster_matches = cluster.objects.filter(name=cluster_name)
+    cluster_count = cluster_matches.count()
+
+    if cluster_count == 0:
+        result={
+            "status": Status.SAFE,
+            "match": Match.NO_MATCH,
+            "id": None,
+            "reason": None,
+        }
+    elif cluster_count == 1:
+        cluster_id = cluster_matches.first()
+        count_pub = publication.objects.filter(cluster=cluster_id).count()
+        if count_pub == 1:
+            result = {
+                "status": Status.SAFE,
+                "match": Match.SINGLE_MATCH,
+                "id": cluster_id.id,
+                "reason": None,
+            }
+        else:
+            result = {
+                "status": Status.LIMBO,
+                "match": Match.MULTI_MATCH,
+                "id": None,
+                "reason": Reason.AMB_PUB
+            }
+    else:
+        result = {
+            "status": Status.LIMBO,
+            "match": Match.MULTI_MATCH,
+            "id": None,
+            "reason": Reason.AMB_CLUSTER
+        }
+    return result
