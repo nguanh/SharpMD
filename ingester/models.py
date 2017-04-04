@@ -124,6 +124,9 @@ class authors_model(models.Model):
         self.block_name = get_name_block(self.main_name)
         super(authors_model, self).save(*args, **kwargs)
 
+    def test(self):
+        return [self.main_name,self.block_name]
+
 
 class publication_author(models.Model):
     url = models.ForeignKey(local_url)
@@ -137,12 +140,21 @@ class publication_author(models.Model):
 class author_aliases(models.Model):
     alias = models.CharField(max_length=200 )
     author = models.ForeignKey(authors_model)
+
+    def test(self):
+        return [self.author.id,self.alias]
     class Meta:
         unique_together=('alias','author')
+
+
 
 class author_alias_source(models.Model):
     alias = models.ForeignKey(author_aliases)
     url = models.ForeignKey(local_url)
+
+    def test(self):
+        return [self.alias.id,self.url.id]
+
     class Meta:
         unique_together = ("alias","url")
 
@@ -152,6 +164,7 @@ class author_alias_source(models.Model):
 class cluster(models.Model):
     name= models.TextField()
     #TODO zusätzliche indizes für bessere Suche?
+
 
 
 class publication(models.Model):

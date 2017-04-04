@@ -1,71 +1,18 @@
 from django.test import TestCase
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
-from dblp.queries import DBLP_ARTICLE
 from dblp.queries import DBLP_ARTICLE, ADD_DBLP_ARTICLE
 from dblp.dblpingester import DblpIngester
 from ingester.ingesting_function import ingest_data
 from ingester.exception import IIngester_Exception
-from .ingester_tools import compare_tables, delete_database,setup_tables,TESTDB,get_table_data,insert_data
+from ingester.models import *
+from .ingester_tools import setup_tables, get_table_data
 import datetime
 import os
 test_path = os.path.dirname(__file__)
 ingester_path = os.path.dirname(test_path)
 
 #TODO weitere tabellen hinzufügen
-test_success = {
-    "local_url": {
-        (1, 3, 1, None, 1, 'journals/acta/AkyildizB89', datetime.datetime(1990, 1, 1, 1, 1, 1)),
-        (2, 1, 1, None, 1, 'TODO PLATZHALTER', datetime.datetime(1990, 1, 1, 1, 1, 1)),
-        (3, 3, 1, None, 1, 'journals/acta/VoglerS014', datetime.datetime(1990, 1, 1, 1, 1, 1)),
-        (4, 1, 1, None, 1, 'TODO PLATZHALTER', datetime.datetime(1990, 1, 1, 1, 1, 1)),
-    },
-    "authors": {
-        (1, "Ian F. Akyildiz", "akyildiz,i", None, None, None, datetime.datetime(1990, 1, 1, 1, 1, 1), None),
-        (2, "Horst von Brand", "von brand,h", None, None, None, datetime.datetime(1990, 1, 1, 1, 1, 1), None),
-        (3, "Walter Vogler", "vogler,w", None, None, None, datetime.datetime(1990, 1, 1, 1, 1, 1), None),
-        (4, "Christian Stahl", "stahl,c", None, None, None, datetime.datetime(1990, 1, 1, 1, 1, 1), None),
-        (5, "Richard Müller", "muller,r", None, None, None, datetime.datetime(1990, 1, 1, 1, 1, 1), None)
-    },
-    "name_alias": {
-        (1, 1, "Ian F. Akyildiz"),
-        (3, 2, "Horst von Brand"),
-        (5, 3, "Walter Vogler"),
-        (7, 4, "Christian Stahl"),
-        (9, 5, "Richard Müller 0001"),
-        (10, 5, "Richard Müller"),
-    },
-    "cluster": {
-        (1, "bla bla bla"),
-        (2, "kam kim kum")
-    },
-
-    "alias_source": {
-        (1, 1, 1),
-        (3, 1, 3),
-        (5, 3, 5),
-        (7, 3, 7),
-        (9, 3, 9),
-        (10, 3, 10),
-    },
-
-    "publication_authors": {
-        (1, 1, 1, 0),
-        (2, 1, 2, 1),
-        (3, 2, 1, 0),
-        (4, 2, 2, 1),
-        (5, 3, 3, 0),
-        (6, 3, 4, 1),
-        (7, 3, 5, 2),
-        (8, 4, 3, 0),
-        (9, 4, 4, 1),
-        (10, 4, 5, 2),
-    },
-    "limbo_publication":set(),
-    "limbo_authors":set(),
-
-}
-
 
 test_limbo={
     "limbo_publication":{
@@ -118,12 +65,57 @@ class TestIngesterDblp(TestCase):
         self.assertEqual(ingester.get_global_url().id, 3)
         result = ingest_data(ingester)
         self.assertEqual(result, 2)
-        """
-        compare_tables(self, test_success, ignore_id=True)
-        tmp = list(get_table_data("dblp_article", null_dates=False))
+        # check local url
+        self.assertEqual(local_url.objects.get(id=1).test(), [3, 'journals/acta/AkyildizB89', 1, 1])
+        self.assertEqual(local_url.objects.get(id=2).test(), [1, 'TODO PLATZHALTER', 1, 1])
+        self.assertEqual(local_url.objects.get(id=3).test(), [3, 'journals/acta/VoglerS014', 1, 1])
+        self.assertEqual(local_url.objects.get(id=4).test(), [1, 'TODO PLATZHALTER', 1, 1])
+        # check authors_model
+        self.assertEqual(authors_model.objects.get(id=1).test(),["Ian F. Akyildiz", "akyildiz,i"])
+        self.assertEqual(authors_model.objects.get(id=2).test(), ["Horst von Brand", "von brand,h"])
+        self.assertEqual(authors_model.objects.get(id=3).test(), ["Walter Vogler", "vogler,w"])
+        self.assertEqual(authors_model.objects.get(id=4).test(), ["Christian Stahl", "stahl,c"])
+        self.assertEqual(authors_model.objects.get(id=5).test(), ["Richard Müller", "muller,r"])
+        # check author alias
+        self.assertEqual(author_aliases.objects.get(id=1).test(), [1, "Ian F. Akyildiz"])
+        self.assertEqual(author_aliases.objects.get(id=2).test(), [2, "Horst von Brand"])
+        self.assertEqual(author_aliases.objects.get(id=3).test(), [3, "Walter Vogler"])
+        self.assertEqual(author_aliases.objects.get(id=4).test(), [4, "Christian Stahl"])
+        self.assertEqual(author_aliases.objects.get(id=5).test(), [5, "Richard Müller 0001"])
+        self.assertEqual(author_aliases.objects.get(id=6).test(), [5, "Richard Müller"])
+        # cluster
+        self.assertEqual(cluster.objects.get(id=1).name, "bla bla bla")
+        self.assertEqual(cluster.objects.get(id=2).name, "kam kim kum")
+        # author alias source
+        self.assertEqual(author_alias_source.objects.get(id=1).test(), [1, 1])
+        self.assertEqual(author_alias_source.objects.get(id=2).test(), [2, 1])
+        self.assertEqual(author_alias_source.objects.get(id=3).test(), [3, 3])
+        self.assertEqual(author_alias_source.objects.get(id=4).test(), [4, 3])
+        self.assertEqual(author_alias_source.objects.get(id=5).test(), [5, 3])
+        self.assertEqual(author_alias_source.objects.get(id=6).test(), [6, 3])
+        # publication authors
+        self.assertEqual(publication_author.objects.get(id=1).test(), [1, 1, 0])
+        self.assertEqual(publication_author.objects.get(id=2).test(), [1, 2, 1])
+        self.assertEqual(publication_author.objects.get(id=3).test(), [2, 1, 0])
+        self.assertEqual(publication_author.objects.get(id=4).test(), [2, 2, 1])
+        self.assertEqual(publication_author.objects.get(id=5).test(), [3, 3, 0])
+        self.assertEqual(publication_author.objects.get(id=6).test(), [3, 4, 1])
+        self.assertEqual(publication_author.objects.get(id=7).test(), [3, 5, 2])
+        self.assertEqual(publication_author.objects.get(id=8).test(), [4, 3, 0])
+        self.assertEqual(publication_author.objects.get(id=9).test(), [4, 4, 1])
+        self.assertEqual(publication_author.objects.get(id=10).test(), [4, 5, 2])
+
+        # limbo
+        self.assertEqual(limbo_authors.objects.count(),0)
+        self.assertEqual(limbo_pub.objects.count(),0)
+
+        # publication
+        self.assertEqual(publication.objects.get(id=1).test(), [2, 1, "Bla Bla Bla"])
+        self.assertEqual(publication.objects.get(id=2).test(), [4, 2, "Kam? Kim! Kum."])
         # check if last harvested is set
+        tmp = list(get_table_data("dblp_article", null_dates=False))
         self.assertEqual(tmp[0][-1].strftime("%Y-%m-%d"), datetime.datetime.now().strftime("%Y-%m-%d"))
-        """
+
 
 """
     def test_success_limit(self):
