@@ -190,3 +190,38 @@ class pub_alias_source(models.Model):
 
     class Meta:
         unique_together = ("alias", "url")
+
+# =============================================== LIMBO ===============================================================
+
+class limbo_pub(models.Model):
+    treason = models.CharField(max_length=100)
+    url = models.CharField(max_length=150)
+    title = models.TextField()
+    pages = models.CharField(max_length=20, default=None, null=True)
+    note = models.TextField(default=None, null=True)
+    doi = models.CharField(max_length=200, default=None, null=True)
+    abstract = models.TextField(default=None, null=True)
+    copyright = models.TextField(default=None, null=True)
+    date_added = models.DateField(null=True,default=None)
+    date_published = models.DateField(null=True,default=None)
+    volume = models.CharField(max_length=20, null=True, default=None)
+    number = models.CharField(max_length=20, null=True, default=None)
+    series = models.CharField(max_length=200, blank=True, null=True, default=None)
+    edition = models.CharField(max_length=200, blank=True, null=True, default=None)
+    location = models.CharField(max_length=200, blank=True, null=True, default=None)
+    publisher = models.CharField(max_length=200, blank=True, null=True, default=None)
+    institution = models.CharField(max_length=200, blank=True, null=True, default=None)
+    school = models.CharField(max_length=200, blank=True, null=True, default=None)
+    address = models.CharField(max_length=200, blank=True, null=True, default=None)
+    isbn = models.CharField(max_length=200, blank=True, null=True, default=None)
+    howpublished = models.CharField(max_length=200, blank=True, null=True, default=None)
+    book_title = models.CharField(max_length=200, blank=True, null=True, default=None)
+    journal = models.CharField(max_length=200, blank=True, null=True, default=None)
+
+
+class limbo_authors(models.Model):
+    publication = models.ForeignKey(limbo_pub)
+    reason = models.CharField(max_length=100)
+    name = models.TextField()
+    priority = models.IntegerField
+

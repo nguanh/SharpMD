@@ -3,6 +3,7 @@ from .helper import *
 from .difference_storage import *
 from django.db.models import ObjectDoesNotExist
 
+
 def create_authors(matching_list, author_list, local_url):
     result = []
     priority = 0
@@ -49,7 +50,7 @@ def create_title(matching, cluster_name):
         cluster_id = matching["id"]
     return cluster_id
 
-#TODO handle none for type and pubmediu
+
 def create_publication(cluster_id, author_ids, type_id=None, pub_medium_id=None):
     # find publication associated with cluster_id
     try:
@@ -58,10 +59,10 @@ def create_publication(cluster_id, author_ids, type_id=None, pub_medium_id=None)
     except ObjectDoesNotExist:
         # create local url and default publication
         gurl_id = global_url.objects.get(id=1)
-        url_id = local_url.objects.create(url="TODO PLATZHALTER", global_url= gurl_id, medium=pub_medium_id)
+        url_id = local_url.objects.create(url="TODO PLATZHALTER", global_url= gurl_id,
+                                          medium=pub_medium_id, type=type_id)
         publication_data = publication.objects.create(url=url_id, cluster=cluster_id)
     # publication_data is tuple with (id,url_id)
-
 
     # add authors to default pub
     for priority, idx in enumerate(author_ids):

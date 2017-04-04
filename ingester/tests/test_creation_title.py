@@ -30,12 +30,7 @@ class TestCreateTitle(TestCase):
             "reason": None,
         }
 
-        test_success = {
-            "cluster": {
-                (1, "matching title"),
-            },
-        }
-        result = create_title(matching,title)
+        result = create_title(matching, title)
         self.assertEqual(result, 1)
         self.assertEqual(cluster.objects.first().name, "matching title")
 
