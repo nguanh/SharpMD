@@ -1,9 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 from django.db import models
-from django_celery_beat.models import PeriodicTask,IntervalSchedule
-from .helper import get_name_block,normalize_title
-import jsonfield
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from .helper import get_name_block, normalize_title
 import json
+
 
 class Config(models.Model):
     # Name of the harvester for identification
@@ -18,6 +18,7 @@ class Config(models.Model):
     # task is not visible on creation
     ingester_task = models.ForeignKey(PeriodicTask, default=None, null=True, blank=True,
                                       related_name="ingester_task", on_delete=models.CASCADE)
+
     def save(self, *args, **kwargs):
         # save object to get its id
         # pass config id as third task parameter
@@ -46,6 +47,8 @@ class Config(models.Model):
 # =====================================================================================================================
 # ================================INGESTER DATABASE STRUCTURE==========================================================
 # =====================================================================================================================
+
+
 class pub_medium(models.Model):
     main_name = models.TextField()
     block_name = models.TextField(blank=True)
@@ -143,9 +146,6 @@ class author_alias_source(models.Model):
     class Meta:
         unique_together = ("alias","url")
 
-
-
-
 # ======================================= PUBLICATIONS ================================================================
 
 
@@ -173,10 +173,7 @@ class publication(models.Model):
         return [self.url.id, self.cluster.id, self.title]
 
 
-
 # ==================================== PUBLICATION MEDIUM =============================================================
-
-
 
 
 class pub_medium_alias(models.Model):

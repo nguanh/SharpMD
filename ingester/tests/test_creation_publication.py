@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from ingester.helper import *
 from ingester.creation_functions import create_publication
 from ingester.models import *
 
@@ -36,7 +35,6 @@ class TestCreatePublication(TestCase):
         # test local url
         self.assertEqual(result[1].test(), [1, "TODO PLATZHALTER", 1, None])
         self.assertEqual(result[0].test(), [2, 1, ""])
-
 
     def test_existing_publication(self):
         pub = publication.objects.create(id=5,url=self.lurl,cluster= self.cluster_id, title="my title")
