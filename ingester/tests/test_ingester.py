@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 from dblp.queries import DBLP_ARTICLE, ADD_DBLP_ARTICLE
@@ -13,14 +13,19 @@ test_path = os.path.dirname(__file__)
 ingester_path = os.path.dirname(test_path)
 
 
-class TestIngesterDblp(TestCase):
+class TestIngesterDblp(TransactionTestCase):
     fixtures = [os.path.join(ingester_path, "fixtures", "initial_data.json")]
 
     def setUp(self):
-        connector = MariaDb(db="test_storage")
+        self.connector = MariaDb(db="test_storage")
         storage_engine = get_config("MISC")["storage_engine"]
-        connector.createTable("dblparticle", DBLP_ARTICLE.format(storage_engine))
-        connector.close_connection()
+        self.connector.createTable("dblparticle", DBLP_ARTICLE.format(storage_engine))
+
+    def tearDown(self):
+        self.connector.execute_ex("DROP TABLE test_storage.dblp_article")
+        self.connector.close_connection()
+
+
 
     def test_invalid_ingester(self):
         setup_tables(os.path.join(test_path, "dblp_test1.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
