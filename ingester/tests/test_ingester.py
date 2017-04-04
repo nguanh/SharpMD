@@ -54,6 +54,7 @@ class TestIngesterDblp(TestCase):
         connector = MariaDb(db="test_storage")
         storage_engine = get_config("MISC")["storage_engine"]
         connector.createTable("dblparticle", DBLP_ARTICLE.format(storage_engine))
+        connector.close_connection()
 
     def test_invalid_ingester(self):
         setup_tables(os.path.join(test_path, "dblp_test1.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
@@ -116,28 +117,32 @@ class TestIngesterDblp(TestCase):
         tmp = list(get_table_data("dblp_article", null_dates=False))
         self.assertEqual(tmp[0][-1].strftime("%Y-%m-%d"), datetime.datetime.now().strftime("%Y-%m-%d"))
 
-
-"""
     def test_success_limit(self):
-        setup_tables("dblp_test1.csv", DBLP_ARTICLE, ADD_DBLP_ARTICLE)
-        ingester = DblpIngester(TESTDB, TESTDB)
+        setup_tables(os.path.join(test_path, "dblp_test1.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
+        ingester = DblpIngester("dblp.ingester", harvesterdb="test_storage")
         ingester.set_limit(1)
-        result = ingest_data2(ingester, TESTDB)
+        result = ingest_data(ingester)
         self.assertEqual(result, 1)
 
     def test_complete_publication(self):
         # for this test a dataset with ALL ROWS filled, will be created to check if all values are
         # successfully transferred
-        setup_tables("dblp_test2.csv", DBLP_ARTICLE, ADD_DBLP_ARTICLE)
-        ingester = DblpIngester(TESTDB, TESTDB)
-        ingest_data2(ingester, TESTDB)
-        publication = list(get_table_data("publication", TESTDB))[0]
-        # remove diff tree for easier comparision
-        filtered_pub = [publication[x] for x in range(len(publication)) if x != 3]
+        setup_tables(os.path.join(test_path, "dblp_test2.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
+        ingester = DblpIngester("dblp.ingester", harvesterdb="test_storage")
+        ingest_data(ingester)
+        publ = publication.objects.first()
+        self.assertEqual(publ.title,"title")
+        self.assertEqual(publ.pages, "1-5")
+        self.assertEqual(publ.doi, "doi")
+        self.assertEqual(publ.abstract, None)
+        self.assertEqual(publ.copyright, None)
+        self.assertEqual(publ.volume, "1")
+        self.assertEqual(publ.number, "2")
+        self.assertEqual(publ.note, None)
+        self.assertEqual(publ.date_added, None)
+        self.assertEqual(publ.date_published, datetime.date(1990,1,1))
 
-        # list of values that should be included in publication
-        included_values= [1,2,1,"title","1-5",None,"doi",None,None,None, "1990",'1','2']
-        self.assertEqual(filtered_pub,included_values)
+"""
 
     def test_limbo_multi_cluster(self):
         setup_tables("dblp_test2.csv", DBLP_ARTICLE, ADD_DBLP_ARTICLE)

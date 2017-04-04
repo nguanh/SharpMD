@@ -12,7 +12,7 @@ def is_not_empty(var):
 
 
 class DblpIngester(Iingester):
-    def __init__(self, name, harvesterdb):
+    def __init__(self, name, harvesterdb=None):
         Iingester.__init__(self,name)
         # find global url/ add global URL
         g_url,created = global_url.objects.get_or_create(
