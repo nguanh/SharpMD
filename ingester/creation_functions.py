@@ -4,7 +4,7 @@ from .difference_storage import *
 from django.db.models import ObjectDoesNotExist
 
 
-def create_authors(matching_list, author_list, local_url):
+def create_authors(matching_list, author_list, local_url_obj):
     result = []
     priority = 0
     for match, author in zip(matching_list,author_list):
@@ -21,59 +21,60 @@ def create_authors(matching_list, author_list, local_url):
                 "about": author["about"],
                 "orcid_id": author["orcid_id"]
             }
-            author_id = authors_model.objects.create(**author_entry)
+            author_obj = authors_model.objects.create(**author_entry)
         else:
             # SINGLE MATCH:
             # MULTIMATCH:  author id is already included
-            author_id = authors_model.objects.get(id=match["id"])
+            author_obj = authors_model.objects.get(id=match["id"])
 
         # add ALIASES and alias SOURCES
         # add original name as alias
 
-        orig,created = author_aliases.objects.get_or_create(alias=author["original_name"], author=author_id)
+        orig,created = author_aliases.objects.get_or_create(alias=author["original_name"], author=author_obj)
         # add parsed name as alias, if it's = original name, skip
-        parsed,created = author_aliases.objects.get_or_create(alias=author["parsed_name"], author=author_id)
-        author_alias_source.objects.get_or_create(alias=orig, url=local_url)
-        author_alias_source.objects.get_or_create(alias=parsed, url=local_url)
-        publication_author.objects.create(url=local_url, author=author_id, priority=priority)
+        parsed,created = author_aliases.objects.get_or_create(alias=author["parsed_name"], author=author_obj)
+        author_alias_source.objects.get_or_create(alias=orig, url=local_url_obj)
+        author_alias_source.objects.get_or_create(alias=parsed, url=local_url_obj)
+        publication_author.objects.create(url=local_url_obj, author=author_obj, priority=priority)
         # store author
-        result.append(author_id)
+        result.append(author_obj)
         priority += 1
     return result
 
 
 def create_title(matching, cluster_name):
     if matching["match"] == Match.NO_MATCH:
-        cluster_id = cluster.objects.create(name= cluster_name)
-        cluster_id = cluster_id.id
+        cluster_obj = cluster.objects.create(name=cluster_name)
     else:
-        cluster_id = matching["id"]
-    return cluster_id
+        cluster_obj = cluster.objects.get(id=matching["id"])
+    return cluster_obj
 
-
-def create_publication(cluster_id, author_ids, type_id=None, pub_medium_id=None):
+#TODO cluster id is id
+def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None):
     # find publication associated with cluster_id
     try:
-        publication_data = publication.objects.get(cluster=cluster_id)
+        publication_data = publication.objects.get(cluster=cluster_obj)
         url_id = publication_data.url
     except ObjectDoesNotExist:
         # create local url and default publication
         gurl_id = global_url.objects.get(id=1)
-        url_id = local_url.objects.create(url="TODO PLATZHALTER", global_url= gurl_id,
-                                          medium=pub_medium_id, type=type_id)
-        publication_data = publication.objects.create(url=url_id, cluster=cluster_id)
+        url_id = local_url.objects.create(url="TODO PLATZHALTER", global_url=gurl_id,
+                                          medium=pub_medium_obj, type=type_obj)
+        publication_data = publication.objects.create(url=url_id, cluster=cluster_obj)
     # publication_data is tuple with (id,url_id)
 
+
     # add authors to default pub
-    for priority, idx in enumerate(author_ids):
-        author = authors_model.objects.get(id=idx)
-        publication_author.objects.create(url=url_id,author=author,priority=priority)
+    for priority, author_obj in enumerate(author_objs):
+        #author = authors_model.objects.get(id=author_obj)
+
+        publication_author.objects.create(url=url_id,author=author_obj,priority=priority)
     # get return publication_id
     return [publication_data, url_id]
 
 
-def update_diff_tree(pub_id, pub_dict, author_ids):
-    diff_tree = pub_id.differences
+def update_diff_tree(pub_obj, pub_dict, author_objs):
+    diff_tree = pub_obj.differences
     if diff_tree is None:
         # create diff tree
         diff_tree = generate_diff_store(pub_dict)
@@ -82,11 +83,11 @@ def update_diff_tree(pub_id, pub_dict, author_ids):
         diff_tree = deserialize_diff_store(diff_tree)
         insert_diff_store(pub_dict, diff_tree)
     # insert each author
-    for author in author_ids:
+    for author in author_objs:
         # create pub_dict for insertion
         author_dict = {
             "url_id": pub_dict["url_id"],
-            "author_ids": author
+            "author_ids": author.id
         }
         insert_diff_store(author_dict, diff_tree)
     return diff_tree

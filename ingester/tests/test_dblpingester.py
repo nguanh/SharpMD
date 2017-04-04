@@ -9,7 +9,7 @@ class TestDblpIngest(TestCase):
         x = DblpIngester("Hello")
         url = global_url.objects.get(id=1)
         self.assertEqual(url.domain,'http://dblp.uni-trier.de')
-        self.assertEqual(x.get_global_url(),1)
+        self.assertEqual(x.get_global_url().id,1)
         self.assertEqual(x.harvester_db,"harvester")
 
     def test_success_update_global_url(self):
@@ -19,6 +19,6 @@ class TestDblpIngest(TestCase):
             url = 'http://dblp.uni-trier.de/rec/xml/'
         )
         x = DblpIngester("Hello")
-        self.assertEqual(x.get_global_url(),100)
+        self.assertEqual(x.get_global_url().id,100)
 
 

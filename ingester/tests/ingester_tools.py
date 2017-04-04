@@ -8,7 +8,7 @@ from mysqlWrapper.mariadb import MariaDb
 from django.forms.models import model_to_dict
 
 
-TESTDB = "ingester_test"
+TESTDB = "test_storage"
 
 
 def get_table_data(table, null_dates = True):
@@ -61,7 +61,7 @@ def setup_tables(filename, table_query, insert_query):
     connector.createTable("test dblp table", table_query)
 
     # setup test ingester database
-    setup_database(TESTDB)
+   # setup_database(TESTDB)
     # import records from csv
     with open(filename, newline='', encoding='utf-8') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')

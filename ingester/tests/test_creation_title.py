@@ -18,8 +18,8 @@ class TestCreateTitle(TestCase):
             "reason": None,
         }
 
-        result = create_title(matching,title,)
-        self.assertEqual(result,1)
+        result = create_title(matching, title,)
+        self.assertEqual(result.id, 1)
 
     def test_no_match(self):
         title = "matching title"
@@ -29,8 +29,7 @@ class TestCreateTitle(TestCase):
             "id": None,
             "reason": None,
         }
-
         result = create_title(matching, title)
-        self.assertEqual(result, 1)
+        self.assertEqual(result.id, 1)
         self.assertEqual(cluster.objects.first().name, "matching title")
 

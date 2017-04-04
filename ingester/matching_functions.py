@@ -92,7 +92,7 @@ def match_title(title):
     return result
 
 
-def match_pub_medium(mapping, url):
+def match_pub_medium(mapping, url_obj):
     if mapping["key"] is None:
         return None
     normalized_key = normalize_title(mapping["key"])
@@ -117,15 +117,15 @@ def match_pub_medium(mapping, url):
             pub_source_id = pub_medium.objects.create(**mapping)
     # create alias and alias source
     alias, created = pub_medium_alias.objects.get_or_create(alias=mapping["main_name"], medium=pub_source_id)
-    pub_alias_source.objects.get_or_create(alias=alias, url=url)
+    pub_alias_source.objects.get_or_create(alias=alias, url=url_obj)
     return pub_source_id
 
 
 def match_type(pub_type):
     try:
-        type_id = publication_type.objects.get(name=pub_type)
+        type_obj = publication_type.objects.get(name=pub_type)
     except ObjectDoesNotExist:
-        type_id = publication_type.objects.get(name='misc')
-    return type_id
+        type_obj = publication_type.objects.get(name='misc')
+    return type_obj
 
 

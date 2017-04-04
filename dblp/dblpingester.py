@@ -12,16 +12,18 @@ def is_not_empty(var):
 
 
 class DblpIngester(Iingester):
-    def __init__(self, name):
+    def __init__(self, name, harvesterdb):
         Iingester.__init__(self,name)
         # find global url/ add global URL
         g_url,created = global_url.objects.get_or_create(
             domain='http://dblp.uni-trier.de',
             url='http://dblp.uni-trier.de/rec/xml/',
         )
-        self.global_url = g_url.id
-
-        self.harvester_db = get_config("DATABASES")["harvester"]
+        self.global_url = g_url
+        if harvesterdb is None:
+            self.harvester_db = get_config("DATABASES")["harvester"]
+        else:
+            self.harvester_db = harvesterdb
         self.query = ("SELECT * FROM {}.dblp_article WHERE last_harvested = 0").format(self.harvester_db)
 
     def get_global_url(self):
