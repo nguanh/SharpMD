@@ -46,6 +46,41 @@ class Config(models.Model):
 # =====================================================================================================================
 # ================================INGESTER DATABASE STRUCTURE==========================================================
 # =====================================================================================================================
+class pub_medium(models.Model):
+    main_name = models.TextField()
+    block_name = models.TextField(blank=True)
+    series = models.CharField( max_length=200,blank=True, null=True, default=None)
+    edition = models.CharField( max_length=200,blank=True, null=True, default=None)
+    location = models.CharField( max_length=200,blank=True, null=True, default=None)
+    publisher = models.CharField( max_length=200,blank=True, null=True, default=None)
+    institution = models.CharField( max_length=200,blank=True, null=True, default=None)
+    school = models.CharField( max_length=200,blank=True, null=True, default=None)
+    address = models.CharField( max_length=200,blank=True, null=True, default=None)
+    isbn = models.CharField( max_length=200,blank=True, null=True, default=None)
+    howpublished = models.CharField( max_length=200,blank=True, null=True, default=None)
+    book_title = models.CharField( max_length=200,blank=True, null=True, default=None)
+    journal = models.CharField( max_length=200,blank=True, null=True, default=None)
+
+    def __str__(self):
+        return self.block_name
+
+    def save(self, *args, **kwargs):
+        # auto normalize author name
+        self.block_name = normalize_title(self.main_name)
+        super(pub_medium, self).save(*args, **kwargs)
+
+# ===========================================NON-HARVEST===============================================================
+# the values in these tables are not harvested but set by users or admin
+
+
+class publication_type(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True,null=True,default=None)
+
+
+class study_field(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True, default=None)
 
 # ======================================= URL =========================================================================
 class global_url(models.Model):
@@ -58,6 +93,13 @@ class local_url(models.Model):
     #auto set date on creation
     last_updated = models.DateTimeField(auto_now_add=True)
     url = models.CharField(max_length=150)
+    medium = models.ForeignKey(pub_medium, default=None, null=True, blank=True)
+    type = models.ForeignKey(publication_type, default=None, null=True, blank=True)
+
+    def test(self):
+        medium = None if self.medium is None else self.medium.id
+        u_type = None if self.type is None else self.type.id
+        return [self.global_url.id, self.url, medium, u_type]
 
 
 # ======================================= AUTHORS =====================================================================
@@ -85,6 +127,9 @@ class publication_author(models.Model):
     author = models.ForeignKey(authors_model)
     priority = models.IntegerField()
 
+    def test(self):
+        return[self.url.id, self.author.id,self.priority]
+
 
 class author_aliases(models.Model):
     alias = models.CharField(max_length=200 )
@@ -97,6 +142,9 @@ class author_alias_source(models.Model):
     url = models.ForeignKey(local_url)
     class Meta:
         unique_together = ("alias","url")
+
+
+
 
 # ======================================= PUBLICATIONS ================================================================
 
@@ -121,30 +169,14 @@ class publication(models.Model):
     volume = models.CharField(max_length=20, null=True, default=None)
     number = models.CharField(max_length=20, null=True, default=None)
 
+    def test(self):
+        return [self.url.id, self.cluster.id, self.title]
+
+
+
 # ==================================== PUBLICATION MEDIUM =============================================================
 
-class pub_medium(models.Model):
-    main_name = models.TextField()
-    block_name = models.TextField(blank=True)
-    series = models.CharField( max_length=200,blank=True, null=True, default=None)
-    edition = models.CharField( max_length=200,blank=True, null=True, default=None)
-    location = models.CharField( max_length=200,blank=True, null=True, default=None)
-    publisher = models.CharField( max_length=200,blank=True, null=True, default=None)
-    institution = models.CharField( max_length=200,blank=True, null=True, default=None)
-    school = models.CharField( max_length=200,blank=True, null=True, default=None)
-    address = models.CharField( max_length=200,blank=True, null=True, default=None)
-    isbn = models.CharField( max_length=200,blank=True, null=True, default=None)
-    howpublished = models.CharField( max_length=200,blank=True, null=True, default=None)
-    book_title = models.CharField( max_length=200,blank=True, null=True, default=None)
-    journal = models.CharField( max_length=200,blank=True, null=True, default=None)
 
-    def __str__(self):
-        return self.block_name
-
-    def save(self, *args, **kwargs):
-        # auto normalize author name
-        self.block_name = normalize_title(self.main_name)
-        super(pub_medium, self).save(*args, **kwargs)
 
 
 class pub_medium_alias(models.Model):
@@ -161,16 +193,3 @@ class pub_alias_source(models.Model):
 
     class Meta:
         unique_together = ("alias", "url")
-
-# ===========================================NON-HARVEST===============================================================
-# the values in these tables are not harvested but set by users or admin
-
-
-class publication_type(models.Model):
-    name = models.CharField(max_length=200)
-    description = models.TextField(blank=True,null=True,default=None)
-
-
-class study_field(models.Model):
-    name = models.CharField(max_length=200)
-    description = models.TextField(blank=True, null=True, default=None)

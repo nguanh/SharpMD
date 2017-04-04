@@ -1,0 +1,54 @@
+[
+  {
+    "model": "ingester.global_url",
+    "pk": 1,
+    "fields": {
+      "domain": "http://localhost/publications",
+      "url": "http://localhost/publications"
+    }
+  },
+  {
+    "model": "ingester.global_url",
+    "pk": 2,
+    "fields": {
+      "domain": "http://localhost/users",
+      "url": "http://localhost/users"
+    }
+  },
+  {
+    "model": "ingester.publication_type",
+    "pk": 1,
+    "fields": {
+      "name": "article"
+    }
+  },
+  {
+    "model": "ingester.publication_type",
+    "pk": 2,
+    "fields": {
+      "name": "misc"
+    }
+  },
+  {
+    "model": "ingester.publication_type",
+    "pk": 3,
+    "fields": {
+      "name": "inproceedings"
+    }
+  },
+  {
+    "model": "ingester.publication_type",
+    "pk": 4,
+    "fields": {
+      "name": "mastersthesis"
+    }
+  },
+  {
+    "model": "ingester.publication_type",
+    "pk": 5,
+    "fields": {
+      "name": "phdthesis"
+    }
+  }
+
+]
