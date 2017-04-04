@@ -1,6 +1,6 @@
 from .helper import *
 from .models import *
-
+from django.db.models import ObjectDoesNotExist
 
 def match_author(authors):
     results = []
@@ -121,13 +121,11 @@ def match_pub_medium(mapping, url):
     return pub_source_id
 
 
-#TODO
-"""
-def match_type(type):
-    type_id = connector.fetch_one((type,), CHECK_TYPE)
-    if type_id is None:
-        # if type is not available, set type is miscellaneous,
-        return connector.fetch_one(('misc',), CHECK_TYPE)
+def match_type(pub_type):
+    try:
+        type_id = publication_type.objects.get(name=pub_type)
+    except ObjectDoesNotExist:
+        type_id = publication_type.objects.get(name='misc')
     return type_id
-"""
+
 

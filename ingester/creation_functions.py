@@ -48,7 +48,7 @@ def create_title(matching, cluster_name):
         cluster_id = matching["id"]
     return cluster_id
 
-
+#TODO handle none for type and pubmediu
 def create_publication(cluster_id, author_ids, type_id=None, pub_medium_id=None):
     # find publication associated with cluster_id
     try:
