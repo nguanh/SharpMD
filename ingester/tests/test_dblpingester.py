@@ -1,8 +1,9 @@
-from django.test import TestCase,mock
+from django.test import TransactionTestCase,mock
 from dblp.dblpingester import DblpIngester
 from ingester.models import global_url
 
-class TestDblpIngest(TestCase):
+
+class TestDblpIngest(TransactionTestCase):
 
     def test_success_create_global_url(self):
         self.assertEqual(global_url.objects.count(),0)

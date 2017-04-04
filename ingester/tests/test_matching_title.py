@@ -1,11 +1,11 @@
-from django.test import TestCase
+from django.test import TestCase,TransactionTestCase
 
 from ingester.helper import *
 from ingester.matching_functions import match_title
 from ingester.models import cluster, publication, global_url, local_url
 
 
-class TestMatchTitle(TestCase):
+class TestMatchTitle(TransactionTestCase):
 
     def setUp(self):
         self.gurl = global_url.objects.create(id=5, domain="http://dummy.de", url="http://dummy.de")

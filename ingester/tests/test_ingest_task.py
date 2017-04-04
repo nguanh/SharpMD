@@ -1,4 +1,4 @@
-from django.test import TestCase,mock
+from django.test import TestCase,mock, TransactionTestCase
 from ingester.ingest_task import ingest_task
 from ingester.exception import IIngester_Exception, IIngester_Disabled
 from ingester.models import IntervalSchedule,Config,PeriodicTask
@@ -20,7 +20,7 @@ class mockIngester(Iingester):
         pass
 
 
-class TestIngestTask(TestCase):
+class TestIngestTask(TransactionTestCase):
     def setUp(self):
         # create IntervalSchedule
         self.config_id = 100

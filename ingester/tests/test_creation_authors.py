@@ -1,10 +1,10 @@
-from django.test import TestCase
+from django.test import TransactionTestCase
 from ingester.helper import *
 from ingester.creation_functions import create_authors
 from ingester.models import *
 
 
-class TestCreateAuthors(TestCase):
+class TestCreateAuthors(TransactionTestCase):
 
     def test_success(self):
         gurl = global_url.objects.create(id=5, domain="http://dummy.de", url="http://dummy.de")

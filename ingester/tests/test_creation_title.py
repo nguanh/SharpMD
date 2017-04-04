@@ -1,12 +1,12 @@
 
-from django.test import TestCase
+from django.test import TransactionTestCase
 
 from ingester.helper import *
 from ingester.creation_functions import create_title
 from ingester.models import *
 
 
-class TestCreateTitle(TestCase):
+class TestCreateTitle(TransactionTestCase):
 
     def test_single_match(self):
         cluster.objects.create(id=1, name= "matching title")

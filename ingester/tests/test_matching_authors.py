@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase,TransactionTestCase
 
 from ingester.helper import *
 from ingester.matching_functions import match_author
@@ -6,7 +6,7 @@ from ingester.models import authors_model, author_aliases, author_alias_source
 
 
 
-class TestMatchAuthors(TestCase):
+class TestMatchAuthors(TransactionTestCase):
 
     def test_success_empty_db(self):
         authors=[{
