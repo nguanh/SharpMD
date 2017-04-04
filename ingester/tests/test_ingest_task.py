@@ -61,8 +61,8 @@ class TestIngestTask(TransactionTestCase):
         self.config.save()
         self.assertRaises(IIngester_Disabled, ingest_task,"ingester.tests.test_ingest_task","mockIngester",self.config_id)
 
-    @mock.patch("ingester.ingest_task.ingest_data2", return_value=5)
-    def test_success(self,ingest_data2_function):
+    @mock.patch("ingester.ingest_task.ingest_data", return_value=5)
+    def test_success(self,ingest_data_function):
         self.assertTrue(ingest_task("ingester.tests.test_ingest_task","mockIngester",self.config_id))
 
 

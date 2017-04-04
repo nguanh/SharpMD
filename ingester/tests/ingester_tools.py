@@ -1,11 +1,9 @@
 import csv
 import datetime
 
-from ingester.setup_database import setup_database
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 
-from django.forms.models import model_to_dict
 
 
 TESTDB = "test_storage"
@@ -34,23 +32,6 @@ def get_table_data(table, null_dates = True):
     connector.close_connection()
     return result
 
-
-def compare_tables(self, comp_object, ignore_id = True):
-    # TODO ignore
-    for key,value in comp_object.items():
-        data = get_table_data(key)
-        self.assertEqual(data, value)
-
-
-def delete_database(database):
-    credentials = dict(get_config("MARIADB"))
-    # connect to database
-    connector = MariaDb(credentials)
-    connector.connector.database = database
-    connector.execute_ex("DROP DATABASE {}".format(database))
-    connector.close_connection()
-
-
 def setup_tables(filename, table_query, insert_query):
     # load testconfig
     credentials = dict(get_config("MARIADB"))
@@ -75,24 +56,6 @@ def setup_tables(filename, table_query, insert_query):
                 connector.execute_ex(insert_query, tup)
             else:
                 do_once = True
-    connector.close_connection()
-
-
-def insert_data(query, tup = None):
-    """
-    execute insertion query
-    :param query:
-    :return:
-    """
-    # load testconfig
-    credentials = dict(get_config("MARIADB"))
-    # setup database
-    connector = MariaDb(credentials)
-    connector.connector.database = TESTDB
-    if tup is None:
-        connector.execute_ex(query)
-    else:
-        connector.execute_ex(query,tup)
     connector.close_connection()
 
 
