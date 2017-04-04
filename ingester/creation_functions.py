@@ -1,5 +1,6 @@
 from .models import *
 from .helper import *
+from .difference_storage import *
 from django.db.models import ObjectDoesNotExist
 
 def create_authors(matching_list, author_list, local_url):
@@ -67,4 +68,24 @@ def create_publication(cluster_id, author_ids, type_id=None, pub_medium_id=None)
         author = authors_model.objects.get(id=idx)
         publication_author.objects.create(url=url_id,author=author,priority=priority)
     # get return publication_id
-    return [publication_data,url_id]
+    return [publication_data, url_id]
+
+
+def update_diff_tree(pub_id, pub_dict, author_ids):
+    diff_tree = pub_id.differences
+    if diff_tree is None:
+        # create diff tree
+        diff_tree = generate_diff_store(pub_dict)
+    else:
+        # de serialize first
+        diff_tree = deserialize_diff_store(diff_tree)
+        insert_diff_store(pub_dict, diff_tree)
+    # insert each author
+    for author in author_ids:
+        # create pub_dict for insertion
+        author_dict = {
+            "url_id": pub_dict["url_id"],
+            "author_ids": author
+        }
+        insert_diff_store(author_dict, diff_tree)
+    return diff_tree

@@ -157,7 +157,7 @@ class cluster(models.Model):
 class publication(models.Model):
     url = models.ForeignKey(local_url)
     cluster = models.ForeignKey(cluster)
-    differences = models.TextField(null=True, default= None)
+    differences = models.BinaryField(null=True, default= None)
     title = models.TextField()
     pages = models.CharField(max_length=20, null=True, default=None)
     note = models.TextField(null=True, default=None)

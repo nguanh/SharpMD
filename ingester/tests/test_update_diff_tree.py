@@ -1,25 +1,24 @@
-from datetime import datetime
-from unittest import TestCase
-
+from django.test import TestCase,mock
+from ingester.models import *
 from ingester.difference_storage import *
-from ingester.helper import *
-from ingester.ingester import create_authors, create_title, create_publication, update_diff_tree
-from ingester.setup_database import setup_database
-from mysqlWrapper.mariadb import MariaDb
-from .ingester_tools import TESTDB, delete_database, insert_data, compare_tables, get_pub_dict
+from ingester.creation_functions import update_diff_tree
+from datetime import datetime
+
+from .ingester_tools import get_pub_dict
 
 
 class TestUpdateDiffTree(TestCase):
     def setUp(self):
-        setup_database(TESTDB)
-        self.connector = MariaDb(db=TESTDB)
+        self.gurl = global_url.objects.create(id=1, domain="http://dummy.de", url="http://dummy.de")
+        self.lurl = local_url.objects.create(id=1, url="a", global_url=self.gurl)
+        self.cluster_id = cluster.objects.create(id=1, name="random Title")
 
     def test_no_diff_tree(self):
-        insert_data("INSERT INTO publication(id,url_id,cluster_id) VALUES (5,5,1)")
+        pub = publication.objects.create(id=5, url=self.lurl, cluster=self.cluster_id, title="test title")
         # every table is empty
         pub_dict = get_pub_dict(url_id=1, title="Hello World", date_published=datetime(1990,1,1,1,1,1))
         author_ids=[1,4,7]
-        result = update_diff_tree(5,pub_dict,author_ids,self.connector)
+        result = update_diff_tree(pub, pub_dict,author_ids)
         self.assertEqual(result["author_ids"],[
             {"value": 1, "votes": 0, "bitvector": 1},
             {"value": 4, "votes": 0, "bitvector": 1},
@@ -27,14 +26,16 @@ class TestUpdateDiffTree(TestCase):
         ])
 
     def test_existing_diff_tree(self):
-        pub_dict = get_pub_dict(url_id=1, title="Hello World Again", date_published=datetime(1990, 1, 1, 1, 1, 1), author_ids=5)
+        pub_dict = get_pub_dict(url_id=1, title="Hello World Again", date_published=datetime(1990, 1, 1, 1, 1, 1),
+                                author_ids=5)
         diff_tree = generate_diff_store(pub_dict)
         serialized_tree = serialize_diff_store(diff_tree)
-        insert_data("INSERT INTO publication(id,url_id,cluster_id, differences) "
-                    "VALUES (5,5,1,%s)",(serialized_tree,))
+        print(serialized_tree)
+        pub = publication.objects.create(id=5, url=self.lurl, cluster=self.cluster_id, title="test title",
+                                         differences=serialized_tree)
         author_ids=[1,4,7]
         pub_dict = get_pub_dict(url_id=2, title="Hello World", date_published=datetime(1990, 1, 1, 1, 1, 1))
-        result = update_diff_tree(5,pub_dict,author_ids,self.connector)
+        result = update_diff_tree(pub,pub_dict,author_ids)
 
         self.assertEqual(result["author_ids"],[
             {"value": 5, "votes": 0, "bitvector": 1},
@@ -44,6 +45,7 @@ class TestUpdateDiffTree(TestCase):
         ])
 
     def test_full_dataset(self):
+
         pub_dict = get_pub_dict(url_id=1, title="Hello World Again",
                                 date_published=datetime(1990, 1, 1, 1, 1, 1),
                                 type_ids=5,
@@ -61,11 +63,11 @@ class TestUpdateDiffTree(TestCase):
                                 author_ids=5)
         diff_tree = generate_diff_store(pub_dict)
         serialized_tree = serialize_diff_store(diff_tree)
-        insert_data("INSERT INTO publication(id,url_id,cluster_id, differences) "
-                    "VALUES (5,5,1,%s)",(serialized_tree,))
+        pub = publication.objects.create(id=5, url=self.lurl, cluster=self.cluster_id, title="test title",
+                                         differences=serialized_tree)
         author_ids=[1,4,7]
         pub_dict = get_pub_dict(url_id=2, title="Hello World", date_published=datetime(1990, 1, 1, 1, 1, 1))
-        result = update_diff_tree(5,pub_dict,author_ids,self.connector)
+        result = update_diff_tree(pub,pub_dict,author_ids)
 
         self.assertEqual(result["type_ids"][0]["value"],5)
         self.assertEqual(result["pub_source_ids"][0]["value"], 1)
@@ -80,7 +82,4 @@ class TestUpdateDiffTree(TestCase):
         self.assertEqual(result["number"][0]["value"], "5")
         self.assertEqual(result["volume"][0]["value"], "5")
 
-    def tearDown(self):
-        self.connector.close_connection()
-        delete_database(TESTDB)
 
