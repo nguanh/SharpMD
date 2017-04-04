@@ -12,40 +12,6 @@ import os
 test_path = os.path.dirname(__file__)
 ingester_path = os.path.dirname(test_path)
 
-#TODO weitere tabellen hinzufügen
-
-test_limbo={
-    "limbo_publication":{
-        (1,'Reason.AMB_CLUSTER','key',"title","1-5",None,"doi",None,None,'2011','1990',"1","2","series",None,None,"publisher",None,"school","address",
-         "isbn",None,"booktitle","journal")
-    },
-    "limbo_authors":{
-        (1,1,'None',"An Author",0),
-        (2,1,'None',"Another Author",1),
-    },
-    "publication_authors": set(),
-
-}
-test_limbo2={
-    "limbo_publication":{
-        (1,'Reason.AMB_PUB','key',"title","1-5",None,"doi",None,None,'2011','1990',"1","2","series",None,None,"publisher",None,"school","address",
-         "isbn",None,"booktitle","journal")
-    },
-    "limbo_authors":{
-        (1,1,'None',"An Author",0),
-        (2,1,'None',"Another Author",1),
-    },
-    "publication_authors": set(),
-
-}
-"""
-    "publication": {
-        (1, 2, 1, None, "Bla Bla Bla", "1-5", None, "dummydoi", None, None, "2011", "1989", "1", "2"),
-        (2, 4, 2, None, "Kam? Kim! Kum.", "10-11", None, "doidoi", None, None, "2014", "2014", "51", "8")
-    },
-
-"""
-
 
 class TestIngesterDblp(TestCase):
     fixtures = [os.path.join(ingester_path, "fixtures", "initial_data.json")]
@@ -142,24 +108,39 @@ class TestIngesterDblp(TestCase):
         self.assertEqual(publ.date_added, None)
         self.assertEqual(publ.date_published, datetime.date(1990,1,1))
 
-"""
-
     def test_limbo_multi_cluster(self):
-        setup_tables("dblp_test2.csv", DBLP_ARTICLE, ADD_DBLP_ARTICLE)
-        insert_data("INSERT into cluster (id,cluster_name) VALUES(1,'title'),(2,'title')")
-        ingester = DblpIngester(TESTDB, TESTDB)
-        ingest_data2(ingester, TESTDB)
-        compare_tables(self,test_limbo,ignore_id=True)
+        setup_tables(os.path.join(test_path, "dblp_test2.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
+        cluster.objects.bulk_create([
+            cluster(id=1, name="title"),
+            cluster(id=2, name="title"),
+        ])
+        ingester = DblpIngester("dblp.ingester", harvesterdb="test_storage")
+        ingest_data(ingester)
+        self.assertEqual(limbo_authors.objects.get(id=1).test(), [1, 'None', "An Author", 0])
+        self.assertEqual(limbo_authors.objects.get(id=2).test(), [1, 'None', "Another Author", 1])
+        self.assertEqual(local_url.objects.count(),0)
+        limbo = limbo_pub.objects.get(id=1).test_extended()
+        compare = ['Reason.AMB_CLUSTER','key',"title","1-5",None,"doi",None,None,
+                                datetime.date(2011,1,1),datetime.date(1990,1,1),"1","2","series",
+                                None,"publisher",None,"school","address",
+                                "isbn",None,"booktitle","journal"]
+        self.assertEqual(limbo,compare)
 
     def test_limbo_multi_pubs(self):
-        setup_tables("dblp_test2.csv", DBLP_ARTICLE, ADD_DBLP_ARTICLE)
-        insert_data("INSERT into cluster (id,cluster_name) VALUES(1,'title')")
-        insert_data("INSERT into global_url (id,domain,url) VALUES(5,'a','a')")
-        insert_data("INSERT into local_url (id,url,global_url_id) VALUES(1,'a',5)")
-        insert_data("INSERT into publication(id,url_id,cluster_id, title)VALUES (1,1,1,'title')")
-        insert_data("INSERT into publication(id,url_id,cluster_id, title)VALUES (2,1,1,'title')")
-        ingester = DblpIngester(TESTDB, TESTDB)
-        ingest_data2(ingester, TESTDB)
-        compare_tables(self, test_limbo2, ignore_id=True)
-"""
+        setup_tables(os.path.join(test_path, "dblp_test2.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
+        cl = cluster.objects.create(id=1, name="title")
+        gurl = global_url.objects.create(id=5,domain ="http://dummy.de", url="http://dummy.de")
+        lurl = local_url.objects.create(id=1,url="jlkjöl", global_url=gurl)
+        publication.objects.bulk_create([
+            publication(url=lurl,cluster=cl,title="Title"),
+            publication(url=lurl, cluster=cl, title="Title")
+        ])
+        ingester = DblpIngester("dblp.ingester", harvesterdb="test_storage")
+        ingest_data(ingester)
+        limbo = limbo_pub.objects.get(id=1).test_extended()
+        self.assertEqual(limbo[0],'Reason.AMB_PUB')
+        self.assertEqual(limbo_authors.objects.get(id=1).test(), [1, 'None', "An Author", 0])
+        self.assertEqual(limbo_authors.objects.get(id=2).test(), [1, 'None', "Another Author", 1])
+        self.assertEqual(local_url.objects.count(),1)
+
 

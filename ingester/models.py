@@ -207,7 +207,7 @@ class pub_alias_source(models.Model):
 # =============================================== LIMBO ===============================================================
 
 class limbo_pub(models.Model):
-    treason = models.CharField(max_length=100)
+    reason = models.CharField(max_length=100)
     url = models.CharField(max_length=150)
     title = models.TextField()
     pages = models.CharField(max_length=20, default=None, null=True)
@@ -231,10 +231,18 @@ class limbo_pub(models.Model):
     book_title = models.CharField(max_length=200, blank=True, null=True, default=None)
     journal = models.CharField(max_length=200, blank=True, null=True, default=None)
 
+    def test_extended(self):
+        return [self.reason,self.url, self.title,self.pages,self.note,self.doi,self.abstract,self.copyright,
+         self.date_added,self.date_published,self.volume,self.number,self.series,self.edition,self.publisher,
+         self.institution,self.school,self.address,self.isbn,self.howpublished,self.book_title,self.journal]
+
 
 class limbo_authors(models.Model):
     publication = models.ForeignKey(limbo_pub)
     reason = models.CharField(max_length=100)
     name = models.TextField()
-    priority = models.IntegerField
+    priority = models.IntegerField(null=True, default=None)
+
+    def test(self):
+        return [self.publication.id, self.reason, self.name,self.priority]
 

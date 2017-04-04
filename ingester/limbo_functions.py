@@ -1,6 +1,11 @@
 from .models import *
+import datetime
 
+def get_date(obj):
+    if obj is None:
+        return None
 
+    return datetime.date(obj,1,1)
 def push_limbo(mapping, author_matching, title_reason):
     pub_dict = {
         "reason": title_reason,
@@ -11,8 +16,8 @@ def push_limbo(mapping, author_matching, title_reason):
         "doi": mapping["publication"]["doi"],
         "abstract": mapping["publication"]["abstract"],
         "copyright": mapping["publication"]["copyright"],
-        "date_added": mapping["publication"]["date_added"],
-        "date_published": mapping["publication"]["date_published"],
+        "date_added": get_date(mapping["publication"]["date_added"]),
+        "date_published": get_date(mapping["publication"]["date_published"]),
         "volume": mapping["publication"]["volume"],
         "number": mapping["publication"]["number"],
         "series": mapping["pub_release"]["series"],
