@@ -15,7 +15,7 @@ def log(request, config_id):
     log_exists = os.path.isfile(os.path.join(log_file))
     if log_exists:
         with open(log_file, 'r') as f:
-            log_text = tailer.tail(f, 40)
+            log_text = "\n".join(tailer.tail(f, 40))
     else:
         log_text = "No log found!"
 
