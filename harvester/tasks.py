@@ -27,6 +27,9 @@ def harvestsource(package, class_name, config_id):
     print("AAAAAAAAAA")
     for active_task in active_queue:
         print(active_task["args"])
+        print(active_task["args"][0])
+        print(active_task["args"][1])
+        print(active_task["args"][2])
         if active_task["args"][0] == parameter_list[0]:
             print("0")
         if active_task["args"][1] == parameter_list[1]:
