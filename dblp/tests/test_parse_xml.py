@@ -1,15 +1,21 @@
 import datetime
 import logging
 from unittest import TestCase, mock
+import os
 
 from dblp.xml_parser import parse_xml
 from harvester.exception import IHarvest_Exception
 from mysqlWrapper.tests.Mariadb_stub import Mariadb_test
 
-#TODO set paths relative
+
+def get_path(path):
+    local_path = os.path.dirname(__file__)
+    return os.path.join(local_path, path)
+
+
 class TestParse_xml(TestCase):
-    valid_dtd = "test.dtd"
-    valid_xml = "valid.xml"
+    valid_dtd = get_path("test.dtd")
+    valid_xml = get_path("valid.xml")
     valid_sql = None
     valid_tag_list = ("article", "inproceedings")
     valid_start_date_1 = "1992-1-31"
@@ -48,17 +54,18 @@ class TestParse_xml(TestCase):
 
     def test_invalid_mdate(self):
         test_db = Mariadb_test()
-        self.assertEqual(1,parse_xml("invalid-mdate.xml", self.valid_dtd, test_db,
+        self.assertEqual(1,parse_xml(get_path("invalid-mdate.xml"), self.valid_dtd, test_db,
                           self.valid_logger, self.valid_tag_list, self.valid_start_date_2, self.valid_end_date_2))
 
     def test_invalid_year(self):
         test_db = Mariadb_test()
-        self.assertEqual(1,parse_xml("invalid-year.xml", self.valid_dtd, test_db,
+        self.assertEqual(1,parse_xml(get_path("invalid-year.xml"), self.valid_dtd, test_db,
                           self.valid_logger, self.valid_tag_list, self.valid_start_date_2, self.valid_end_date_2))
 
     @mock.patch.object(Mariadb_test, 'execute')
     def test_article_valid(self,mock_execute):
         test_db = Mariadb_test()
+
         result =parse_xml(self.valid_xml, self.valid_dtd, test_db,self.valid_logger,
                                           self.valid_tag_list,self.valid_start_date_2, self.valid_end_date_2)
         mock_execute.assert_called_with(
@@ -72,13 +79,13 @@ class TestParse_xml(TestCase):
 
     def test_time_range_0(self):
         test_db = Mariadb_test()
-        result =parse_xml("valid-timerange-n.xml", self.valid_dtd, test_db, self.valid_logger,
+        result =parse_xml(get_path("valid-timerange-n.xml"), self.valid_dtd, test_db, self.valid_logger,
                                           self.valid_tag_list,datetime.datetime(2013,2,1,0,0), datetime.datetime(2013,2,28))
         self.assertEqual(result,0)
 
     def test_time_range_n(self):
         test_db = Mariadb_test()
-        result =parse_xml("valid-timerange-n.xml", self.valid_dtd, test_db, self.valid_logger,
+        result =parse_xml(get_path("valid-timerange-n.xml"), self.valid_dtd, test_db, self.valid_logger,
                                           self.valid_tag_list,datetime.datetime(2012,2,1,0,0),datetime.datetime(2012,2,28))
         self.assertEqual(result,2)
         self.assertListEqual(["a/b/c", "d/e/f"], test_db.getList())
@@ -87,7 +94,7 @@ class TestParse_xml(TestCase):
     @mock.patch.object(Mariadb_test, 'execute')
     def test_tag_in_title(self, mock_execute):
         test_db = Mariadb_test()
-        result =parse_xml("valid-title.xml", self.valid_dtd, test_db, self.valid_logger)
+        result =parse_xml(get_path("valid-title.xml"), self.valid_dtd, test_db, self.valid_logger)
         self.assertEqual(result, 1)
         mock_execute.assert_called_with(
                                         ('a/b/c', datetime.datetime(2012, 2, 12, 0, 0), 'Aut hor;', 'title of titles',
@@ -100,7 +107,7 @@ class TestParse_xml(TestCase):
     @mock.patch.object(Mariadb_test, 'execute')
     def test_tag_in_title_regression(self, mock_execute):
         test_db = Mariadb_test()
-        result = parse_xml("valid-title2.xml", self.valid_dtd, test_db, self.valid_logger)
+        result = parse_xml(get_path("valid-title2.xml"), self.valid_dtd, test_db, self.valid_logger)
         self.assertEqual(result, 1)
         mock_execute.assert_called_with(
                                         ('journals/kbs/FinnieS03', datetime.datetime(2004, 5, 4, 0, 0),
@@ -113,7 +120,7 @@ class TestParse_xml(TestCase):
     @mock.patch.object(Mariadb_test, 'execute')
     def test_tag_in_title_regression2(self, mock_execute):
         test_db = Mariadb_test()
-        result = parse_xml("valid-title3.xml", self.valid_dtd, test_db, self.valid_logger)
+        result = parse_xml(get_path("valid-title3.xml"), self.valid_dtd, test_db, self.valid_logger)
         self.assertEqual(result, 1)
 
         mock_execute.assert_called_with(
@@ -127,7 +134,7 @@ class TestParse_xml(TestCase):
     @mock.patch.object(Mariadb_test, 'execute')
     def test_tag_in_title_regression4(self, mock_execute):
         test_db = Mariadb_test()
-        result = parse_xml("valid-title4.xml", self.valid_dtd, test_db, self.valid_logger)
+        result = parse_xml(get_path("valid-title4.xml"), self.valid_dtd, test_db, self.valid_logger)
         self.assertEqual(result, 1)
 
         mock_execute.assert_called_with(
@@ -147,7 +154,7 @@ class TestParse_xml(TestCase):
     @mock.patch.object(Mariadb_test, 'execute')
     def test_multiple_authors(self, mock_execute):
         test_db = Mariadb_test()
-        result =parse_xml("valid-authors.xml", self.valid_dtd, test_db, self.valid_logger,("article","inproceedings"))
+        result =parse_xml(get_path("valid-authors.xml"), self.valid_dtd, test_db, self.valid_logger,("article","inproceedings"))
         self.assertEqual(result, 1)
         mock_execute.assert_called_with(
                                         ('a/b/c', datetime.datetime(2012, 2, 12, 0, 0), 'Aut hor;AutA horA;AutB horB;AutC horC;',
@@ -160,37 +167,37 @@ class TestParse_xml(TestCase):
 
     def test_article_valid_min(self):
         test_db = Mariadb_test()
-        result = parse_xml("valid-min.xml", self.valid_dtd, test_db, self.valid_logger)
+        result = parse_xml(get_path("valid-min.xml"), self.valid_dtd, test_db, self.valid_logger)
         self.assertEqual(result, 1)
 
     def test_article_valid_max(self):
         test_db = Mariadb_test()
-        result = parse_xml("valid-full.xml", self.valid_dtd, test_db, self.valid_logger)
+        result = parse_xml(get_path("valid-full.xml"), self.valid_dtd, test_db, self.valid_logger)
         self.assertEqual(result,1)
 
     def test_inproceedings_article(self):
         test_db = Mariadb_test()
-        result = parse_xml("valid-tags.xml", self.valid_dtd, test_db, self.valid_logger)
+        result = parse_xml(get_path("valid-tags.xml"), self.valid_dtd, test_db, self.valid_logger)
         self.assertEqual(result, 2)
 
     def test_limit_0(self):
         test_db = Mariadb_test()
-        result = parse_xml("valid-limit.xml", self.valid_dtd, test_db, self.valid_logger, limit=0)
+        result = parse_xml(get_path("valid-limit.xml"), self.valid_dtd, test_db, self.valid_logger, limit=0)
         self.assertEqual(result, 0)
 
     def test_limit_1(self):
         test_db = Mariadb_test()
-        result = parse_xml("valid-limit.xml", self.valid_dtd, test_db, self.valid_logger, limit=1)
+        result = parse_xml(get_path("valid-limit.xml"), self.valid_dtd, test_db, self.valid_logger, limit=1)
         self.assertEqual(result, 1)
 
     def test_limit_max(self):
         test_db = Mariadb_test()
-        result = parse_xml("valid-limit.xml", self.valid_dtd, test_db, self.valid_logger, limit=99)
+        result = parse_xml(get_path("valid-limit.xml"), self.valid_dtd, test_db, self.valid_logger, limit=99)
         self.assertEqual(result, 5)
 
     def test_limit_equal(self):
         test_db = Mariadb_test()
-        result = parse_xml("valid-limit.xml", self.valid_dtd, test_db, self.valid_logger, limit=5)
+        result = parse_xml(get_path("valid-limit.xml"), self.valid_dtd, test_db, self.valid_logger, limit=5)
         self.assertEqual(result, 5)
 
 
