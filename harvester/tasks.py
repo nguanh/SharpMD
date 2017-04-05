@@ -24,7 +24,7 @@ def test(package,class_name,config_id):
 def harvestsource(package, class_name, config_id):
     active_queue = app.control.inspect().active()["celery@bremen"]
     parameter_list= [package,class_name,config_id]
-    print("Parameter", parameter_list)
+    print("AAAAAAAAAA")
     for active_task in active_queue:
         print(active_task["args"])
         if active_task["args"][0] == parameter_list[0]:
