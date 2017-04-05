@@ -23,15 +23,18 @@ def test(package,class_name,config_id):
 @shared_task
 def harvestsource(package, class_name, config_id):
     active_queue = app.control.inspect().active()["celery@bremen"]
+    print(active_queue)
     for active_task in active_queue:
+        print(active_task["args"])
         if active_task["args"] == [package, class_name, config_id]:
             print("TASK IS ALREADY RUNNING")
             return None
+    """
     print("Active:",len(active_queue))
     print(app.control.inspect().active())
     print("Reserved:",len(app.control.inspect().reserved()))
     print(app.control.inspect().reserved())
-
+    """
     """
 
     :param package: relative path to package
