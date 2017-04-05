@@ -20,3 +20,10 @@ app.autodiscover_tasks()
 @app.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))
+
+
+@app.task()
+def inspect_task():
+    print(app.control.inspect())
+    print(app.control.inspect().active_queues())
+

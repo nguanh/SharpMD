@@ -17,6 +17,10 @@ def test(package,class_name,config_id):
         print("config not found")
 
 
+@shared_task()
+def inspect_task():
+    pass
+
 @shared_task
 def harvestsource(package, class_name, config_id):
     """
