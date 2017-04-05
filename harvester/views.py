@@ -5,7 +5,6 @@ import tailer
 from .models import Config
 PROJECT_DIR = os.path.dirname(__file__)
 
-
 def log(request, config_id):
     config = get_object_or_404(Config, pk=config_id)
     log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
@@ -13,7 +12,8 @@ def log(request, config_id):
     log_file = os.path.join(log_dir, "{}.log").format(log_name)
     log_exists = os.path.isfile(os.path.join(log_file))
     if log_exists:
-        log_text = tailer.tail(log_file,40)
+        with open(log_file, 'r') as f:
+            log_text = tailer.tail(f, 40)
     else:
         log_text = "No log found!"
 
