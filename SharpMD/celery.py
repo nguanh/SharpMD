@@ -26,5 +26,5 @@ def debug_task(self):
 def inspect_task():
     print(app.control.inspect().active())
     print(app.control.inspect().reserved())
-    print(app.control.inspect().scheduled())
+    # print(app.control.inspect().scheduled())
 

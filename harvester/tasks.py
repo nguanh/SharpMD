@@ -6,6 +6,7 @@ from celery import states
 from .exception import IHarvest_Disabled,IHarvest_Exception
 from .harvest_task import harvest_task
 from .models import Config
+from SharpMD.celery import app
 
 
 
@@ -21,6 +22,8 @@ def test(package,class_name,config_id):
 
 @shared_task
 def harvestsource(package, class_name, config_id):
+    print("Active:",len(app.control.inspect().active()))
+    print("Reserved:",len(app.control.inspect().reserved()))
     """
 
     :param package: relative path to package
