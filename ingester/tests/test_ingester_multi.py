@@ -28,7 +28,7 @@ class TestIngesterMulti(TransactionTestCase):
         # insert data
         dblp_article = ("dblpkey",  # key
                         "2011-11-11",  # mdate
-                        "Andreas Anders;Bertha Theresa Balte;Carim Chass Jr.;",  # authors
+                        "Andreas Anders;Bertha Theresa Balte;",  # authors
                         "The Ultimate Title",  # title
                         "10-14",  # pages
                         datetime.date(2005,1,1),  # pub year
@@ -51,7 +51,7 @@ class TestIngesterMulti(TransactionTestCase):
         arxiv_article = ("arxivkey",  # identifier
                          "2007-07-07",  # created
                          "2008-08-08",  # updated
-                         "Andreas Theodor Anders;Bertha Theresa Balte;",  # authors
+                         "Andreas Theodor Anders;Bertha Theresa Balte;Carim Chass Jr.;",  # authors
                          "The Ultimate Title!",  # title
                          None,  # mscclass
                          None,  # acmclass
@@ -103,7 +103,8 @@ class TestIngesterMulti(TransactionTestCase):
         self.assertEqual(authors_model.objects.count(), 3)
         self.assertEqual(author_aliases.objects.count(), 4)
         self.assertEqual(author_alias_source.objects.count(), 5)
-        #TODO publication authors
+        # publication authors
+        self.assertEqual(publication_author.objects.count(), 8)
         # check publication
         publ = publication.objects.first()
         self.assertEqual(publ.title, "The Ultimate Title") # from DBLP
@@ -118,12 +119,10 @@ class TestIngesterMulti(TransactionTestCase):
         self.assertEqual(publ.number,"3")   # DBLP
         # check diff tree
         diff = deserialize_diff_store(publ.differences)
-        print(diff["date_added"])
         self.assertEqual(diff["url_id"],[1,3])
         self.assertEqual(diff["doi"],[{"bitvector":1, "votes": 0, "value": "http://google.de"},
                                       {"bitvector": 2, "votes": 0, "value": "http://google.com"}])
         self.assertEqual(diff["copyright"],[])
-        print(diff["type_ids"])
         self.assertEqual(diff["type_ids"],[{"bitvector":1, "votes": 0, "value": 1},
                                       {"bitvector": 2, "votes": 0, "value": 2}])
         self.assertEqual(diff["pages"],[{"bitvector":1, "votes": 0, "value": "10-14"}])

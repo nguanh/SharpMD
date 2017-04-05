@@ -91,7 +91,7 @@ def ingest_data(ingester_obj):
             publication_values["differences"] = serialized_tree
             publication_values["cluster"] = cluster_obj
             publication_values["url"] = def_url_obj
-            publication_values["date_added"] = None
+            publication_values["date_added"] = None # is set to None because this value is ambiguous
             publication_values["date_published"] = datetime.date(publication_values["date_published"],1,1)
             # 8.store publication
             for key, value in publication_values.items():

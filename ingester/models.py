@@ -136,6 +136,9 @@ class publication_author(models.Model):
     def test(self):
         return[self.url.id, self.author.id,self.priority]
 
+    class Meta:
+        unique_together=('url','author')
+
 
 class author_aliases(models.Model):
     alias = models.CharField(max_length=200 )

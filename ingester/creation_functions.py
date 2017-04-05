@@ -35,7 +35,7 @@ def create_authors(matching_list, author_list, local_url_obj):
         parsed,created = author_aliases.objects.get_or_create(alias=author["parsed_name"], author=author_obj)
         author_alias_source.objects.get_or_create(alias=orig, url=local_url_obj)
         author_alias_source.objects.get_or_create(alias=parsed, url=local_url_obj)
-        publication_author.objects.create(url=local_url_obj, author=author_obj, priority=priority)
+        publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, priority=priority)
         # store author
         result.append(author_obj)
         priority += 1
@@ -65,9 +65,7 @@ def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=N
 
     # add authors to default pub
     for priority, author_obj in enumerate(author_objs):
-        #author = authors_model.objects.get(id=author_obj)
-
-        publication_author.objects.create(url=url_id,author=author_obj,priority=priority)
+        publication_author.objects.get_or_create(url=url_id, author=author_obj, priority=priority)
     # get return publication_id
     return [publication_data, url_id]
 
