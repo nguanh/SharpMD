@@ -6,6 +6,7 @@ from celery import states
 from .exception import IHarvest_Disabled,IHarvest_Exception
 from .harvest_task import harvest_task
 from .models import Config
+from celery.app.control import Inspect
 
 
 @shared_task
