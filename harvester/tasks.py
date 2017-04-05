@@ -31,7 +31,7 @@ def harvestsource(package, class_name, config_id):
         if active_task["args"] == parameter_list:
             print("TASK IS ALREADY RUNNING")
             return None
-        else
+        else:
             print("NOT EQUAL, FUCCCK")
     """
     print("Active:",len(active_queue))
