@@ -26,7 +26,7 @@ def harvestsource(package, class_name, config_id):
     parameter_list= "[{},{},{}]".format(package, class_name, config_id)
     for active_task in active_queue:
         print(active_task["args"])
-        print(isinstance(active_task["args"]),str)
+        print(isinstance(active_task["args"],str))
         print(parameter_list)
         if active_task["args"] == parameter_list:
             print("TASK IS ALREADY RUNNING")
