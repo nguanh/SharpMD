@@ -11,10 +11,9 @@ PROJECT_DIR = os.path.dirname(__file__)
 
 
 def harvest_task(package, class_name, config_id):
-        #load config files
+        # load config files
         try:
             config = Config.objects.get(id=config_id)
-            print(config.name)
         except Config.DoesNotExist:
             raise IHarvest_Exception("{} is invalid config_id".format(config_id))
 
