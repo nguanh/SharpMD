@@ -40,7 +40,7 @@ def harvestsource(package, class_name, config_id):
             matches += 1
 
     if matches > 1:
-        print("Task is already running")
+        print("Task {} is already running, skipping execution".format(parameter_list))
         return None
     try:
         harvest_task(package, class_name, config_id)
