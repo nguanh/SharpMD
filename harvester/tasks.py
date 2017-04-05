@@ -23,7 +23,8 @@ def test(package,class_name,config_id):
 @shared_task
 def harvestsource(package, class_name, config_id):
     active_queue = app.control.inspect().active()["celery@bremen"]
-    print(active_queue)
+    parameter_list= [package,class_name,config_id]
+    print("Parameter", parameter_list)
     for active_task in active_queue:
         print(active_task["args"])
         if active_task["args"] == [package, class_name, config_id]:
