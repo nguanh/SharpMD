@@ -6,7 +6,7 @@ from celery import states
 from .exception import IHarvest_Disabled,IHarvest_Exception
 from .harvest_task import harvest_task
 from .models import Config
-from celery.app.control import Inspect
+
 
 
 @shared_task
@@ -17,14 +17,6 @@ def test(package,class_name,config_id):
     except Config.DoesNotExist:
         print("config not found")
 
-
-@shared_task()
-def inspect_task2():
-    x = Inspect()
-    print("Active Q",x.active_queues())
-    print("Reserved", x.reserved())
-    print ("Reg2", x.registered())
-    print("Registered", x.registered_tasks)
 
 
 @shared_task
