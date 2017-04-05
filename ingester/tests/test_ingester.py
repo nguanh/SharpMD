@@ -1,4 +1,4 @@
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 from dblp.queries import DBLP_ARTICLE, ADD_DBLP_ARTICLE
@@ -13,7 +13,7 @@ test_path = os.path.dirname(__file__)
 ingester_path = os.path.dirname(test_path)
 
 
-class TestIngesterDblp(TransactionTestCase):
+class TestIngester(TransactionTestCase):
     fixtures = [os.path.join(ingester_path, "fixtures", "initial_data.json")]
 
     def setUp(self):

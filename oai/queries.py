@@ -19,7 +19,6 @@ OAI_DATASET = (
     "  `last_updated` TIMESTAMP,"
     "  `last_harvested` TIMESTAMP,"
     "  PRIMARY KEY (`identifier`)"
-    #") ENGINE=TokuDB CHARSET=utf8mb4")
     ") ENGINE=InnoDB CHARSET=utf8mb4")
 
 ADD_OAI_DEFAULT = ("INSERT INTO oaipmh_articles"
@@ -65,7 +64,6 @@ ARXIV_ARTICLE = (
     "  `last_updated` TIMESTAMP,"
     "  `last_harvested` TIMESTAMP,"
     "  PRIMARY KEY (`identifier`)"
-    # ") ENGINE=TokuDB CHARSET=utf8mb4")
     ") ENGINE=InnoDB CHARSET=utf8mb4")
 
 

@@ -3,7 +3,6 @@ import re
 from ingester.Iingester import Iingester
 from ingester.helper import split_authors
 from conf.config import get_config
-from mysqlWrapper.mariadb import MariaDb
 from ingester.models import global_url
 
 
