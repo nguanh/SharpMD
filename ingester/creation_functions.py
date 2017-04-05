@@ -49,7 +49,6 @@ def create_title(matching, cluster_name):
         cluster_obj = cluster.objects.get(id=matching["id"])
     return cluster_obj
 
-#TODO cluster id is id
 def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None):
     # find publication associated with cluster_id
     try:

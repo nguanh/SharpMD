@@ -177,8 +177,8 @@ class publication(models.Model):
     doi = models.TextField(null=True, default=None)
     abstract = models.TextField(null=True, default=None)
     copyright = models.TextField(null=True, default=None)
-    date_added = models.DateField(null=True,default=None)
-    date_published = models.DateField(null=True,default=None)
+    date_added = models.DateField(null=True, default=None)
+    date_published = models.DateField(null=True, default=None)
     volume = models.CharField(max_length=20, null=True, default=None)
     number = models.CharField(max_length=20, null=True, default=None)
 

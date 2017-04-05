@@ -78,8 +78,10 @@ def ingest_data(ingester_obj):
             source_lurl_obj.medium = pub_medium_obj
             source_lurl_obj.save()
             # 6.get /create diff tree
-            mapping['publication']['url_id'] = def_url_obj.id
-            mapping['publication']['pub_source_ids'] = pub_medium_obj.id
+            mapping['publication']['url_id'] = source_lurl_obj.id
+            # handle if there is no pub_medium
+            if pub_medium_obj is not None:
+                mapping['publication']['pub_source_ids'] = pub_medium_obj.id
             mapping['publication']['type_ids'] = type_obj.id
             diff_tree = update_diff_tree(def_pub_obj, mapping['publication'], author_ids)
             # 7.get default values from diff tree and re-serialize tree

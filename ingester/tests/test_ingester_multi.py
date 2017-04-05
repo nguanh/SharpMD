@@ -4,7 +4,9 @@ from mysqlWrapper.mariadb import MariaDb
 from dblp.queries import DBLP_ARTICLE, ADD_DBLP_ARTICLE
 from oai.queries import ARXIV_ARTICLE, ADD_ARXIV
 from dblp.dblpingester import DblpIngester
+from oai.arxivingester import ArxivIngester
 from ingester.ingesting_function import ingest_data
+from ingester.difference_storage import deserialize_diff_store
 from ingester.exception import IIngester_Exception
 from ingester.models import *
 from .ingester_tools import setup_tables, get_table_data
@@ -26,7 +28,7 @@ class TestIngesterMulti(TransactionTestCase):
         # insert data
         dblp_article = ("dblpkey",  # key
                         "2011-11-11",  # mdate
-                        "Andreas Anders; Bertha Theresa Balte; Carim Chass Jr.;",  # authors
+                        "Andreas Anders;Bertha Theresa Balte;Carim Chass Jr.;",  # authors
                         "The Ultimate Title",  # title
                         "10-14",  # pages
                         datetime.date(2005,1,1),  # pub year
@@ -49,7 +51,7 @@ class TestIngesterMulti(TransactionTestCase):
         arxiv_article = ("arxivkey",  # identifier
                          "2007-07-07",  # created
                          "2008-08-08",  # updated
-                         "Andreas Theodor Anders; Bertha Theresa Balte;",  # authors
+                         "Andreas Theodor Anders;Bertha Theresa Balte;",  # authors
                          "The Ultimate Title!",  # title
                          None,  # mscclass
                          None,  # acmclass
@@ -76,4 +78,60 @@ class TestIngesterMulti(TransactionTestCase):
         dblpingester = DblpIngester("dblp.ingester", harvesterdb="test_storage")
         result = ingest_data(dblpingester)
         self.assertEqual(result,1)
+
         # then arxiv
+        arxivingester = ArxivIngester("arxiv.ingester", harvester_db="test_storage")
+        result2 = ingest_data(arxivingester)
+        self.assertEqual(result2, 1)
+
+        # check all tables
+        self.assertEqual(cluster.objects.count(), 1)
+        self.assertEqual(publication.objects.count(), 1)
+        self.assertEqual(local_url.objects.count(), 3)
+        self.assertEqual(global_url.objects.count(), 4)
+        self.assertEqual(limbo_authors.objects.count(), 0)
+        self.assertEqual(limbo_pub.objects.count(), 0)
+        self.assertEqual(pub_medium.objects.count(),1)
+        # check local url
+        dblp_url = local_url.objects.get(id=1)
+        pub_url = local_url.objects.get(id=2)
+        arxiv_url = local_url.objects.get(id=3)
+        self.assertEqual(dblp_url.test(), [3, "dblpkey", 1, publication_type.objects.get(name="article").id])
+        self.assertEqual(arxiv_url.test(), [4, "arxivkey", None, publication_type.objects.get(name="misc").id])
+        self.assertEqual(pub_url.test(), [1, "TODO PLATZHALTER", 1, publication_type.objects.get(name="article").id])
+        # check authors
+        self.assertEqual(authors_model.objects.count(), 3)
+        self.assertEqual(author_aliases.objects.count(), 4)
+        self.assertEqual(author_alias_source.objects.count(), 5)
+        #TODO publication authors
+        # check publication
+        publ = publication.objects.first()
+        self.assertEqual(publ.title, "The Ultimate Title") # from DBLP
+        self.assertEqual(publ.pages, "10-14")  # DBLP
+        self.assertEqual(publ.note, None)
+        self.assertEqual(publ.doi, "http://google.de")  # DBLP
+        self.assertEqual(publ.abstract, "this is a test")  # arxiv
+        self.assertEqual(publ.copyright, None)
+        self.assertEqual(publ.date_added,None)
+        self.assertEqual(publ.date_published,datetime.date(2005,1,1))   # DBLP
+        self.assertEqual(publ.volume,"2")   # DBLP
+        self.assertEqual(publ.number,"3")   # DBLP
+        # check diff tree
+        diff = deserialize_diff_store(publ.differences)
+        print(diff["date_added"])
+        self.assertEqual(diff["url_id"],[1,3])
+        self.assertEqual(diff["doi"],[{"bitvector":1, "votes": 0, "value": "http://google.de"},
+                                      {"bitvector": 2, "votes": 0, "value": "http://google.com"}])
+        self.assertEqual(diff["copyright"],[])
+        print(diff["type_ids"])
+        self.assertEqual(diff["type_ids"],[{"bitvector":1, "votes": 0, "value": 1},
+                                      {"bitvector": 2, "votes": 0, "value": 2}])
+        self.assertEqual(diff["pages"],[{"bitvector":1, "votes": 0, "value": "10-14"}])
+
+
+
+
+
+
+
+
