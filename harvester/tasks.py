@@ -19,8 +19,13 @@ def test(package,class_name,config_id):
 
 
 @shared_task()
-def inspect_task():
-    pass
+def inspect_task2():
+    x = Inspect()
+    print("Active Q",x.active_queues())
+    print("Reserved", x.reserved())
+    print ("Reg2", x.registered())
+    print("Registered", x.registered_tasks)
+
 
 @shared_task
 def harvestsource(package, class_name, config_id):
