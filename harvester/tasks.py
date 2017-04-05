@@ -22,23 +22,6 @@ def test(package,class_name,config_id):
 
 @shared_task
 def harvestsource(package, class_name, config_id):
-    active_queue = app.control.inspect().active()["celery@bremen"]
-    parameter_list= "['{}', '{}', {}]".format(package, class_name, config_id)
-    for active_task in active_queue:
-        print(active_task["args"])
-        print(isinstance(active_task["args"],str))
-        print(parameter_list)
-        if active_task["args"] == parameter_list:
-            print("TASK IS ALREADY RUNNING")
-            return None
-        else:
-            print("NOT EQUAL, FUCCCK")
-    """
-    print("Active:",len(active_queue))
-    print(app.control.inspect().active())
-    print("Reserved:",len(app.control.inspect().reserved()))
-    print(app.control.inspect().reserved())
-    """
     """
 
     :param package: relative path to package
@@ -46,6 +29,19 @@ def harvestsource(package, class_name, config_id):
     :param config_id: id of config model containing all config related data
     :return:
     """
+
+    # Check if task is already running by checking queue for task with same parameters
+    active_queue = app.control.inspect().active()["celery@bremen"]
+    # transform parameter to string list for comparision
+    parameter_list = "['{}', '{}', {}]".format(package, class_name, config_id)
+    matches = 0
+    for active_task in active_queue:
+        if active_task["args"] == parameter_list:
+            matches += 1
+
+    if matches > 1:
+        print("Task is already running")
+        return None
     try:
         harvest_task(package, class_name, config_id)
     except ImportError as e:
