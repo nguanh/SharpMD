@@ -18,4 +18,4 @@ sudo pip3 install django-admin-row-actions
 sudo pip3 install lxml
 sudo pip3 install jsonfield
 sudo pip3 install mysqlclient
-
+sudo pip3 install requests
