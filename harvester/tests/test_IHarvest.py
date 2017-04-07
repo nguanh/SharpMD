@@ -47,7 +47,6 @@ class TestIHarvest(TestCase):
             url="http://google.de",
             module_path="dblp.dblpharvester",
             module_name="DblpHarvester",
-            task="harvester.tasks.test",
             schedule= self.schedule,
             extra_config={"a":1}
         )

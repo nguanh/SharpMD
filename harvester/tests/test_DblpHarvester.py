@@ -36,7 +36,6 @@ class TestIHarvest(TestCase):
             url="http://test.de/",
             module_path="dblp.dblpharvester",
             module_name="DblpHarvester",
-            task="harvester.tasks.test",
             schedule= self.schedule,
             extra_config={"zip_name": "dblp.xml.gz",
                           "dtd_name": "dblp.dtd",

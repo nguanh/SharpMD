@@ -35,7 +35,6 @@ class TestIHarvest(TestCase):
             url="http://google.de",
             module_path="dblp.dblpharvester",
             module_name="DblpHarvester",
-            task="harvester.tasks.test",
             schedule= self.schedule,
             extra_config={"a":1}
         )
@@ -49,14 +48,12 @@ class TestIHarvest(TestCase):
             url="http://google.de",
             module_path="dblp.dblpharvester",
             module_name="DblpHarvester",
-            task="harvester.tasks.test",
             schedule=self.schedule,
             extra_config={"a": 1}
         )
         task = test.celery_task
         self.assertNotEqual(test.name,task.name)
         self.assertEqual(test.schedule.schedule,task.interval)
-        self.assertEqual(test.task,task.task)
         self.assertEqual(task.args,json.dumps(["dblp.dblpharvester","DblpHarvester",self.config_id+1]))
         self.assertEqual(task.enabled, False)
 
@@ -69,7 +66,6 @@ class TestIHarvest(TestCase):
         task = self.config.celery_task
         self.assertEqual(task.name, "New Harvester-Task")
         self.assertEqual(task.args,json.dumps(["newpath","newname",self.config_id]))
-        self.assertEqual(task.task,self.config.task)
         self.assertEqual(task.enabled, True)
 
     def test_time_interval_all(self):
@@ -87,7 +83,6 @@ class TestIHarvest(TestCase):
             url="http://google.de",
             module_path="dblp.dblpharvester",
             module_name="DblpHarvester",
-            task="harvester.tasks.test",
             schedule=schedule,
             extra_config={"a": 1}
         )
@@ -113,7 +108,6 @@ class TestIHarvest(TestCase):
             url="http://google.de",
             module_path="dblp.dblpharvester",
             module_name="DblpHarvester",
-            task="harvester.tasks.test",
             schedule=schedule,
             extra_config={"a": 1}
         )
@@ -139,7 +133,6 @@ class TestIHarvest(TestCase):
             url="http://google.de",
             module_path="dblp.dblpharvester",
             module_name="DblpHarvester",
-            task="harvester.tasks.test",
             schedule=schedule,
             extra_config={"a": 1}
         )
@@ -165,7 +158,6 @@ class TestIHarvest(TestCase):
             url="http://google.de",
             module_path="dblp.dblpharvester",
             module_name="DblpHarvester",
-            task="harvester.tasks.test",
             schedule=schedule,
             extra_config={"a": 1}
         )
@@ -191,7 +183,6 @@ class TestIHarvest(TestCase):
                 url="http://google.de",
                 module_path="dblp.dblpharvester",
                 module_name="DblpHarvester",
-                task="harvester.tasks.test",
                 schedule=schedule,
                 extra_config={"a": 1}
             )

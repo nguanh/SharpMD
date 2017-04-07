@@ -36,7 +36,6 @@ class TestIHarvest(TestCase):
             url="http://citeseerx.ist.psu.edu/oai2",
             module_path="oai.oaiharvester",
             module_name="oaiHarvester",
-            task="harvester.tasks.test",
             schedule= self.schedule,
         )
 

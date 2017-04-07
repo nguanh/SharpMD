@@ -47,16 +47,16 @@ class Config(models.Model):
     # source url
     url = models.URLField()
     # addition config parameters set as json
-    extra_config = jsonfield.JSONField()
+    extra_config = jsonfield.JSONField( default=None, blank=True, null=True)
     module_path = models.CharField(max_length=200, default=None)
     module_name = models.CharField(max_length=200, default=None)
-    # task is not visible on creation
     schedule = models.ForeignKey(Schedule, default=None)
-    task = models.CharField(_('task name'), max_length=200)
     celery_task = models.ForeignKey(PeriodicTask, default=None, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
+
+
 
     # wird aufgerufen, sobald ein neuer Harvester erstellt wird, oder verändert wird
     def save(self, *args, **kwargs):
@@ -87,7 +87,7 @@ class Config(models.Model):
         if self.celery_task is not None:
             setattr(self.celery_task, 'name', "{}-Task".format(self.name))
             setattr(self.celery_task, 'interval', self.schedule.schedule)
-            setattr(self.celery_task, 'task', self.task)
+            setattr(self.celery_task, 'task', "harvester.tasks.harvestsource")
             setattr(self.celery_task, 'args', json.dumps(task_args))
             setattr(self.celery_task, 'enabled',self.enabled)
 
@@ -96,7 +96,7 @@ class Config(models.Model):
             obj = PeriodicTask(
                 name="{}-Task".format(self.name),
                 interval=self.schedule.schedule,
-                task=self.task,
+                task="harvester.tasks.harvestsource",
                 args=json.dumps(task_args),
                 enabled=self.enabled
             )

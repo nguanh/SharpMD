@@ -50,35 +50,13 @@ class ScheduleAdmin(AdminRowActionsMixin,admin.ModelAdmin):
 
 
 class ConfigForm(forms.ModelForm):
-    """Form that lets you create and modify periodic tasks."""
 
-    regtask = TaskChoiceField(
-        label=_('Task (registered)'),
-        required=False,
-    )
-    task = forms.CharField(
-        label=_('Task (custom)'),
-        required=False,
-        max_length=200,
-    )
 
     class Meta:
         """Form metadata."""
 
         model = Config
         exclude = ()
-
-    def clean(self):
-        # set task as the data from regtask
-        data = super(ConfigForm, self).clean()
-        regtask = data.get('regtask')
-        if regtask:
-            data['task'] = regtask
-        if not data['task']:
-            exc = forms.ValidationError(_('Need name of task'))
-            self._errors['task'] = self.error_class(exc.messages)
-            raise exc
-        return data
 
     def clean_limit(self):
         if self.cleaned_data["limit"] is None:
@@ -107,7 +85,7 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
     form = ConfigForm
     model = Config
     # welche attribute sollen in der listenansicht gezeigt werden
-    list_display = ('__str__', 'enabled','task')
+    list_display = ('__str__', 'enabled')
     """Admin-interface for Harvester Configs."""
     def get_row_actions(self, obj):
         row_actions = [
@@ -127,7 +105,7 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
             'classes': ('extrapretty', 'wide'),
         }),
         ('Schedule', {
-            'fields': ('schedule', 'regtask','task', 'module_path','module_name'),
+            'fields': ('schedule', 'module_path','module_name'),
             'classes': ('extrapretty', 'wide', ),
         }),
     )
