@@ -84,7 +84,8 @@ def n_set_popular(connector,word_list):
         connector.execute_ex(("INSERT INTO `n_popular_words`(word,counter) VALUES(%s,1)"
                               "ON DUPLICATE KEY UPDATE counter= counter+1"), (word,))
 
-if __name__ =="__main__":
+
+def run():
     setup()
     read_connector = MariaDb()
     write_connector = MariaDb(db=DB_NAME)
@@ -101,3 +102,5 @@ if __name__ =="__main__":
 
     read_connector.close_connection()
     write_connector.close_connection()
+if __name__ =="__main__":
+    run()
