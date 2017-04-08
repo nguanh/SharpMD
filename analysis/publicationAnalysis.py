@@ -34,7 +34,9 @@ N_POPULAR = ("CREATE TABLE `n_popular_words` ("
     ") ENGINE={} CHARSET=utf8mb4")
 
 
-DBLP_QUERY = ("SELECT * FROM {}.dblp_article").format("harvester")
+DBLP_QUERY = ("SELECT mdate,title,pub_year FROM {}.dblp_article LIMIT 1000").format("harvester")
+
+
 def setup():
     """
     create database and table structure
@@ -56,10 +58,10 @@ def setup():
 
 def dblp_mapping(query_tuple):
     return {
-        "pub": query_tuple[5],
-        "mdate": query_tuple[1],
-        "title": query_tuple[3].split(" "),
-        "normal": normalize_title(query_tuple[3]).split(" "),
+        "pub": query_tuple[2],
+        "mdate": query_tuple[0],
+        "title": query_tuple[1].split(" "),
+        "normal": normalize_title(query_tuple[1]).split(" "),
     }
 def set_mdate(connector,mdate):
     connector.execute_ex(("INSERT INTO `mdates`(mdate,counter) VALUES(%s,1)"
