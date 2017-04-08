@@ -3,7 +3,7 @@ from django.db import models
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from .helper import get_name_block, normalize_title
 import json
-
+from django.db.models.signals import pre_delete
 
 class Config(models.Model):
     # Name of the harvester for identification
@@ -18,6 +18,10 @@ class Config(models.Model):
     # task is not visible on creation
     ingester_task = models.ForeignKey(PeriodicTask, default=None, null=True, blank=True,
                                       related_name="ingester_task", on_delete=models.CASCADE)
+
+
+    def __str__(self):
+        return self.name
 
     def save(self, *args, **kwargs):
         # save object to get its id
@@ -303,5 +307,13 @@ class limbo_authors(models.Model):
     priority = models.IntegerField(null=True, default=None)
 
     def test(self):
-        return [self.publication.id, self.reason, self.name,self.priority]
+        return [self.publication.id, self.reason, self.name, self.priority]
 
+
+def delete_task(sender, instance, using, **kwargs):
+    try:
+        instance.ingester_task.delete()
+    except Exception as e:
+        print(e)
+
+pre_delete.connect(delete_task, sender=Config)

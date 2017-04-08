@@ -1,9 +1,9 @@
 from django.db import models
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
-from django.utils.translation import ugettext_lazy as _
 import json
 import jsonfield
 import datetime
+from django.db.models.signals import pre_delete
 
 
 class Schedule(models.Model):
@@ -106,3 +106,10 @@ class Config(models.Model):
 
 
 
+def delete_task(sender,instance,using, **kwargs):
+    try:
+        instance.celery_task.delete()
+    except Exception as e:
+        print(e)
+
+pre_delete.connect(delete_task, sender=Config)
