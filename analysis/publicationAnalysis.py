@@ -34,7 +34,7 @@ N_POPULAR = ("CREATE TABLE `n_popular_words` ("
     ") ENGINE={} CHARSET=utf8mb4")
 
 
-DBLP_QUERY = ("SELECT mdate,title,pub_year FROM {}.dblp_article LIMIT 1000").format("harvester")
+DBLP_QUERY = ("SELECT mdate,title,pub_year FROM {}.dblp_article").format("harvester")
 
 
 def setup():
