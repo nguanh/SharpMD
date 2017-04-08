@@ -72,6 +72,23 @@ class pub_medium(models.Model):
         self.block_name = normalize_title(self.main_name)
         super(pub_medium, self).save(*args, **kwargs)
 
+class keywordsModel(models.Model):
+    main_name = models.TextField()
+    block_name = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True, default=None)
+
+    def __str__(self):
+        return self.block_name
+
+    def save(self, *args, **kwargs):
+        # auto normalize author name
+        self.block_name = normalize_title(self.main_name)
+        super(keywordsModel, self).save(*args, **kwargs)
+
+    def test(self):
+        return [self.main_name, self.block_name]
+
+
 # ===========================================NON-HARVEST===============================================================
 # the values in these tables are not harvested but set by users or admin
 
@@ -98,11 +115,14 @@ class local_url(models.Model):
     url = models.CharField(max_length=150)
     medium = models.ForeignKey(pub_medium, default=None, null=True, blank=True)
     type = models.ForeignKey(publication_type, default=None, null=True, blank=True)
-
+    keyword = models.ForeignKey(keywordsModel, default=None, null=True, blank=True)
+    study_field = models.ForeignKey(study_field, default=None,null=True,blank=True)
     def test(self):
         medium = None if self.medium is None else self.medium.id
         u_type = None if self.type is None else self.type.id
-        return [self.global_url.id, self.url, medium, u_type]
+        sf = None if self.study_field is None else self.study_field.id
+        kw = None if self.keyword is None else self.keyword
+        return [self.global_url.id, self.url, medium, u_type, sf, kw]
 
 
 # ======================================= AUTHORS =====================================================================
@@ -206,6 +226,42 @@ class pub_alias_source(models.Model):
 
     class Meta:
         unique_together = ("alias", "url")
+
+# =============================================== KEYWORDS ===============================================================
+
+
+class publication_keyword(models.Model):
+    url = models.ForeignKey(local_url)
+    keyword = models.ForeignKey(keywordsModel)
+
+    def test(self):
+        return [self.url.id, self.keyword]
+
+    class Meta:
+        unique_together = ('url', 'keyword')
+
+
+class keyword_aliases(models.Model):
+    alias = models.CharField(max_length=200)
+    keyword = models.ForeignKey(keywordsModel)
+
+    def test(self):
+        return [self.keyword.id, self.alias]
+
+    class Meta:
+        unique_together = ('alias', 'keyword')
+
+
+class keyword_alias_source(models.Model):
+    alias = models.ForeignKey(keyword_aliases)
+    url = models.ForeignKey(local_url)
+
+    def test(self):
+        return [self.alias.id, self.url.id]
+
+    class Meta:
+        unique_together = ("alias", "url")
+
 
 # =============================================== LIMBO ===============================================================
 
