@@ -6,7 +6,7 @@ import json
 import datetime
 
 
-class TestIHarvest(TestCase):
+class TestModels(TestCase):
     def setUp(self):
         # create IntervalSchedule
         self.config_id = 100

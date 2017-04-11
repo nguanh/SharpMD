@@ -114,7 +114,7 @@ class TestHarvest_task(TestCase):
         self.config.save()
         self.assertTrue(harvest_task("harvester.tests.test_harvest_task", "MockHarvester", self.config_id))
         newconfig = Config.objects.get(id=self.config_id)
-        self.assertEqual(newconfig.start_date,datetime.date(2011,1,26))
+        self.assertEqual(newconfig.start_date,datetime.date(2011,1,25))
         self.assertEqual(newconfig.end_date, datetime.date(2011,1,25))
 
 
@@ -133,3 +133,42 @@ class TestHarvest_task(TestCase):
         newconfig = Config.objects.get(id=self.config_id)
         self.assertEqual(newconfig.start_date,datetime.date(2011,1,17))
         self.assertEqual(newconfig.end_date, datetime.date(2011,1,24))
+
+
+
+    def test_monthly_limited_today(self):
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        schedule,created = Schedule.objects.get_or_create(
+            name="test_schedule",
+            time_interval= "month",
+            schedule= self.interval,
+            min_date = yesterday,
+            max_date = None,
+        )
+        self.config.schedule = schedule
+        self.config.save()
+        #execution is skipped, because end date would be too far in the future
+        self.assertTrue(harvest_task("harvester.tests.test_harvest_task", "MockHarvester", self.config_id))
+        newconfig = Config.objects.get(id=self.config_id)
+        self.assertEqual(newconfig.start_date,yesterday)
+        self.assertEqual(newconfig.end_date, yesterday+ datetime.timedelta(days=30))
+
+    def test_weekly_last_week(self):
+        last_week = datetime.date.today() - datetime.timedelta(days=8)
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        schedule,created = Schedule.objects.get_or_create(
+            name="test_schedule",
+            time_interval= "week",
+            schedule= self.interval,
+            min_date = last_week,
+            max_date = None,
+        )
+        self.config.schedule = schedule
+        self.config.save()
+        self.assertEqual(self.config.start_date,last_week)
+        self.assertEqual(self.config.end_date,yesterday)
+        #execution is skipped, because end date would be too far in the future
+        self.assertTrue(harvest_task("harvester.tests.test_harvest_task", "MockHarvester", self.config_id))
+        newconfig = Config.objects.get(id=self.config_id)
+        self.assertEqual(newconfig.start_date, datetime.date.today())
+        self.assertEqual(newconfig.end_date, datetime.date.today() + datetime.timedelta(days=7))

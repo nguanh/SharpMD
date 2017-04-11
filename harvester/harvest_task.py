@@ -43,6 +43,12 @@ def harvest_task(package, class_name, config_id):
             logger.error(e)
             raise
         source = None
+
+        # check end date in config
+        if config.end_date is not None and config.end_date > datetime.date.today():
+            logger.info("Skipping {} due to end date".format(name))
+            return True
+
         try:
             source = imported_class(config_id)
             if isinstance(source, IHarvest) is False:
@@ -55,9 +61,6 @@ def harvest_task(package, class_name, config_id):
                 print("Finished {}".format(name))
                 source.cleanup()
                 print("Cleanup {}".format(name))
-                start_date = config.start_date
-                end_date = config.end_date
-                max_date = config.schedule.max_date or datetime.date.today()
                 interval = config.schedule.time_interval
 
                 days = 1
@@ -74,9 +77,16 @@ def harvest_task(package, class_name, config_id):
 
                 # set new start and end dates by shifting the interval for X days
                 # end date cannot be in the future so maximum is today
-                if start_date is not None:
-                    config.start_date = end_date + datetime.timedelta(days=1)
-                    config.end_date = min(max_date, config.start_date + datetime.timedelta(days=days))
+                if config.start_date is not None:
+                    config.start_date = config.end_date + datetime.timedelta(days=1)
+                    if config.schedule.max_date is None:
+                        config.end_date = config.start_date + datetime.timedelta(days=days)
+                    else:
+                        config.end_date = min(config.schedule.max_date,
+                                              config.start_date + datetime.timedelta(days=days))
+                    # boundary conditioon if max date is reached
+                    if config.start_date > config.end_date:
+                        config.start_date = config.end_date
                     logger.info("Updating dates: {} - {}".format(
                                 config.start_date.strftime("%Y.%m.%d"),
                                 config.end_date.strftime("%Y.%m.%d")))

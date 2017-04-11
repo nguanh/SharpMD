@@ -69,18 +69,22 @@ class Config(models.Model):
         if self.start_date is None:
             time_interval = self.schedule.time_interval
             self.start_date = self.schedule.min_date
-            max_date = self.schedule.max_date or datetime.date.today()
             if time_interval == "all":
+                # harvester cannot go into future for one time exevution
                 self.end_date = self.schedule.max_date
+            #allw end dates into the future
             elif time_interval == "month":
-                new_date = self.schedule.min_date + datetime.timedelta(days=30)
-                self.end_date = min(new_date, max_date)
+                self.end_date = self.schedule.min_date + datetime.timedelta(days=30)
+                if self.schedule.max_date is not None:
+                    self.end_date = min(self.end_date, self.schedule.max_date)
             elif time_interval == "week":
-                new_date = self.schedule.min_date + datetime.timedelta(days=7)
-                self.end_date = min(new_date, max_date)
+                self.end_date = self.schedule.min_date + datetime.timedelta(days=7)
+                if self.schedule.max_date is not None:
+                    self.end_date = min(self.end_date, self.schedule.max_date)
             elif time_interval == "day":
-                new_date = self.schedule.min_date + datetime.timedelta(days=1)
-                self.end_date = min(new_date, max_date)
+                self.end_date = self.schedule.min_date + datetime.timedelta(days=1)
+                if self.schedule.max_date is not None:
+                    self.end_date = min(self.end_date, self.schedule.max_date)
 
         # join module path,name and id
         task_args = [self.module_path, self.module_name, self.id]
