@@ -1,5 +1,11 @@
 import scrapy
-
+import sys,os
+p = os.path.abspath(os.path.join('', "models"))
+sys.path.append(p)
+print(p)
+import weaver.models
+#mod = __import__("weaver.models", fromlist=["PDFDownloadQueue"])
+#weaver = getattr(mod, "PDFDownloadQueue")
 
 class PDFSpider(scrapy.Spider):
     # unique spider name
@@ -10,6 +16,8 @@ class PDFSpider(scrapy.Spider):
 
     def start_requests(self):
         # inital crawling list
+        pass
+        """
         urls = [
             'https://arxiv.org/pdf/1704.03423.pdf',
             #'http://quotes.toscrape.com/page/1/',
@@ -19,7 +27,7 @@ class PDFSpider(scrapy.Spider):
         for url in urls:
             self.lastUrl = url
             yield scrapy.Request(url=url, callback=self.parse)
-
+        """
     #method used to parse scraped responses
     def parse(self, response):
         # write httpresponse as a html file

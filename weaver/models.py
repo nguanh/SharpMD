@@ -10,3 +10,8 @@ class PDFDownloadQueue(models.Model):
     tries = models.IntegerField(default=0)
     # last unsuccessful attempt
     last_try = models.DateTimeField(blank=True, null=True, default=None)
+
+    def __str__(self):
+        return self.url
+
+

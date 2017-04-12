@@ -11,8 +11,8 @@
 
 BOT_NAME = 'PDFDownloader'
 
-SPIDER_MODULES = ['PDFDownloader.spiders']
-NEWSPIDER_MODULE = 'PDFDownloader.spiders'
+SPIDER_MODULES = ['PDFDownloader']
+NEWSPIDER_MODULE = 'PDFDownloader'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
