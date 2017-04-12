@@ -1,6 +1,8 @@
 import scrapy
 from scrapy.crawler import CrawlerProcess
 from weaver.models import PDFDownloadQueue
+from conf.config import get_config
+import os
 class PDFSpider(scrapy.Spider):
     # unique spider name
     name = "quotes"
@@ -13,7 +15,6 @@ class PDFSpider(scrapy.Spider):
         # generator call returning an iterable of requests
         for url in PDFDownloadQueue.objects.all():
             self.lastUrl = url.url
-            #yield scrapy.Request(url=url.url, callback=self.parse)
             yield self.make_requests_from_url(url.url)
 
 
@@ -21,10 +22,15 @@ class PDFSpider(scrapy.Spider):
     def parse(self, response):
         # write httpresponse as a html file
         filename = response.url.split("/")[-1]
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-        self.log('Saved file %s' % filename)
-        print("Parsed {}".format(self.lastUrl))
+        output = os.path.join(get_config("WEAVER")["pdf_path"],filename)
+        # check if file exists
+        if os.path.isfile(output) is False:
+            with open(output, 'wb') as f:
+                f.write(response.body)
+            self.log('Saved file %s' % filename)
+            print("Parsed {}".format(self.lastUrl))
+        else:
+            self.log("File {} already exists".format(output))
 
 
 def run():
