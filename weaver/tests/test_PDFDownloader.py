@@ -1,9 +1,11 @@
 from django.test import TransactionTestCase,mock
+from unittest.mock import patch
 from weaver.PDFDownloader import download_queue
 from weaver.models import PDFDownloadQueue
 import os
 import logging
 import sys
+
 
 class TestPDFDownloader(TransactionTestCase):
     def setUp(self):
@@ -41,5 +43,32 @@ class TestPDFDownloader(TransactionTestCase):
         self.assertTrue(os.path.isfile(os.path.join(self.output_folder, "1704.03732.pdf")))
         self.assertTrue(os.path.isfile(os.path.join(self.output_folder, "1704.03723.pdf")))
         self.assertEqual(result["successful"], 3)
+
+    def test_success_limit(self):
+        self.assertEqual(PDFDownloadQueue.objects.count(), 3)
+        result = download_queue(self.output_folder, self.logger, limit=1)
+        self.assertEqual(PDFDownloadQueue.objects.count(), 2)
+        self.assertTrue(os.path.isfile(os.path.join(self.output_folder, "1704.03738.pdf")))
+        self.assertEqual(result["successful"], 1)
+
+    def test_invalid_link(self):
+        PDFDownloadQueue.objects.all().delete()
+        PDFDownloadQueue.objects.create(url="https://arxiv.org/pdf/1704dasdsad738.pdf", tries=0)
+        result = download_queue(self.output_folder, self.logger)
+        self.assertEqual(result["invalid"],1)
+        self.assertEqual(PDFDownloadQueue.objects.count(),0)
+
+    @patch("weaver.PDFDownloader.requests.get")
+    def test_403(self,req):
+        req.return_value.status_code = 403
+        PDFDownloadQueue.objects.all().delete()
+        PDFDownloadQueue.objects.create(url="https://arxiv.org/pdf/1704dasdsad738.pdf", tries=0)
+        result = download_queue(self.output_folder, self.logger)
+        self.assertEqual(result["skipped"], 1)
+        obj = PDFDownloadQueue.objects.first()
+        self.assertEqual(obj.tries, 1)
+        self.assertIsNotNone(obj.last_try)
+
+
 
 
