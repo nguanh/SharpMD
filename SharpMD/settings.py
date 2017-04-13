@@ -146,3 +146,4 @@ STATIC_URL = '/static/'
 CELERY_RESULT_BACKEND = 'django-db'
 # CELERY_RESULT_BACKEND = 'django-cache'
 CELERY_IMPORTS = ('harvester.tasks','ingester.tasks')
+CELERY_MAX_TASKS_PER_CHILD = 1

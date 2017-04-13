@@ -3,6 +3,7 @@ import os
 from urllib.parse import urlparse
 from os.path import basename
 
+
 url1 = 'http://dblp.uni-trier.de/xml/dblp.xml.gz'
 url2 = 'http://dblp.uni-trier.de/xml/dblp.dtd'
 url3 = 'http://dblp.uni-trier.de/xml/docu/Person.java'

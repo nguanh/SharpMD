@@ -30,9 +30,12 @@ class PDFSpider(scrapy.Spider):
         """
     #method used to parse scraped responses
     def parse(self, response):
+        pass
+        """
         # write httpresponse as a html file
         filename = response.url.split("/")[-1]
         with open(filename, 'wb') as f:
             f.write(response.body)
         self.log('Saved file %s' % filename)
         print("Parsed {}".format(self.lastUrl))
+        """
