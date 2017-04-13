@@ -3,7 +3,7 @@ import os
 import xml.sax
 from lxml import etree
 from io import StringIO
-
+from http.client import HTTPConnection, HTTPException
 namespace ="{http://www.tei-c.org/ns/1.0}"
 #TODO replace faulty äöü
 def nameDot(name):
@@ -50,25 +50,40 @@ def parseMonogr(element):
     return result
 
 
+class GrobidException(Exception):
+    pass
+
+
+def grobid_queue(grobid_url,input_path):
+    if os.path.isdir(input_path) is False:
+        raise GrobidException("Invalid input path")
+    # TODO
+    #if is_alive(grobid_url) is False:
+        #raise(GrobidException("{} is not reachable".format(grobid_url)))
+
+    #iterate over all pdf files
+    for filename in os.listdir(input_path):
+        if filename.endswith(".pdf"):
+            file_path = os.path.join(input_path,filename)
+            with open(file_path, "rb") as f:
+                ref_handler = requests.post(grobid_url, files={"input": f})
+            if ref_handler.ok is False:
+                continue
+            parser2 = etree.XMLPullParser(tag="{}biblStruct".format(namespace))
+            parser2.feed(ref_handler.text)
+            print(filename)
+            """
+            for action, elem in parser2.read_events():
+                for i in elem:
+                    if i.tag.replace(namespace, '') == "monogr":
+                        try:
+                            result = parseMonogr(i)
+                            print(result)
+                        except Exception as e:
+                            print(e)
+            """
 
 
 
 
-url = "http://localhost:8080/processReferences"
-
-# open pdf file
-
-with open("grobid1.pdf", "rb") as f:
-    x= requests.post(url, files={"input":f})
-
-print(x.text)
-
-parser2 = etree.XMLPullParser(tag="{}biblStruct".format(namespace))
-parser2.feed(x.text)
-
-for action, elem in parser2.read_events():
-    for i in elem:
-        if i.tag.replace(namespace,'') == "monogr":
-            result = parseMonogr(i)
-            print(result)
-
+grobid_queue("http://localhost:8080/processReferences","C:\\Users\\anhtu\\Google Drive\\Informatik 2016\\Related Work")
