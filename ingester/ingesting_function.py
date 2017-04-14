@@ -19,7 +19,7 @@ def ingest_data(ingester_obj):
     pub_added = 0
     pub_limbo = 0
     pub_duplicate = 0
-    logger = logging.getLogger(ingester_obj.get_name())
+    logger = logging.getLogger("ingester.{}".format(ingester_obj.get_name()))
     # mysql connector to read from harvester
     read_connector = MariaDb()
     write_connector= MariaDb()
