@@ -1,9 +1,8 @@
 import requests
 import os
-import xml.sax
 from lxml import etree
-from io import StringIO
-from http.client import HTTPConnection, HTTPException
+from requests.exceptions import ConnectionError
+
 namespace ="{http://www.tei-c.org/ns/1.0}"
 #TODO replace faulty äöü
 def nameDot(name):
@@ -42,8 +41,10 @@ def parseMonogr(element):
             result["title"] = i.text
 
         if i.tag.replace(namespace, '') == "imprint":
-            if i[0].tag.replace(namespace, '')== "date":
-                result["pubyear"]= i[0].get("when")
+            #TODO find dates in whole imprint
+            for el in i:
+                if el.tag.replace(namespace, '')== "date":
+                    result["pubyear"]= el.get("when")
         if i.tag.replace(namespace, '') == "author":
             result["authors"].append(parsePersName(i))
 
@@ -58,6 +59,11 @@ def grobid_queue(grobid_url,input_path):
     if os.path.isdir(input_path) is False:
         raise GrobidException("Invalid input path")
     # TODO
+    try:
+        requests.post(grobid_url)
+    except ConnectionError:
+        print("Grobid does not answer")
+        return
     #if is_alive(grobid_url) is False:
         #raise(GrobidException("{} is not reachable".format(grobid_url)))
 
@@ -71,17 +77,26 @@ def grobid_queue(grobid_url,input_path):
                 continue
             parser2 = etree.XMLPullParser(tag="{}biblStruct".format(namespace))
             parser2.feed(ref_handler.text)
-            print(filename)
-            """
+           # print(ref_handler.text)
+            result = {}
             for action, elem in parser2.read_events():
                 for i in elem:
                     if i.tag.replace(namespace, '') == "monogr":
+                        result["monogr"] = parseMonogr(i)
+                        """
                         try:
-                            result = parseMonogr(i)
-                            print(result)
+                            result["monogr"] = parseMonogr(i)
                         except Exception as e:
                             print(e)
-            """
+                        """
+                    if i.tag.replace(namespace, '') == "analytic":
+                        try:
+                            result["analytic"] = parseMonogr(i)
+                        except Exception as e:
+                            print(e)
+
+            print(result)
+
 
 
 
