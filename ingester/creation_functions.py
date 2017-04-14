@@ -49,7 +49,8 @@ def create_title(matching, cluster_name):
         cluster_obj = cluster.objects.get(id=matching["id"])
     return cluster_obj
 
-def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_ids=[]):
+
+def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_objs=[]):
     # find publication associated with cluster_id
     try:
         publication_data = publication.objects.get(cluster=cluster_obj)
@@ -66,6 +67,10 @@ def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=N
     # add authors to default pub
     for priority, author_obj in enumerate(author_objs):
         publication_author.objects.get_or_create(url=url_id, author=author_obj, priority=priority)
+
+    # add keyword to default pub
+    for keyword in keyword_objs:
+        publication_keyword.objects.get_or_create(url=url_id, keyword=keyword)
     # get return publication_id
     return [publication_data, url_id]
 

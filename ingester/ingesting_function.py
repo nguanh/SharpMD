@@ -71,10 +71,10 @@ def ingest_data(ingester_obj):
             pub_medium_obj = match_pub_medium(mapping["pub_release"], source_lurl_obj)
             cluster_name = normalize_title(mapping["publication"]["title"])
             author_ids = create_authors(author_matches, mapping["authors"], source_lurl_obj)
-            keyword_ids = match_keywords(mapping["publication"]["keyword_ids"],source_lurl_obj)
+            keyword_obj = match_keywords(mapping["publication"]["keyword_ids"],source_lurl_obj)
             cluster_obj = create_title(title_match, cluster_name)
             # 5.create default publication / or find existing one and link with authors and cluster
-            def_pub_obj, def_url_obj = create_publication(cluster_obj, author_ids, type_obj, pub_medium_obj)
+            def_pub_obj, def_url_obj = create_publication(cluster_obj, author_ids, type_obj, pub_medium_obj, keyword_obj)
             # update local url with pub_medium_obj and study field
             source_lurl_obj.medium = pub_medium_obj
             source_lurl_obj.save()

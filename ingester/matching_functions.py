@@ -156,7 +156,7 @@ def match_keywords(keywords, url_obj):
         keyword_alias_source.objects.create(alias=alias, url=url_obj)
         # add publication keyword
         publication_keyword.objects.get_or_create(url=url_obj, keyword=key_record)
-        key_id_list.append(key_record.id)
+        key_id_list.append(key_record)
 
     return key_id_list
 

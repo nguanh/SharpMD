@@ -124,8 +124,7 @@ class local_url(models.Model):
         medium = None if self.medium is None else self.medium.id
         u_type = None if self.type is None else self.type.id
         sf = None if self.study_field is None else self.study_field.id
-        kw = None if self.keyword is None else self.keyword
-        return [self.global_url.id, self.url, medium, u_type, sf, kw]
+        return [self.global_url.id, self.url, medium, u_type, sf]
 
 
 # ======================================= AUTHORS =====================================================================

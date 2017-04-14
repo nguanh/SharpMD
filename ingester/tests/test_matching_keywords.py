@@ -21,7 +21,8 @@ class TestMatchKeyword(TransactionTestCase):
 
     def test_no_match(self):
         identifier = match_keywords(["He?llo", "World"], self.lurl)
-        self.assertEqual(identifier, [1, 2])
+        self.assertEqual(identifier[0].id, 1)
+        self.assertEqual(identifier[1].id, 2)
         self.assertEqual(keyword_aliases.objects.get(id=1).alias, "He?llo")
         self.assertEqual(keyword_aliases.objects.get(id=2).alias, "World")
         self.assertEqual(keyword_alias_source.objects.get(id=1).test(), [1, 1])
@@ -36,7 +37,8 @@ class TestMatchKeyword(TransactionTestCase):
         data = ["Keyword", "Nonsense"]
         identifier = match_keywords(data, self.lurl)
 
-        self.assertEqual(identifier, [3,4])
+        self.assertEqual(identifier[0].id, 3)
+        self.assertEqual(identifier[1].id, 4)
         self.assertEqual(keyword_aliases.objects.get(id=1).alias, "Keyword")
         self.assertEqual(keyword_aliases.objects.get(id=2).alias, "Nonsense")
         self.assertEqual(keyword_alias_source.objects.get(id=1).test(), [1, 1])
@@ -52,7 +54,7 @@ class TestMatchKeyword(TransactionTestCase):
 
         identifier = match_keywords(["myJournal"], self.lurl)
 
-        self.assertEqual(identifier, [2])
+        self.assertEqual(identifier[0].id, 2)
         self.assertEqual(keyword_alias_source.objects.get(id=1).test(),[2,1])
         self.assertEqual(publication_keyword.objects.get(id=1).test(),[1,2])
 
@@ -65,7 +67,7 @@ class TestMatchKeyword(TransactionTestCase):
         self.assertEqual(keywordsModel.objects.count(),2)
         identifier = match_keywords(["myJOurnal"], self.lurl)
 
-        self.assertEqual(identifier, [3])
+        self.assertEqual(identifier[0].id, 3)
         self.assertEqual(keyword_alias_source.objects.get(id=1).test(), [3,1])
         self.assertEqual(publication_keyword.objects.get(id=1).test(), [1, 3])
 
