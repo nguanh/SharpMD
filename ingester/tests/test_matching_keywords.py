@@ -1,7 +1,7 @@
 from django.test import  TransactionTestCase
 
 from ingester.matching_functions import match_keywords
-from ingester.models import local_url, global_url,keyword_aliases,keyword_alias_source,keywordsModel
+from ingester.models import local_url, global_url,keyword_aliases,keyword_alias_source,keywordsModel,publication_keyword
 
 
 class TestMatchKeyword(TransactionTestCase):
@@ -21,14 +21,18 @@ class TestMatchKeyword(TransactionTestCase):
 
     def test_no_match(self):
         identifier = match_keywords(["He?llo", "World"], self.lurl)
-        self.assertEqual(identifier,[1,2])
-        self.assertEqual(keyword_aliases.objects.get(id=1).alias,"He?llo")
+        self.assertEqual(identifier, [1, 2])
+        self.assertEqual(keyword_aliases.objects.get(id=1).alias, "He?llo")
         self.assertEqual(keyword_aliases.objects.get(id=2).alias, "World")
         self.assertEqual(keyword_alias_source.objects.get(id=1).test(), [1, 1])
         self.assertEqual(keyword_alias_source.objects.get(id=2).test(), [2, 1])
+        self.assertEqual(publication_keyword.objects.get(id=1).test(), [1, 1])
+        self.assertEqual(publication_keyword.objects.get(id=2).test(), [1, 2])
 
     def test_single_match(self):
-        keywordsModel.objects.create(id=3,main_name="Key?Wor!d..", block_name="keyword")
+        x= keywordsModel.objects.create(id=3,main_name="Key?Wor!d..", block_name="keyword")
+        publication_keyword.objects.create(url=self.lurl,keyword=x)
+
         data = ["Keyword", "Nonsense"]
         identifier = match_keywords(data, self.lurl)
 
@@ -37,6 +41,8 @@ class TestMatchKeyword(TransactionTestCase):
         self.assertEqual(keyword_aliases.objects.get(id=2).alias, "Nonsense")
         self.assertEqual(keyword_alias_source.objects.get(id=1).test(), [1, 1])
         self.assertEqual(keyword_alias_source.objects.get(id=2).test(), [2, 1])
+        self.assertEqual(publication_keyword.objects.get(id=1).test(), [1, 3])
+        self.assertEqual(publication_keyword.objects.get(id=2).test(), [1, 4])
 
     def test_multi_match_single_alias(self):
         med1 = keywordsModel.objects.create(main_name="myJournal", block_name="myjournal")
@@ -48,6 +54,7 @@ class TestMatchKeyword(TransactionTestCase):
 
         self.assertEqual(identifier, [2])
         self.assertEqual(keyword_alias_source.objects.get(id=1).test(),[2,1])
+        self.assertEqual(publication_keyword.objects.get(id=1).test(),[1,2])
 
     def test_multi_match_multi_alias(self):
         med1 = keywordsModel.objects.create(main_name="myJournal", block_name="myjournal")
@@ -60,6 +67,7 @@ class TestMatchKeyword(TransactionTestCase):
 
         self.assertEqual(identifier, [3])
         self.assertEqual(keyword_alias_source.objects.get(id=1).test(), [3,1])
+        self.assertEqual(publication_keyword.objects.get(id=1).test(), [1, 3])
 
 
 

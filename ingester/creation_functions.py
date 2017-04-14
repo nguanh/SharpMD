@@ -49,7 +49,7 @@ def create_title(matching, cluster_name):
         cluster_obj = cluster.objects.get(id=matching["id"])
     return cluster_obj
 
-def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None):
+def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_ids=[]):
     # find publication associated with cluster_id
     try:
         publication_data = publication.objects.get(cluster=cluster_obj)
@@ -68,6 +68,10 @@ def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=N
         publication_author.objects.get_or_create(url=url_id, author=author_obj, priority=priority)
     # get return publication_id
     return [publication_data, url_id]
+
+
+
+
 
 
 def update_diff_tree(pub_obj, pub_dict, author_objs):

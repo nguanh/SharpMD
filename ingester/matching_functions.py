@@ -152,8 +152,10 @@ def match_keywords(keywords, url_obj):
             else:
                 key_record = keywordsModel.objects.create(main_name=key)
         #create alias and source
-        alias,create = keyword_aliases.objects.get_or_create(alias=key,keyword=key_record)
+        alias, create = keyword_aliases.objects.get_or_create(alias=key, keyword=key_record)
         keyword_alias_source.objects.create(alias=alias, url=url_obj)
+        # add publication keyword
+        publication_keyword.objects.get_or_create(url=url_obj, keyword=key_record)
         key_id_list.append(key_record.id)
 
     return key_id_list

@@ -119,7 +119,6 @@ class local_url(models.Model):
     url = models.CharField(max_length=150)
     medium = models.ForeignKey(pub_medium, default=None, null=True, blank=True)
     type = models.ForeignKey(publication_type, default=None, null=True, blank=True)
-    keyword = models.ForeignKey(keywordsModel, default=None, null=True, blank=True)
     study_field = models.ForeignKey(study_field, default=None,null=True,blank=True)
     def test(self):
         medium = None if self.medium is None else self.medium.id
@@ -239,7 +238,7 @@ class publication_keyword(models.Model):
     keyword = models.ForeignKey(keywordsModel)
 
     def test(self):
-        return [self.url.id, self.keyword]
+        return [self.url.id, self.keyword.id]
 
     class Meta:
         unique_together = ('url', 'keyword')

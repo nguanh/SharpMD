@@ -4,7 +4,7 @@ from .models import *
 import logging
 from mysqlWrapper.mariadb import MariaDb
 from django.db.models import ObjectDoesNotExist
-from .matching_functions import match_type,match_pub_medium,match_author,match_title
+from .matching_functions import match_type,match_pub_medium,match_author,match_title, match_keywords
 from .limbo_functions import push_limbo
 from .creation_functions import create_publication,create_authors,create_title,update_diff_tree
 from .difference_storage import *
@@ -71,6 +71,7 @@ def ingest_data(ingester_obj):
             pub_medium_obj = match_pub_medium(mapping["pub_release"], source_lurl_obj)
             cluster_name = normalize_title(mapping["publication"]["title"])
             author_ids = create_authors(author_matches, mapping["authors"], source_lurl_obj)
+            keyword_ids = match_keywords(mapping["publication"]["keyword_ids"],source_lurl_obj)
             cluster_obj = create_title(title_match, cluster_name)
             # 5.create default publication / or find existing one and link with authors and cluster
             def_pub_obj, def_url_obj = create_publication(cluster_obj, author_ids, type_obj, pub_medium_obj)
