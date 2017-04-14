@@ -15,7 +15,7 @@ test_path = os.path.dirname(__file__)
 ingester_path = os.path.dirname(test_path)
 
 
-class TestIngesterMulti(TransactionTestCase):
+class TestIngesterMulti2(TransactionTestCase):
     fixtures = [os.path.join(ingester_path, "fixtures", "initial_data.json")]
 
     def setUp(self):
