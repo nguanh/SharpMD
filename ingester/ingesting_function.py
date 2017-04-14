@@ -83,10 +83,17 @@ def ingest_data(ingester_obj):
             # handle if there is no pub_medium
             if pub_medium_obj is not None:
                 mapping['publication']['pub_source_ids'] = pub_medium_obj.id
+            if len(keyword_obj) > 0:
+                key_id_list = []
+                for keyword in keyword_obj:
+                    key_id_list.append(keyword.id)
+                mapping['publicaton']['keyword_ids'] = key_id_list or None
             mapping['publication']['type_ids'] = type_obj.id
             diff_tree = update_diff_tree(def_pub_obj, mapping['publication'], author_ids)
             # 7.get default values from diff tree and re-serialize tree
             publication_values = get_default_values(diff_tree)
+            get_default_ids(diff_tree,def_url_obj)
+            # TODO get default values for URL as well
             serialized_tree = serialize_diff_store(diff_tree)
             # set missing values that are not default
             publication_values["differences"] = serialized_tree

@@ -1,5 +1,6 @@
 import msgpack
 import datetime
+from .models import *
 URL_LIST_MAX = 62
 
 
@@ -56,6 +57,29 @@ def get_default_values(store):
         else:
             result[key] = None
     return result
+
+
+def get_default_ids(store, url_obj):
+    # get popular IDs
+    if len(store["type_ids"]) > 0:
+        type_id = store["type_ids"][0]["value"]
+    else:
+        type_id = None
+    if len(store["pub_source_ids"]) > 0:
+        pub_source_id = store["pub_source_ids"][0]["value"]
+    else:
+        pub_source_id = None
+
+    # set type, study field and pub medium id for urls
+    types = None if url_obj.type is None else url_obj.type.id
+    medium = None if url_obj.medium is None else url_obj.medium.id
+
+    if types != type_id and type_id is not None:
+        url_obj.type = publication_type.objects.get(id=type_id)
+    if medium != pub_source_id and pub_source_id is not None:
+        url_obj.medium = pub_medium.objects.get(id=pub_source_id)
+    url_obj.save()
+
 
 
 def vote(store,attribute,value,vote_count = 1):

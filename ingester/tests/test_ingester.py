@@ -25,8 +25,6 @@ class TestIngester(TransactionTestCase):
         self.connector.execute_ex("DROP TABLE test_storage.dblp_article")
         self.connector.close_connection()
 
-
-
     def test_invalid_ingester(self):
         setup_tables(os.path.join(test_path, "dblp_test1.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
         self.assertRaises(IIngester_Exception, ingest_data, datetime.datetime(1990,1,1,1,1,1))
@@ -38,10 +36,10 @@ class TestIngester(TransactionTestCase):
         result = ingest_data(ingester)
         self.assertEqual(result, 2)
         # check local url
-        self.assertEqual(local_url.objects.get(id=1).test(), [3, 'journals/acta/AkyildizB89', 1, 1])
-        self.assertEqual(local_url.objects.get(id=2).test(), [1, 'TODO PLATZHALTER', 1, 1])
-        self.assertEqual(local_url.objects.get(id=3).test(), [3, 'journals/acta/VoglerS014', 1, 1])
-        self.assertEqual(local_url.objects.get(id=4).test(), [1, 'TODO PLATZHALTER', 1, 1])
+        self.assertEqual(local_url.objects.get(id=1).test(), [3, 'journals/acta/AkyildizB89', 1, 1,None])
+        self.assertEqual(local_url.objects.get(id=2).test(), [1, 'TODO PLATZHALTER', 1, 1,None])
+        self.assertEqual(local_url.objects.get(id=3).test(), [3, 'journals/acta/VoglerS014', 1, 1,None])
+        self.assertEqual(local_url.objects.get(id=4).test(), [1, 'TODO PLATZHALTER', 1, 1,None])
         # check authors_model
         self.assertEqual(authors_model.objects.get(id=1).test(),["Ian F. Akyildiz", "akyildiz,i"])
         self.assertEqual(authors_model.objects.get(id=2).test(), ["Horst von Brand", "von brand,h"])
