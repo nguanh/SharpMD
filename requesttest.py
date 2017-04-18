@@ -41,7 +41,6 @@ def parseMonogr(element):
             result["title"] = i.text
 
         if i.tag.replace(namespace, '') == "imprint":
-            #TODO find dates in whole imprint
             for el in i:
                 if el.tag.replace(namespace, '')== "date":
                     result["pubyear"]= el.get("when")
@@ -94,7 +93,7 @@ def grobid_queue(grobid_url,input_path):
                             result["analytic"] = parseMonogr(i)
                         except Exception as e:
                             print(e)
-
+            'TODO analytic und monogr zusammensetzen zu etwas sinnvollen'
             print(result)
 
 
