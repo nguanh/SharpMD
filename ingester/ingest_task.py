@@ -7,25 +7,24 @@ import logging
 import sys
 import os
 import random
-from celery.utils.log import get_task_logger
 PROJECT_DIR = os.path.dirname(__file__)
 
-log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
-log_file = os.path.join(log_dir, "TEST.log")
-# init logger, generate logger for every tasks
-# logger = logging.getLogger("ingester")
-logger = get_task_logger("ingester")
-logger.setLevel(logging.INFO)
-# create the logging file handler
-fh = logging.FileHandler(log_file)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-fh.setFormatter(formatter)
-# add handler to logger object
-logger.addHandler(fh)
 
 
 def test_bug(package,class_name,config_id):
-    logger = get_task_logger("ingester")
+    # init logger, generate logger for every tasks
+    logger = logging.getLogger("ingester")
+    if not logger.handlers:
+        log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
+        log_file = os.path.join(log_dir, "TEST.log")
+        logger.setLevel(logging.INFO)
+        # create the logging file handler
+        fh = logging.FileHandler(log_file)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        # add handler to logger object
+        logger.addHandler(fh)
+
     logger.info("STARTED")
     logger.info(random.randint(0, 100))
 
