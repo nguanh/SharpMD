@@ -23,6 +23,7 @@ class TestArxivWeaver(TransactionTestCase):
         self.connector.execute_ex(ADD_ARXIV, dataset2)
 
     def tearDown(self):
+        self.connector.execute_ex("DROP TABLE test_storage.arxiv_articles")
         self.connector.close_connection()
 
     def test_success(self):
@@ -39,3 +40,14 @@ class TestArxivWeaver(TransactionTestCase):
         self.assertEqual(source1,[0, "AAAAA", None])
         self.assertEqual(source2,[0,"BBBBB",None])
 
+
+    def test_limit(self):
+        obj = ArxivWeaver(1,"test_storage")
+        obj.run()
+
+        link1 = PDFDownloadQueue.objects.get(id=1)
+        self.assertEqual(link1.test(), ["https://arxiv.org/pdf/AAAAA.pdf",0,1])
+        source1 = OpenReferences.objects.get(id=1).test()
+        self.assertEqual(source1,[0, "AAAAA", None])
+
+        self.assertEqual(OpenReferences.objects.count(),1)
