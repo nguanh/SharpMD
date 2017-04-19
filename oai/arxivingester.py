@@ -49,5 +49,4 @@ class ArxivIngester(Iingester):
         mapping["study_fields"] = query_tuple[11]
         mapping["publication"]["type_ids"] = 1
 
-        #TODO try to extract some information from journalref
         return mapping

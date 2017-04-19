@@ -55,7 +55,7 @@ def match_author(authors):
 
 def match_title(title):
     cluster_name = normalize_title(title)
-    # check for matching cluster (so far ONLY COMPLETE MATCH) TODO levenshtein distance
+    # check for matching cluster (so far ONLY COMPLETE MATCH)
     cluster_matches = cluster.objects.filter(name=cluster_name)
     cluster_count = cluster_matches.count()
 

@@ -63,6 +63,7 @@ ARXIV_ARTICLE = (
     "  `mdate` DATE NOT NULL,"
     "  `last_updated` TIMESTAMP,"
     "  `last_harvested` TIMESTAMP,"
+    "  `last_referenced` TIMESTAMP,"
     "  PRIMARY KEY (`identifier`)"
     ") ENGINE=InnoDB CHARSET=utf8mb4")
 
@@ -70,8 +71,8 @@ ARXIV_ARTICLE = (
 ADD_ARXIV = ("INSERT INTO arxiv_articles"
              "(identifier,created, updated,author,title,mscclass,acmclass,"
              "reportno,journalref,comments,description,categories,doi,mdate,"
-             "last_updated, last_harvested) "
-             "VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, CURRENT_TIMESTAMP, 0)"
+             "last_updated, last_harvested, last_referenced) "
+             "VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, CURRENT_TIMESTAMP, 0, 0)"
              "ON DUPLICATE KEY UPDATE last_updated= CURRENT_TIMESTAMP,"
              "created =VALUES(created),"
              "updated =VALUES(updated),"

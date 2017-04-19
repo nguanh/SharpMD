@@ -93,7 +93,7 @@ def ingest_data(ingester_obj):
             # 7.get default values from diff tree and re-serialize tree
             publication_values = get_default_values(diff_tree)
             get_default_ids(diff_tree,def_url_obj)
-            # TODO get default values for URL as well
+
             serialized_tree = serialize_diff_store(diff_tree)
             # set missing values that are not default
             publication_values["differences"] = serialized_tree
