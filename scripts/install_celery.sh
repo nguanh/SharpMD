@@ -19,3 +19,5 @@ sudo pip3 install lxml
 sudo pip3 install jsonfield
 sudo pip3 install mysqlclient
 sudo pip3 install requests
+sudo pip3 install mysqlclient
+sudo pip3 install tailer
