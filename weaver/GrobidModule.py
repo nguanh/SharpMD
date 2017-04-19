@@ -7,6 +7,7 @@ import logging
 namespace ="{http://www.tei-c.org/ns/1.0}"
 #TODO replace faulty äöü
 # Ăź = ü
+
 def nameDot(name):
     if len(name) == 1:
         name += "."

@@ -3,3 +3,6 @@ class GrobidException(Exception):
 
 class IWeaver_Exception(Exception):
     pass
+
+class PDFException(Exception):
+    pass

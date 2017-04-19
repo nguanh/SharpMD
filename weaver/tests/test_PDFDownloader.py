@@ -1,10 +1,25 @@
 from django.test import TransactionTestCase,mock
 from unittest.mock import patch
-from weaver.PDFDownloader import download_queue
-from weaver.models import PDFDownloadQueue
+from weaver.PDFDownloader import download_queue,PdfDownloader
+from weaver.models import PDFDownloadQueue,OpenReferences,SingleReference
 import os
 import logging
 import sys
+
+
+path = os.path.dirname(os.path.abspath(__file__))
+
+
+class TestGrobid(TransactionTestCase):
+    def setUp(self):
+        self.file_path = os.path.join(path, "grobid1.pdf")
+        self.grobid_url = "http://localhost:8080/processReferences"
+        self.source = OpenReferences.objects.create(source_table="0",source_key="AAAAA")
+
+    def test_success(self):
+        x = PdfDownloader(path,self.grobid_url)
+        x.parse_references(self.file_path,self.source)
+        self.assertEqual(SingleReference.objects.count(),5)
 
 
 class TestPDFDownloader(TransactionTestCase):
