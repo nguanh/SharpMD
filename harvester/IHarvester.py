@@ -19,13 +19,20 @@ class IHarvest(ABC):
         """
         # get values from config object
         config = Config.objects.get(id=config_id)
+        # name of sub component
         self.name = config.name
+        # is enabled
         self.enabled = config.enabled
+        # maximum amount of datasets harvested per execution ( testing purposes)
         self.limit = config.limit
+        # additional parameters are passed as a dict
         self.extra = config.extra_config
+        # if defined all datasets between start and end date are harvested
         self.start_date = config.start_date
         self.end_date = config.end_date
+        # url of source
         self.url = config.url
+        # table name of where harvester stores its data
         self.table_name = config.table_name
 
         if self.limit == 0:
