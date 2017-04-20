@@ -44,6 +44,102 @@ class TestGrobid(TransactionTestCase):
         file = os.path.join(path, "invalid.txt")
         self.assertRaises(GrobidException, x.parse_references, file, self.source)
 
+    def test_get_reference_no_analytics(self):
+        tei_doc = {
+            "monogr":{
+                "title": "title",
+                "authors":["A. And; B. And"],
+                "pubyear": "2001"
+            }
+        }
+        x = PdfDownloader.get_reference(tei_doc)
+        self.assertEqual(x, {"title": "title",
+                             "authors": ["A. And; B. And"],
+                             "pubyear": datetime.date(2001, 1, 1)})
+
+    def test_get_reference_no_analytics_no_date(self):
+        tei_doc = {
+            "monogr":{
+                "title": "title",
+                "authors":["A. And; B. And"],
+                "pubyear": None
+            }
+        }
+        x = PdfDownloader.get_reference(tei_doc)
+        self.assertEqual(x, {"title": "title",
+                             "authors": ["A. And; B. And"],
+                             "pubyear": None})
+
+    def test_analytics(self):
+        tei_doc = {
+            "monogr": {
+                "title": "title",
+                "authors": None,
+                "pubyear": None
+            },
+            "analytic": {
+                "title": "better title",
+                "authors": ["A. And; B. And"],
+                "pubyear": "1999"
+            }
+        }
+        x = PdfDownloader.get_reference(tei_doc)
+        self.assertEqual(x, {"title": "better title",
+                             "authors": ["A. And; B. And"],
+                             "pubyear": datetime.date(1999, 1, 1)})
+
+    def test_analytics_2(self):
+        tei_doc = {
+            "monogr": {
+                "title": "title",
+                "authors": None,
+                "pubyear": "1998"
+            },
+            "analytic": {
+                "title": "better title",
+                "authors": ["A. And; B. And"],
+                "pubyear": None
+            }
+        }
+        x = PdfDownloader.get_reference(tei_doc)
+        self.assertEqual(x, {"title": "better title",
+                             "authors": ["A. And; B. And"],
+                             "pubyear": datetime.date(1998, 1, 1)})
+
+    def test_no_title(self):
+        tei_doc = {
+            "monogr": {
+                "title": None,
+                "authors": None,
+                "pubyear": None
+            },
+            "analytic": {
+                "title": None,
+                "authors": ["A. And; B. And"],
+                "pubyear": "1999"
+            }
+        }
+        x = PdfDownloader.get_reference(tei_doc)
+        self.assertEqual(x, None)
+
+    def test_no_authors(self):
+        tei_doc = {
+            "monogr": {
+                "title": "title",
+                "authors": None,
+                "pubyear": None
+            },
+            "analytic": {
+                "title": "better title",
+                "authors": [],
+                "pubyear": "1999"
+            }
+        }
+        x = PdfDownloader.get_reference(tei_doc)
+        self.assertEqual(x, None)
+
+
+
 
 
 class TestPDFDownloader(TransactionTestCase):
