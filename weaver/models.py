@@ -1,5 +1,6 @@
 from django.db import models
 from ingester.models import local_url
+import msgpack
 # Create your models here.
 STATUS_CHOICES = (
     ('OP', 'OPEN'),
@@ -38,7 +39,7 @@ class SingleReference(models.Model):
 
     def test(self):
         # TODO deserialize
-        authors = None
+        authors = msgpack.unpackb(self.authors, encoding="utf-8")
         return [self.source.id, self.title, self.date, authors, self.status]
 
 

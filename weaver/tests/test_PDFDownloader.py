@@ -2,10 +2,11 @@ from django.test import TransactionTestCase,mock
 from unittest.mock import patch
 from weaver.PDFDownloader import download_queue,PdfDownloader
 from weaver.models import PDFDownloadQueue,OpenReferences,SingleReference
+from weaver.exceptions import GrobidException
 import os
 import logging
 import sys
-
+import datetime
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -20,6 +21,29 @@ class TestGrobid(TransactionTestCase):
         x = PdfDownloader(path,self.grobid_url)
         x.parse_references(self.file_path,self.source)
         self.assertEqual(SingleReference.objects.count(),5)
+        ref1 = SingleReference.objects.get(id=1).test()
+        ref2 = SingleReference.objects.get(id=2).test()
+        ref3 = SingleReference.objects.get(id=3).test()
+        ref4 = SingleReference.objects.get(id=4).test()
+        ref5 = SingleReference.objects.get(id=5).test()
+        self.assertEqual(ref1, [1, 'Retrieving metadata for your local scholarly papers',
+                                datetime.date(2009, 1, 1), 'D. Aumueller', 'OP'])
+
+        self.assertEqual(ref2, [1, 'Introducing Mr. DLib, a Machine-readable Digital Library',
+                                datetime.date(2011, 1, 1),
+                                'J. Beel;B. Gipp;S. Langer;M. Genzmehr;E. Wilde;A. NĂźrnberger;J. Pitman', 'OP'])
+        self.assertEqual(ref3, [1, 'SciPlore Xtract: Extracting Titles from Scientific PDF Documents by Analyzing Style Information (Font Size)',
+                                datetime.date(2010, 1, 1), 'J. Beel;B. Gipp;A. Shaker;N. Friedrich', 'OP'])
+
+    def test_invalid_path(self):
+        x = PdfDownloader(path,self.grobid_url)
+        self.assertRaises(GrobidException,x.parse_references,"nkjk",self.source)
+
+    def test_invalid_file(self):
+        x = PdfDownloader(path, self.grobid_url)
+        file = os.path.join(path, "invalid.txt")
+        self.assertRaises(GrobidException, x.parse_references, file, self.source)
+
 
 
 class TestPDFDownloader(TransactionTestCase):

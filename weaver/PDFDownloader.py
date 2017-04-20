@@ -109,11 +109,9 @@ class PdfDownloader:
 
     def parse_references(self, file_path,source):
         if not os.path.isfile(file_path):
-            self.logger.error("File {} does not exist".format(file_path))
-            return False
+            raise GrobidException("File {} does not exist".format(file_path))
         if not file_path.endswith(".pdf"):
-            self.logger.error("File {} is not pdf".format(file_path))
-            return False
+            raise GrobidException("File {} is not pdf".format(file_path))
         try:
             requests.post(self.grobid_url)
         except ConnectionError:
