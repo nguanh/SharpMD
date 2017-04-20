@@ -222,7 +222,6 @@ class PdfDownloader:
                                                 tries=url_dict["tries"] + 1,
                                                 last_try=self.now,
                                                 source=url_dict["source"])
-                continue
             self.logger.info("Continuing")
             if self.limit is not None:
                 self.limit -= 1

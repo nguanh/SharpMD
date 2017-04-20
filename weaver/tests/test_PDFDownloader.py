@@ -232,7 +232,7 @@ class TestPDFDownloader(TransactionTestCase):
 
     def test_error(self):
         self.obj.limit=1
-        #self.obj.parse_references.side_effect = Exception()
+        self.obj.parse_references.side_effect = Exception()
         result = self.obj.process_pdf()
         self.assertEqual(PDFDownloadQueue.objects.count(), 3)
         self.assertEqual(result["skipped"], 1)
