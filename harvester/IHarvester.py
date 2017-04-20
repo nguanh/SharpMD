@@ -1,6 +1,3 @@
-import configparser
-
-import datetime
 from abc import ABC, abstractmethod
 
 from mysqlWrapper.mariadb import MariaDb
@@ -11,10 +8,16 @@ from conf.config import get_config
 
 
 class IHarvest(ABC):
+    """
+    Interface for Harvester Sub-Components
+    """
 
     def __init__(self, config_id):
-        # get values from config object
+        """
 
+        :param config_id: id of config, see harvester models
+        """
+        # get values from config object
         config = Config.objects.get(id=config_id)
         self.name = config.name
         self.enabled = config.enabled
@@ -27,7 +30,7 @@ class IHarvest(ABC):
 
         if self.limit == 0:
             self.limit = None
-
+        # get logger from name
         self.logger = logging.getLogger(self.name)
 
         # connect to database
@@ -38,20 +41,32 @@ class IHarvest(ABC):
             self.logger.debug("MariaDB connection successful")
         except Exception as err:
             raise IHarvest_Exception("MARIADB ERROR: {}".format(err))
-        # check certain parameters in specific config
 
+        # check certain parameters in specific config
         if self.enabled is False:
             self.connector.close_connection()
             raise IHarvest_Disabled()
 
     @abstractmethod
     def init(self):
+        """
+        method to be called on initialisation
+        :return:
+        """
         pass
 
     @abstractmethod
     def run(self):
+        """
+        method to be called for start harvesting
+        :return:
+        """
         pass
 
     @abstractmethod
     def cleanup(self):
+        """
+        optional method to be called for removing data and cleaning up
+        :return:
+        """
         pass
