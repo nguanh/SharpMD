@@ -1,12 +1,14 @@
 from django.test import TransactionTestCase,mock
+from unittest.mock import MagicMock
 from unittest.mock import patch
-from weaver.PDFDownloader import download_queue,PdfDownloader
+from weaver.PDFDownloader import PdfDownloader
 from weaver.models import PDFDownloadQueue,OpenReferences,SingleReference
 from weaver.exceptions import GrobidException
 import os
 import logging
 import sys
 import datetime
+from requests.exceptions import ConnectionError
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -139,27 +141,11 @@ class TestGrobid(TransactionTestCase):
         self.assertEqual(x, None)
 
 
-
-
-
 class TestPDFDownloader(TransactionTestCase):
     def setUp(self):
-        self.output_folder ="C:\\Users\\anhtu\\Desktop\\pdf"
-        # delete all files in test folder
-        for the_file in os.listdir(self.output_folder):
-            file_path = os.path.join(self.output_folder, the_file)
-            try:
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-            except Exception as e:
-                print(e)
-
-        PDFDownloadQueue.objects.bulk_create([
-            PDFDownloadQueue(url="https://arxiv.org/pdf/1704.03738.pdf", tries=0),
-            PDFDownloadQueue(url="https://arxiv.org/pdf/1704.03732.pdf", tries=0),
-            PDFDownloadQueue(url="https://arxiv.org/pdf/1704.03723.pdf", tries=0),
-            ]
-        )
+        self.grobid_url = "http://localhost:8080/processReferences"
+        self.source = OpenReferences.objects.create(source_table="0",source_key="AAAAA")
+        self.output_folder = "C:\\Users\\anhtu\\Desktop\\pdf"
 
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
@@ -170,39 +156,86 @@ class TestPDFDownloader(TransactionTestCase):
         # add handler to logger object
         self.logger.addHandler(fh)
 
+        self.obj = PdfDownloader(self.output_folder, self.grobid_url ,logger=self.logger)
+        self.obj.parse_references= MagicMock(return_value=None)
+        # delete all files in test folder
+        for the_file in os.listdir(self.output_folder):
+            file_path = os.path.join(self.output_folder, the_file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception as e:
+                print(e)
+
+        self.source = OpenReferences.objects.create(source_table=0, source_key="AAAAA")
+
+        PDFDownloadQueue.objects.bulk_create([
+            PDFDownloadQueue(url="https://arxiv.org/pdf/1704.03738.pdf", tries=0, source=self.source),
+            PDFDownloadQueue(url="https://arxiv.org/pdf/1704.03732.pdf", tries=0, source=self.source),
+            PDFDownloadQueue(url="https://arxiv.org/pdf/1704.03723.pdf", tries=0, source=self.source),
+            ]
+        )
+
     def test_success(self):
         self.assertEqual(PDFDownloadQueue.objects.count(), 3)
-        result=download_queue(self.output_folder,self.logger)
+        result= self.obj.process_pdf()
         self.assertEqual(PDFDownloadQueue.objects.count(), 0)
-        self.assertTrue(os.path.isfile(os.path.join(self.output_folder,"1704.03738.pdf")))
-        self.assertTrue(os.path.isfile(os.path.join(self.output_folder, "1704.03732.pdf")))
-        self.assertTrue(os.path.isfile(os.path.join(self.output_folder, "1704.03723.pdf")))
         self.assertEqual(result["successful"], 3)
+        self.obj.parse_references.assert_called_with(os.path.join(self.output_folder,"1704.03723.pdf"),self.source)
 
     def test_success_limit(self):
         self.assertEqual(PDFDownloadQueue.objects.count(), 3)
-        result = download_queue(self.output_folder, self.logger, limit=1)
+        self.obj.limit=1
+        result = self.obj.process_pdf()
         self.assertEqual(PDFDownloadQueue.objects.count(), 2)
-        self.assertTrue(os.path.isfile(os.path.join(self.output_folder, "1704.03738.pdf")))
         self.assertEqual(result["successful"], 1)
+        self.obj.parse_references.assert_called_with(os.path.join(self.output_folder, "1704.03738.pdf"), self.source)
 
-    def test_invalid_link(self):
-        PDFDownloadQueue.objects.all().delete()
-        PDFDownloadQueue.objects.create(url="https://arxiv.org/pdf/1704dasdsad738.pdf", tries=0)
-        result = download_queue(self.output_folder, self.logger)
-        self.assertEqual(result["invalid"],1)
-        self.assertEqual(PDFDownloadQueue.objects.count(),0)
 
     @patch("weaver.PDFDownloader.requests.get")
-    def test_403(self,req):
+    def test_403(self, req):
         req.return_value.status_code = 403
         PDFDownloadQueue.objects.all().delete()
         PDFDownloadQueue.objects.create(url="https://arxiv.org/pdf/1704dasdsad738.pdf", tries=0)
-        result = download_queue(self.output_folder, self.logger)
+        result = self.obj.process_pdf()
         self.assertEqual(result["skipped"], 1)
         obj = PDFDownloadQueue.objects.first()
         self.assertEqual(obj.tries, 1)
         self.assertIsNotNone(obj.last_try)
+
+    @patch("weaver.PDFDownloader.requests.get")
+    def test_404(self, req):
+        req.return_value.status_code = 404
+        PDFDownloadQueue.objects.all().delete()
+        PDFDownloadQueue.objects.create(url="https://arxiv.org/pdf/1704dasdsad738.pdf", tries=0)
+        result = self.obj.process_pdf()
+        self.assertEqual(result["invalid"], 1)
+        self.assertEqual(PDFDownloadQueue.objects.count(), 0)
+
+    @patch("weaver.PDFDownloader.requests.get")
+    def test_false(self, req):
+        req.return_value.ok = False
+        PDFDownloadQueue.objects.all().delete()
+        PDFDownloadQueue.objects.create(url="https://arxiv.org/pdf/1704dasdsad738.pdf", tries=0)
+        result = self.obj.process_pdf()
+        self.assertEqual(result["skipped"], 1)
+        obj = PDFDownloadQueue.objects.first()
+        self.assertEqual(obj.tries, 1)
+        self.assertIsNotNone(obj.last_try)
+
+    def test_connection_error(self):
+        self.assertEqual(PDFDownloadQueue.objects.count(), 3)
+        self.obj.parse_references.side_effect = ConnectionError()
+        result = self.obj.process_pdf()
+        self.assertEqual(PDFDownloadQueue.objects.count(), 3)
+        self.assertEqual(result["skipped"], 1)
+
+    def test_error(self):
+        self.obj.limit=1
+        #self.obj.parse_references.side_effect = Exception()
+        result = self.obj.process_pdf()
+        self.assertEqual(PDFDownloadQueue.objects.count(), 3)
+        self.assertEqual(result["skipped"], 1)
 
 
 
