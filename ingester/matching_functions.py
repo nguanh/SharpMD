@@ -2,12 +2,12 @@ from .helper import *
 from .models import *
 from django.db.models import ObjectDoesNotExist
 
-
 def match_author(authors):
     results = []
     # iterate through all authors
     for author_index, author_dict in enumerate(authors):
-        name_block = get_name_block(author_dict["parsed_name"])
+        #name_block = get_name_block(author_dict["parsed_name"])
+        name_block = normalize_authors(author_dict["parsed_name"])
         # find matching existing author with name block
         author_block_match = authors_model.objects.filter(block_name=name_block)
         author_match_count = author_block_match.count()

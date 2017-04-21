@@ -5,7 +5,6 @@ from ingester.matching_functions import match_author
 from ingester.models import authors_model, author_aliases, author_alias_source
 
 
-
 class TestMatchAuthors(TransactionTestCase):
 
     def test_success_empty_db(self):
@@ -47,8 +46,8 @@ class TestMatchAuthors(TransactionTestCase):
     def test_single_block_match(self):
         authors_model.objects.create(id=5, main_name ="Hans Gruber")
         authors = [{
-            "original_name": "Hans Meyer Gruber",
-            "parsed_name": "Hans Meyer Gruber",
+            "original_name": "Hans. Gruber",
+            "parsed_name": "Hans. Gruber",
             "website": None,
             "contact": None,
             "about": None,
@@ -68,18 +67,18 @@ class TestMatchAuthors(TransactionTestCase):
 
     def test_multi_block_alias_match(self):
         author1 = authors_model.objects.create(id=5, main_name="Hans Gruber")
-        author2 = authors_model.objects.create(id=1, main_name="Heinrich Gruber")
+        author2 = authors_model.objects.create(id=1, main_name="Hans Gruber")
 
         author_aliases.objects.bulk_create([
-            author_aliases(id=1, author=author2, alias="Heinrich Gruber"),
-            author_aliases(id=2, author=author2, alias="Heinrich F. Gruber"),
-            author_aliases(id=3, author=author1, alias="Hans Gruber"),
-            author_aliases(id=4, author=author1, alias="Hans Meyer Gruber"),
+            author_aliases(id=1, author=author2, alias="Hans? Gruber"),
+            author_aliases(id=2, author=author2, alias="Hans Gruber"),
+            author_aliases(id=3, author=author1, alias="Hans! Gruber"),
+            author_aliases(id=4, author=author1, alias="Hans Gruber"),
         ])
 
         authors = [{
-            "original_name": "Hans Meyer Gruber",
-            "parsed_name": "Hans Meyer Gruber",
+            "original_name": "Hans? Gruber",
+            "parsed_name": "Hans? Gruber",
             "website": None,
             "contact": None,
             "about": None,
@@ -92,24 +91,24 @@ class TestMatchAuthors(TransactionTestCase):
         self.assertEqual(result,[{
                 "status": Status.SAFE,
                 "match": Match.MULTI_MATCH,
-                "id": 5,
+                "id": 1,
                 "reason": None,
             },
         ])
 
     def test_multi_block_alias_no_match(self):
         author1 = authors_model.objects.create(id=5, main_name="Hans Gruber")
-        author2 = authors_model.objects.create(id=1, main_name="Heinrich Gruber")
+        author2 = authors_model.objects.create(id=1, main_name="Hans Gruber")
 
         author_aliases.objects.bulk_create([
-            author_aliases(id=1, author=author2, alias="Heinrich Gruber"),
-            author_aliases(id=2, author=author2, alias="Heinrich F. Gruber"),
-            author_aliases(id=3, author=author1, alias="Heinrich Gruber"),
-            author_aliases(id=4, author=author1, alias="Heinrich F. Gruber"),
+            author_aliases(id=1, author=author2, alias="Hans Gruber"),
+            author_aliases(id=2, author=author2, alias="Hans? Gruber"),
+            author_aliases(id=3, author=author1, alias="Hans Gruber"),
+            author_aliases(id=4, author=author1, alias="Hans! Gruber"),
         ])
         authors = [{
-            "original_name": "Hans Meyer Gruber",
-            "parsed_name": "Hans Meyer Gruber",
+            "original_name": "Hans= Gruber",
+            "parsed_name": "Hans= Gruber",
             "website": None,
             "contact": None,
             "about": None,
