@@ -21,3 +21,4 @@ sudo pip3 install mysqlclient
 sudo pip3 install requests
 sudo pip3 install mysqlclient
 sudo pip3 install tailer
+sudo pip3 install django-extensions
