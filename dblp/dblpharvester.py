@@ -10,14 +10,19 @@ import datetime
 
 
 class DblpHarvester(IHarvest):
-
+    """
+    Harvester Sub Component for DBLP
+    xml_url: url to dblp xml file
+    dtd_url: url to dblp dtd file
+    extraction_path: folder where downloaded data is stored
+    tags: publication types to be included (for example: article, phdthesis)
+    """
     def __init__(self, config_id):
         # call constructor of base class for initiating values
         IHarvest.__init__(self, config_id)
-
-        # get config values
-        # required values
         try:
+            # check paths for all dblp files, and paths for storing the files
+            # get values from extra parameters, parsed by IHarvest
             self.tags = self.extra["tags"]
             # file download requirements
             self.xml_url = urllib.parse.urljoin(self.url, self.extra["zip_name"])
@@ -39,6 +44,11 @@ class DblpHarvester(IHarvest):
             raise IHarvest_Exception("Invalid Tags")
 
     def init(self):
+        """
+        Init harvester by downloading files, extracting xml file from .gz
+        creating harvester table, if non existent
+        :return:
+        """
         if self.connector.createTable(self.table_name, DBLP_ARTICLE):
             self.logger.info("Table %s created", self.table_name)
         else:
@@ -54,6 +64,7 @@ class DblpHarvester(IHarvest):
         if xml_result and dtd_result:
             self.logger.info("Files were created")
             self.logger.info("Extracting .gz file")
+            # use unix tool for extraction
             result = subprocess.call(["gunzip", xml_result])
             if result == 0:
                 self.logger.info("Files were extracted")
@@ -63,12 +74,23 @@ class DblpHarvester(IHarvest):
 
     # time_begin and time_end are always valid datetime objects
     def run(self):
+        """
+        parse downloaded xml file and include all datasets containing:
+        1. the matching tag
+        2. mdate is between start and enddate
+        :return:
+        """
         start = None if self.start_date is None else datetime.datetime.combine(self.start_date, datetime.time.min)
         end = None if self.end_date is None else datetime.datetime.combine(self.end_date, datetime.time.min)
         return parse_xml(self.xml_path, self.dtd_path, self.connector, self.logger,
                          self.tags, start, end, self.limit)
 
     def cleanup(self):
+        """
+        remove downloaded files
+        close mysql connector
+        :return:
+        """
         if os.path.isfile(self.xml_path):
             os.remove(self.xml_path)
             self.logger.info("Xml files removed")

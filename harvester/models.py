@@ -8,7 +8,7 @@ from django.db.models.signals import pre_delete
 
 class Schedule(models.Model):
     """
-    Schedule determines the way the harvester works.
+    TheSchedule determines how often the Harvester is executed and the amount of data harvested
     The harvester will be executed at times specified in the schedule.
     It will harvest all publications defined in the range of min and max date
     If both are empty, the harvester will harvest all data on every execution
@@ -21,11 +21,17 @@ class Schedule(models.Model):
         ("week", "Weekly"),
         ("day", "Daily"),
     )
-    # total date range of Harvester can both be empty
+    # Name of schedule
     name= models.CharField(max_length=200, default=None)
+    # all data sets with dates lower than min date are not harvested
     min_date = models.DateField('Min Date', blank=True, null=True, default=None)
+    # all data sets with dates higher than max date are not harvested
     max_date = models.DateField('Max Date', blank=True, null=True, default= None)
+    # Schedule determines how often the harvester is executed
     schedule = models.ForeignKey(IntervalSchedule, default=None)
+    # time interval determines the amount of data harvested per execution
+    # all means all data is harvested
+    # monthly means that every harvest gathers all data sets for a month, the next harvest gathers the following month
     time_interval = models.CharField(max_length=200, default="all", null=True, choices=INTERVAL_CHOICES)
 
     def __str__(self):
@@ -33,10 +39,13 @@ class Schedule(models.Model):
 
 
 class Config(models.Model):
+    """
+    model containing all configurations for a given harvester (DBLP,ARXIV,...)
+    """
     # Name of the harvester for identification
     # name of harvester for logger
     name = models.CharField(max_length=200, unique=True)
-    # table used by harvester
+    # db table the harvester stores its data
     table_name = models.CharField(max_length=200)
     # start and end date for selective harvesting, set implicitly by selecting a schedule
     start_date = models.DateField('Start Date', blank=True, null=True, default = None)
@@ -51,17 +60,20 @@ class Config(models.Model):
     module_path = models.CharField(max_length=200, default=None)
     module_name = models.CharField(max_length=200, default=None)
     schedule = models.ForeignKey(Schedule, default=None)
+    # Celery Task
     celery_task = models.ForeignKey(PeriodicTask, default=None, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
-
-
-    # wird aufgerufen, sobald ein neuer Harvester erstellt wird, oder verändert wird
     def save(self, *args, **kwargs):
+        """
+        To be called, when Config is created or updated
+        :param args:
+        :param kwargs:
+        :return:
+        """
         # save object to get its id
-        # pass config id as third task parameter
         if self.id is None:
             super(Config, self).save(*args, **kwargs)  # Call the "real" save() method.
 
@@ -72,7 +84,7 @@ class Config(models.Model):
             if time_interval == "all":
                 # harvester cannot go into future for one time exevution
                 self.end_date = self.schedule.max_date
-            #allw end dates into the future
+            # all end dates into the future
             elif time_interval == "month":
                 self.end_date = self.schedule.min_date + datetime.timedelta(days=30)
                 if self.schedule.max_date is not None:
@@ -89,6 +101,7 @@ class Config(models.Model):
         # join module path,name and id
         task_args = [self.module_path, self.module_name, self.id]
         if self.celery_task is not None:
+            # config is updated, update task
             setattr(self.celery_task, 'name', "{}-Task".format(self.name))
             setattr(self.celery_task, 'interval', self.schedule.schedule)
             setattr(self.celery_task, 'task', "harvester.tasks.harvestsource")
@@ -111,6 +124,14 @@ class Config(models.Model):
 
 
 def delete_task(sender,instance,using, **kwargs):
+    """
+    If a Config is deleted, delete its task as well
+    :param sender:
+    :param instance: Config Object
+    :param using:
+    :param kwargs:
+    :return:
+    """
     try:
         instance.celery_task.delete()
     except Exception as e:

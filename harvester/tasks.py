@@ -23,7 +23,8 @@ def test(package,class_name,config_id):
 @shared_task
 def harvestsource(package, class_name, config_id):
     """
-
+    harvesting task for calling harvesting sub-components
+    the sub-components are called by specifying their paths and passing their configs
     :param package: relative path to package
     :param class_name: class name in package
     :param config_id: id of config model containing all config related data
@@ -45,6 +46,7 @@ def harvestsource(package, class_name, config_id):
     try:
         harvest_task(package, class_name, config_id)
     except ImportError as e:
+        # set task state
         harvestsource.update_state(
             state=states.FAILURE,
             meta=e,

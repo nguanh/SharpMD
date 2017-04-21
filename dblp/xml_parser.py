@@ -15,7 +15,7 @@ COMPLETE_TAG_LIST = ("article", "inproceedings", "proceedings", "book", "incolle
 def parse_xml(xmlPath, dtdPath, sql_connector, logger,
               tagList=COMPLETE_TAG_LIST, startDate=datetime.datetime.min, endDate=datetime.datetime.max, limit=None):
     """
-
+    Function for parsing Dblp.xml file using lxml
     :param xmlPath: path to dblp.xml file
     :param dtdPath: path to dblp.dtd file
     :param sql_connector:
@@ -103,6 +103,7 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
 
 
         try:
+            # include into database
             sql_connector.execute(tup)
         except Exception as e:
             logger.error("%s MariaDB error: %s",dataset['key'], e)
@@ -112,8 +113,6 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
 
         if success_count % 10000 == 0:
             logger.info(success_count)
-
-
 
     logger.info("Final Count %s/%s", success_count, overall_count)
     sql_connector.close_connection()

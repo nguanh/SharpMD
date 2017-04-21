@@ -1,21 +1,25 @@
 from django.contrib import admin
-from .models import Schedule,Config
-from django_celery_beat.admin import TaskChoiceField
+from .models import Schedule, Config
 from django import forms
-# Register your models here.
 from django_admin_row_actions import AdminRowActionsMixin
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from kombu.utils.json import loads
 
 
 class ScheduleForm(forms.ModelForm):
-
+    """
+    Admin View Form for Schedules
+    """
     class Meta:
-        model= Schedule
+        model = Schedule
         exclude = ()
 
     def clean_max_date(self):
+        """
+        validation method for max_date in form
+        The only check is that min date is not after max date
+        :return:
+        """
         min_date = self.cleaned_data["min_date"]
         max_date = self.cleaned_data["max_date"]
         if min_date is None or max_date is None:
@@ -27,6 +31,12 @@ class ScheduleForm(forms.ModelForm):
         return max_date
 
     def clean_time_interval(self):
+        """
+        validation method for the time interval
+        in case of "all" min and max date are ignored
+        otherwise a min date has to be defined
+        :return:
+        """
         time_interval = self.cleaned_data["time_interval"]
         min_date = self.cleaned_data["min_date"]
 
@@ -40,17 +50,22 @@ class ScheduleForm(forms.ModelForm):
         return time_interval
 
 
-class ScheduleAdmin(AdminRowActionsMixin,admin.ModelAdmin):
+class ScheduleAdmin(AdminRowActionsMixin, admin.ModelAdmin):
+    """
+    Combine Model and Scheduleform
+    Display Attributes in list view
+    """
     form = ScheduleForm
     model = Schedule
-    # welche attribute sollen in der listenansicht gezeigt werden
-    list_display = ('__str__', 'schedule','time_interval')
+    list_display = ('__str__', 'schedule', 'time_interval')
     """Admin-interface for Harvester Configs."""
 
 
 
 class ConfigForm(forms.ModelForm):
-
+    """
+    Admin Harvester Config Form
+    """
 
     class Meta:
         """Form metadata."""
@@ -59,6 +74,10 @@ class ConfigForm(forms.ModelForm):
         exclude = ()
 
     def clean_limit(self):
+        """
+        Limit can be None or a non negative number
+        :return:
+        """
         if self.cleaned_data["limit"] is None:
             return None
 
@@ -71,6 +90,10 @@ class ConfigForm(forms.ModelForm):
             )
 
     def clean_module_name(self):
+        """
+        check if the given module name and class name exist
+        :return:
+        """
         try:
             mod = __import__(self.cleaned_data["module_path"], fromlist=[self.cleaned_data["module_name"]])
             getattr(mod, self.cleaned_data["module_name"])
@@ -81,13 +104,22 @@ class ConfigForm(forms.ModelForm):
         return self.cleaned_data["module_name"]
 
 
-class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
+class ConfigAdmin(AdminRowActionsMixin, admin.ModelAdmin):
+    """
+    Combine Form and Model for Harvester config
+    """
     form = ConfigForm
     model = Config
-    # welche attribute sollen in der listenansicht gezeigt werden
+
     list_display = ('__str__', 'enabled')
-    """Admin-interface for Harvester Configs."""
+
     def get_row_actions(self, obj):
+        """
+        Row actions for displaying buttons in admin list view
+        Responsible for displaying the log tail
+        :param obj: object of type Config
+        :return:
+        """
         row_actions = [
             {
                 'label': 'Log',
@@ -99,6 +131,9 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
         row_actions += super(ConfigAdmin, self).get_row_actions(obj)
         return row_actions
 
+    # partition Creation form into separate areas
+    # one area containing all harvester related data
+    # the other one for Schedule related data
     fieldsets = (
         (None, {
             'fields': ('name', 'table_name', 'url', 'enabled', 'limit', 'extra_config'),
