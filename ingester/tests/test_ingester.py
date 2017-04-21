@@ -146,4 +146,14 @@ class TestIngester(TransactionTestCase):
         self.assertEqual(limbo_authors.objects.get(id=2).test(), [1, 'None', "Another Author", 1])
         self.assertEqual(local_url.objects.count(),1)
 
+    def test_limbo_alias(self):
+        setup_tables(os.path.join(test_path, "dblp_test3.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
+        ingester = DblpIngester("dblp.ingester", harvesterdb="test_storage")
+        ingest_data(ingester)
+
+        self.assertEqual(limbo_pub.objects.count(), 0)
+        self.assertEqual(cluster.objects.count(), 3)
+        self.assertEqual(authors_model.objects.count(),2)
+
+
 

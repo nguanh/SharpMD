@@ -10,7 +10,6 @@ STATUS_CHOICES = (
 )
 
 
-
 class OpenReferences(models.Model):
     # harvester table
     source_table = models.IntegerField()
@@ -38,7 +37,6 @@ class SingleReference(models.Model):
         return self.title
 
     def test(self):
-        # TODO deserialize
         authors = msgpack.unpackb(self.authors, encoding="utf-8")
         return [self.source.id, self.title, self.date, authors, self.status]
 

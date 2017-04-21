@@ -8,15 +8,28 @@ punctuation_dict = str.maketrans({key: None for key in (string.punctuation)})
 whitespace_dict = str.maketrans({key: None for key in (string.whitespace.replace(" ", ""))})
 ascii_dict = str.maketrans({key: None for key in (string.printable)})
 
-# TODO interpret latex commands
-def filter_latex(text):
-    pass
-    #\\[a-zA-z]+   matches all math commands \ddadad but not \jl{
+suffix_list = ["jr", "jnr", "sr", "snr"]
+
+# TODO regex for latex and html
 
 def normalize_title(title, latex=False):
 
     # translate unicode characters to closest ascii characters
     ascii_decoded = unidecode(title)
+    remove_punctuation = ascii_decoded.translate(punctuation_dict)
+    remove_whitespace = remove_punctuation.translate(whitespace_dict)
+    lowered = remove_whitespace.lower()
+    only_one_space = lowered
+    # by removing certain unicode characters we introduced multiple spaces, replace them by only on space
+    while '  ' in only_one_space:
+        only_one_space = only_one_space.replace('  ', ' ')
+
+    return only_one_space.strip()
+
+
+def normalize_authors(author):
+    # translate unicode characters to closest ascii characters
+    ascii_decoded = unidecode(author)
     remove_punctuation = ascii_decoded.translate(punctuation_dict)
     remove_whitespace = remove_punctuation.translate(whitespace_dict)
     lowered = remove_whitespace.lower()

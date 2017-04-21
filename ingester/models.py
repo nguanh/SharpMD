@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from django.db import models
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
-from .helper import get_name_block, normalize_title
+from .helper import get_name_block, normalize_title,normalize_authors
 import json
 from django.db.models.signals import pre_delete
 
@@ -143,7 +143,7 @@ class authors_model(models.Model):
 
     def save(self, *args, **kwargs):
         #auto normalize author name
-        self.block_name = get_name_block(self.main_name)
+        self.block_name = normalize_authors(self.main_name)
         super(authors_model, self).save(*args, **kwargs)
 
     def test(self):

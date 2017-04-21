@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django_admin_row_actions',
     'harvester.apps.HarvesterConfig',
     'ingester.apps.IngesterConfig',
-    'weaver.apps.WeaverConfig',
+   # 'weaver.apps.WeaverConfig',
     'django_extensions',
 
 ]
