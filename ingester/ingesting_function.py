@@ -65,6 +65,8 @@ def ingest_data(ingester_obj):
                 source_lurl_obj.delete()
                 push_limbo(mapping, author_matches, str(title_match["reason"]))
                 pub_limbo += 1
+                #TODO include in test
+                write_connector.execute_ex(ingester_obj.update_harvested(), (mapping["local_url"],))
                 continue
 
             # ------------------------ CREATION ------------------------------------------------------------------------
