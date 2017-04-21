@@ -28,8 +28,10 @@ def normalize_title(title, latex=False):
 
 
 def normalize_authors(author):
+    # split double names connected by - into separate names
+    name_split = author.replace("-", " ")
     # translate unicode characters to closest ascii characters
-    ascii_decoded = unidecode(author)
+    ascii_decoded = unidecode(name_split)
     remove_punctuation = ascii_decoded.translate(punctuation_dict)
     remove_whitespace = remove_punctuation.translate(whitespace_dict)
     lowered = remove_whitespace.lower()
