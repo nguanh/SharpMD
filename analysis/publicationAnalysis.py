@@ -1,6 +1,7 @@
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 from ingester.helper import normalize_title
+import pandas
 import datetime
 DB_NAME = "analysis"
 DATE_TABLE = ("CREATE TABLE `mdates` ("
@@ -90,22 +91,17 @@ def n_set_popular(connector,word_list):
 def run():
     setup()
     read_connector = MariaDb()
-    write_connector = MariaDb(db=DB_NAME)
-    count = 0
     read_connector.cursor.execute(DBLP_QUERY)
+    mdates = pandas.DataFrame(index=["count"])
+
     for query_dataset in read_connector.cursor:
         mapping = dblp_mapping(query_dataset)
-        count += 1
-        if count % 10000== 0:
-            print(count)
-        #set_mdate(write_connector, mapping["mdate"])
-        #set_pubyear(write_connector, mapping["pub"])
-        #set_title_length(write_connector, len(mapping["title"]))
-        #set_popular(write_connector, mapping["title"])
-        #n_set_popular(write_connector,mapping["normal"])
-
+        print(mapping["mdate"])
+        if mapping["mdate"] not in mdates:
+            mdates.insert(0,mapping["mdate"],1)
+        else:
+            mdates.ix["count",mapping["mdate"]] += 1
 
     read_connector.close_connection()
-    write_connector.close_connection()
 if __name__ =="__main__":
     run()
