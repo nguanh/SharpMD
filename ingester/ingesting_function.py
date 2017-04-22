@@ -30,6 +30,7 @@ def ingest_data(ingester_obj):
 
     for query_dataset in read_connector.cursor:
         mapping = ingester_obj.mapping_function(query_dataset)
+        write_connector.execute_ex(ingester_obj.update_harvested(), (mapping["local_url"],))
         try:
             # 1. get Harvester specific record and parse to common-form dict
             # ------------------------- LOCAL_URL ----------------------------------------------------------------------
@@ -109,7 +110,7 @@ def ingest_data(ingester_obj):
             def_pub_obj.save()
             logger.debug("%s: Publication added %s", mapping["local_url"], def_pub_obj)
             # 9.set publication as harvested
-            write_connector.execute_ex(ingester_obj.update_harvested(), (mapping["local_url"],))
+            #write_connector.execute_ex(ingester_obj.update_harvested(), (mapping["local_url"],))
             pub_added += 1
         except Exception as e:
             logger.error("%s: %s", mapping["local_url"], e)
