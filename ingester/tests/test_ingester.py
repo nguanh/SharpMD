@@ -155,5 +155,16 @@ class TestIngester(TransactionTestCase):
         self.assertEqual(cluster.objects.count(), 3)
         self.assertEqual(authors_model.objects.count(), 5)
 
+    def test_set_last_harvested(self):
+        setup_tables(os.path.join(test_path, "dblp_test3.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
+        ingester = DblpIngester("dblp.ingester", harvesterdb="test_storage")
+        ingester.set_limit(1)
+        result1 = ingest_data(ingester)
+        self.assertEqual(result1, 1)
+        ingester.set_limit(3)
+        result2 = ingest_data(ingester)
+        self.assertEqual(result2, 2)
+
+
 
 
