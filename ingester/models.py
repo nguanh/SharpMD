@@ -187,7 +187,7 @@ class author_alias_source(models.Model):
 
 
 class cluster(models.Model):
-    name= models.TextField( db_index=True)
+    name= models.TextField()
 
 
 class publication(models.Model):
