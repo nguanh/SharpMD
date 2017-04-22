@@ -25,7 +25,7 @@ POPULAR = ("CREATE TABLE `popular_words` ("
     "  `word` varchar(100) NOT NULL,"
     "  `counter` INT NOT NULL,"
     "  PRIMARY KEY (`word`)"
-    ") ENGINE={} CHARSET=utf8mb4")
+    ") ENGINE= {} CHARSET=utf8mb4")
 
 N_POPULAR = ("CREATE TABLE `n_popular_words` ("
     "  `word` varchar(100) NOT NULL,"
@@ -95,11 +95,11 @@ def run():
     read_connector.cursor.execute(DBLP_QUERY)
     for query_dataset in read_connector.cursor:
         mapping = dblp_mapping(query_dataset)
-        set_mdate(write_connector, mapping["mdate"])
-        set_pubyear(write_connector, mapping["pub"])
-        set_title_length(write_connector, len(mapping["title"]))
-        set_popular(write_connector, mapping["title"])
-        n_set_popular(write_connector,mapping["normal"])
+        #set_mdate(write_connector, mapping["mdate"])
+        #set_pubyear(write_connector, mapping["pub"])
+        #set_title_length(write_connector, len(mapping["title"]))
+        #set_popular(write_connector, mapping["title"])
+        #n_set_popular(write_connector,mapping["normal"])
 
 
     read_connector.close_connection()
