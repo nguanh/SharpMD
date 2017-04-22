@@ -91,10 +91,13 @@ def run():
     setup()
     read_connector = MariaDb()
     write_connector = MariaDb(db=DB_NAME)
-
+    count = 0
     read_connector.cursor.execute(DBLP_QUERY)
     for query_dataset in read_connector.cursor:
         mapping = dblp_mapping(query_dataset)
+        count += 1
+        if count % 10000== 0:
+            print(count)
         #set_mdate(write_connector, mapping["mdate"])
         #set_pubyear(write_connector, mapping["pub"])
         #set_title_length(write_connector, len(mapping["title"]))
