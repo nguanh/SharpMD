@@ -116,7 +116,7 @@ class local_url(models.Model):
     global_url = models.ForeignKey(global_url, default=None)
     #auto set date on creation
     last_updated = models.DateTimeField(auto_now_add=True)
-    url = models.CharField(max_length=150 , db_index=True)
+    url = models.CharField(max_length=150)
     medium = models.ForeignKey(pub_medium, default=None, null=True, blank=True)
     type = models.ForeignKey(publication_type, default=None, null=True, blank=True)
     study_field = models.ForeignKey(study_field, default=None,null=True,blank=True)
