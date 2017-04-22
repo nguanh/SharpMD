@@ -8,7 +8,6 @@ def create_authors(matching_list, author_list, local_url_obj):
     result = []
     priority = 0
     for match, author in zip(matching_list,author_list):
-        #name_block = get_name_block(author["parsed_name"])
         # create author record first depending on matching status
         if match["match"] == Match.NO_MATCH:
             # NOMATCH: create new  publication author
