@@ -41,11 +41,11 @@ class TestIngester(TransactionTestCase):
         self.assertEqual(local_url.objects.get(id=3).test(), [3, 'journals/acta/VoglerS014', 1, 1,None])
         self.assertEqual(local_url.objects.get(id=4).test(), [1, 'TODO PLATZHALTER', 1, 1,None])
         # check authors_model
-        self.assertEqual(authors_model.objects.get(id=1).test(),["Ian F. Akyildiz", "akyildiz,i"])
-        self.assertEqual(authors_model.objects.get(id=2).test(), ["Horst von Brand", "von brand,h"])
-        self.assertEqual(authors_model.objects.get(id=3).test(), ["Walter Vogler", "vogler,w"])
-        self.assertEqual(authors_model.objects.get(id=4).test(), ["Christian Stahl", "stahl,c"])
-        self.assertEqual(authors_model.objects.get(id=5).test(), ["Richard Müller", "muller,r"])
+        self.assertEqual(authors_model.objects.get(id=1).test(),["Ian F. Akyildiz", "ian f akyildiz"])
+        self.assertEqual(authors_model.objects.get(id=2).test(), ["Horst von Brand", "horst von brand"])
+        self.assertEqual(authors_model.objects.get(id=3).test(), ["Walter Vogler", "walter vogler"])
+        self.assertEqual(authors_model.objects.get(id=4).test(), ["Christian Stahl", "christian stahl"])
+        self.assertEqual(authors_model.objects.get(id=5).test(), ["Richard Müller", "richard muller"])
         # check author alias
         self.assertEqual(author_aliases.objects.get(id=1).test(), [1, "Ian F. Akyildiz"])
         self.assertEqual(author_aliases.objects.get(id=2).test(), [2, "Horst von Brand"])
@@ -153,7 +153,7 @@ class TestIngester(TransactionTestCase):
 
         self.assertEqual(limbo_pub.objects.count(), 0)
         self.assertEqual(cluster.objects.count(), 3)
-        self.assertEqual(authors_model.objects.count(),2)
+        self.assertEqual(authors_model.objects.count(), 5)
 
 
 

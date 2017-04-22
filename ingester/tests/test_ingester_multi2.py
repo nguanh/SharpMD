@@ -50,7 +50,7 @@ class TestIngesterMulti2(TransactionTestCase):
         arxiv_article = ("arxivkey",  # identifier
                          "2007-07-07",  # created
                          "2008-08-08",  # updated
-                         "Andreas Theodor Anders;Bertha Theresa Balte;Carim Chass Jr.;",  # authors
+                         "Andreas Anders;Bertha Theresa Balte;Carim Chass Jr.;",  # authors
                          "The Ultimate Title!",  # title
                          None,  # mscclass
                          None,  # acmclass
@@ -65,6 +65,10 @@ class TestIngesterMulti2(TransactionTestCase):
 
         self.connector.execute_ex(ADD_DBLP_ARTICLE, dblp_article)
         self.connector.execute_ex(ADD_ARXIV, arxiv_article)
+
+    def tearDown(self):
+        self.connector.execute_ex("DROP TABLE test_storage.arxiv_articles")
+        self.connector.execute_ex("DROP TABLE test_storage.dblp_article")
         self.connector.close_connection()
 
     def test_success_reversed(self):
@@ -97,7 +101,7 @@ class TestIngesterMulti2(TransactionTestCase):
                          [1, "TODO PLATZHALTER", 1, publication_type.objects.get(name="misc").id, None])
         # check authors
         self.assertEqual(authors_model.objects.count(), 3)
-        self.assertEqual(author_aliases.objects.count(), 4)
+        self.assertEqual(author_aliases.objects.count(), 3)
         self.assertEqual(author_alias_source.objects.count(), 5)
         # publication authors
         self.assertEqual(publication_author.objects.count(), 8)

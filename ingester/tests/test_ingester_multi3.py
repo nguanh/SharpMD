@@ -29,7 +29,7 @@ class TestIngesterCiteseer(TransactionTestCase):
         # insert data
         dblp_article = ("dblpkey",  # key
                         "2011-11-11",  # mdate
-                        "Andreas Anders;Bertha Theresa Balte;",  # authors
+                        "Andreas Theodor Anders;Bertha Theresa Balte;",  # authors
                         "The Ultimate Title",  # title
                         "10-14",  # pages
                         datetime.date(2005,1,1),  # pub year
@@ -85,6 +85,11 @@ class TestIngesterCiteseer(TransactionTestCase):
         self.connector.execute_ex(ADD_DBLP_ARTICLE, dblp_article)
         self.connector.execute_ex(ADD_ARXIV, arxiv_article)
         self.connector.execute_ex(ADD_OAI_DEFAULT,citeseer_article)
+
+    def tearDown(self):
+        self.connector.execute_ex("DROP TABLE test_storage.arxiv_articles")
+        self.connector.execute_ex("DROP TABLE test_storage.dblp_article")
+        self.connector.execute_ex("DROP TABLE test_storage.oaipmh_articles")
         self.connector.close_connection()
 
     def test_success_all_3_ingester(self):
@@ -124,7 +129,7 @@ class TestIngesterCiteseer(TransactionTestCase):
         self.assertEqual(citeseerurl.test(), [5, "citeseerkey", None, publication_type.objects.get(name="misc").id, None])
         # check authors
         self.assertEqual(authors_model.objects.count(), 3)
-        self.assertEqual(author_aliases.objects.count(), 4)
+        self.assertEqual(author_aliases.objects.count(), 3)
         self.assertEqual(author_alias_source.objects.count(), 8)
         # publication authors
         self.assertEqual(publication_author.objects.count(), 11)
