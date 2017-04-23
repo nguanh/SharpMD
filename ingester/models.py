@@ -163,7 +163,7 @@ class publication_author(models.Model):
 
 
 class author_aliases(models.Model):
-    alias = models.CharField(max_length=200 )
+    alias = models.CharField(max_length=200, db_index=True)
     author = models.ForeignKey(authors_model)
 
     def test(self):
