@@ -87,7 +87,11 @@ def run():
     title_length = pandas.DataFrame(index=["count"])
     title_popular = pandas.DataFrame(index=["count"])
     name_popular = pandas.DataFrame(index=["count"])
-    read_connector = pymysql.connect(get_config("MARIADB"))
+    read_connector = pymysql.connect(user="root",
+                                     password="master",
+                                     host="localhost",
+                                     database="harvester",
+                                     charset="utf8mb4")
     with read_connector.cursor as cursor:
         cursor.execute(DBLP_QUERY,())
         for query_dataset in cursor:
