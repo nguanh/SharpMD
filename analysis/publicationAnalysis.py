@@ -131,6 +131,6 @@ def run():
     title_length.to_csv(os.path.join(local_path, "titlelength.csv"))
     title_popular.to_csv(os.path.join(local_path, "titlepop.csv"))
     name_popular.to_csv(os.path.join(local_path, "namepop.csv"))
-    read_connector.close_connection()
+    read_connector.close()
 if __name__ =="__main__":
     run()
