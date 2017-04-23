@@ -1,8 +1,10 @@
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
-from ingester.helper import normalize_title
+from ingester.helper import normalize_title,split_authors, normalize_authors
 import pandas
 import datetime
+import os
+local_path = os.path.dirname(os.path.abspath(__file__))
 DB_NAME = "analysis"
 DATE_TABLE = ("CREATE TABLE `mdates` ("
     "  `mdate` date NOT NULL,"
@@ -35,7 +37,7 @@ N_POPULAR = ("CREATE TABLE `n_popular_words` ("
     ") ENGINE={} CHARSET=utf8mb4")
 
 
-DBLP_QUERY = ("SELECT mdate,title,pub_year FROM {}.dblp_article").format("harvester")
+DBLP_QUERY = ("SELECT mdate,title,pub_year,author FROM {}.dblp_article").format("harvester")
 
 
 def setup():
@@ -61,21 +63,9 @@ def dblp_mapping(query_tuple):
     return {
         "pub": query_tuple[2],
         "mdate": query_tuple[0],
-        "title": query_tuple[1].split(" "),
         "normal": normalize_title(query_tuple[1]).split(" "),
+        "author": split_authors(query_tuple[3]),
     }
-def set_mdate(connector,mdate):
-    connector.execute_ex(("INSERT INTO `mdates`(mdate,counter) VALUES(%s,1)"
-                         "ON DUPLICATE KEY UPDATE counter= counter+1"),(mdate,))
-
-
-def set_pubyear(connector,pubyear):
-    connector.execute_ex(("INSERT INTO `pub_year`(pubyear,counter) VALUES(%s,1)"
-                          "ON DUPLICATE KEY UPDATE counter= counter+1"), (pubyear,))
-
-def set_title_length(connector,length):
-    connector.execute_ex(("INSERT INTO `title_length`(length,counter) VALUES(%s,1)"
-                         "ON DUPLICATE KEY UPDATE counter= counter+1"),(length,))
 
 def set_popular(connector,word_list):
     for word in word_list:
@@ -93,15 +83,48 @@ def run():
     read_connector = MariaDb()
     read_connector.cursor.execute(DBLP_QUERY)
     mdates = pandas.DataFrame(index=["count"])
+    pubyear = pandas.DataFrame(index=["count"])
+    title_length = pandas.DataFrame(index=["count"])
+    title_popular = pandas.DataFrame(index=["count"])
+    name_popular = pandas.DataFrame(index=["count"])
 
     for query_dataset in read_connector.cursor:
         mapping = dblp_mapping(query_dataset)
-        print(mapping["mdate"])
+        # Modify Date
         if mapping["mdate"] not in mdates:
             mdates.insert(0,mapping["mdate"],1)
         else:
             mdates.ix["count",mapping["mdate"]] += 1
+        # publication year
+        if mapping["pub"] not in pubyear:
+            pubyear.insert(0,mapping["pub"],1)
+        else:
+            pubyear.ix["count",mapping["pub"]] += 1
+        # title length
+        if len(mapping["normal"]) not in title_length:
+            title_length.insert(0, len(mapping["normal"]), 1)
+        else:
+            title_length.ix["count", len(mapping["normal"])] += 1
+        # popular words
+        for word in mapping["normal"]:
+            if word not in title_popular:
+                title_popular.insert(0, word, 1)
+            else:
+                title_popular.ix["count", word] += 1
+        # popular names
+        for author in mapping["author"]:
+            name_list = normalize_authors(author).split(" ")
+            for word in name_list:
+                if word not in name_popular:
+                    name_popular.insert(0, word, 1)
+                else:
+                    name_popular.ix["count", word] += 1
 
+    mdates.to_csv(os.path.join(local_path,"mdates.csv"))
+    pubyear.to_csv(os.path.join(local_path,"pubyear.csv"))
+    title_length.to_csv(os.path.join(local_path, "titlelength.csv"))
+    title_popular.to_csv(os.path.join(local_path, "titlepop.csv"))
+    name_popular.to_csv(os.path.join(local_path, "namepop.csv"))
     read_connector.close_connection()
 if __name__ =="__main__":
     run()
