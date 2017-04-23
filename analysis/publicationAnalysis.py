@@ -92,7 +92,7 @@ def run():
                                      host="localhost",
                                      database="harvester",
                                      charset="utf8mb4")
-    with read_connector.cursor as cursor:
+    with read_connector.cursor() as cursor:
         cursor.execute(DBLP_QUERY,())
         for query_dataset in cursor:
             mapping = dblp_mapping(query_dataset)
