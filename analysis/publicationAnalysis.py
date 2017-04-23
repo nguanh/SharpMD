@@ -32,11 +32,11 @@ POPULAR = ("CREATE TABLE `popular_words` ("
     "  PRIMARY KEY (`word`)"
     ") ENGINE= {} CHARSET=utf8mb4")
 
-N_POPULAR = ("CREATE TABLE `n_popular_words` ("
-    "  `word` varchar(100) NOT NULL,"
+N_POPULAR = ("CREATE TABLE `popular_names` ("
+    "  `name` varchar(100) NOT NULL,"
     "  `counter` INT NOT NULL,"
-    "  PRIMARY KEY (`word`)"
-    ") ENGINE={} CHARSET=utf8mb4")
+    "  PRIMARY KEY (`name`)"
+    ") ENGINE= {} CHARSET=utf8mb4")
 
 
 DBLP_QUERY = ("SELECT mdate,title,pub_year,author FROM {}.dblp_article").format("harvester")
@@ -57,7 +57,7 @@ def setup():
     connector.createTable("publication year", PUB_YEAR_TABLE.format(storage_engine))
     connector.createTable("popular_words", POPULAR.format(storage_engine))
     connector.createTable("title_length", TITLE_LENGTH.format(storage_engine))
-    connector.createTable("popular words normalized", N_POPULAR.format(storage_engine))
+    connector.createTable("popular names", N_POPULAR.format(storage_engine))
     connector.close_connection()
 
 
@@ -69,17 +69,62 @@ def dblp_mapping(query_tuple):
         "author": split_authors(query_tuple[3]),
     }
 
+def set_mdate(connector,mdate):
+    connector.execute(("INSERT INTO `mdates`(mdate,counter) VALUES(%s,1)"
+                       "ON DUPLICATE KEY UPDATE counter= counter+1"), (mdate,))
+
+def set_pubyear(connector,year):
+    connector.execute(("INSERT INTO `pub_year`(pubyear,counter) VALUES(%s,1)"
+                       "ON DUPLICATE KEY UPDATE counter= counter+1"), (year,))
+
+def set_title_length(connector,length):
+    connector.execute(("INSERT INTO `title_length`(length,counter) VALUES(%s,1)"
+                       "ON DUPLICATE KEY UPDATE counter= counter+1"), (length,))
+
 def set_popular(connector,word_list):
     for word in word_list:
-        connector.execute_ex(("INSERT INTO `popular_words`(word,counter) VALUES(%s,1)"
+        connector.execute(("INSERT INTO `popular_words`(word,counter) VALUES(%s,1)"
                               "ON DUPLICATE KEY UPDATE counter= counter+1"), (word,))
 
-def n_set_popular(connector,word_list):
-    for word in word_list:
-        connector.execute_ex(("INSERT INTO `n_popular_words`(word,counter) VALUES(%s,1)"
-                              "ON DUPLICATE KEY UPDATE counter= counter+1"), (word,))
+def set_popular_names(connector,name_list):
+    for name in name_list:
+        normal_name_list = normalize_authors(name).split(" ")
+        for normal_name in normal_name_list:
+            connector.execute(("INSERT INTO `popular_names`(name,counter) VALUES(%s,1)"
+                              "ON DUPLICATE KEY UPDATE counter= counter+1"), (normal_name,))
 
 
+
+def run_db():
+    setup()
+    read_connector = pymysql.connect(user="root",
+                                     password="master",
+                                     host="localhost",
+                                     database="harvester",
+                                     charset="utf8mb4")
+    write_connector = pymysql.connect(user="root",
+                                     password="master",
+                                     host="localhost",
+                                     database="analysis",
+                                     charset="utf8mb4")
+    count = 0
+    with read_connector.cursor() as cursor:
+        with write_connector.cursor() as wcursor:
+            cursor.execute(DBLP_QUERY, ())
+            for query_dataset in cursor:
+                mapping = dblp_mapping(query_dataset)
+                set_pubyear(wcursor, mapping["pub"])
+                set_mdate(wcursor, mapping["mdate"])
+                set_popular(wcursor, mapping["normal"])
+                set_title_length(wcursor, len(mapping["normal"]))
+                set_popular_names(wcursor,mapping["author"])
+                write_connector.commit()
+                count += 1
+                if count % 10000 == 0:
+                    print(count)
+
+        write_connector.close()
+    read_connector.close()
 def run():
     #setup()
     mdates = pandas.DataFrame(index=["count"])
@@ -133,4 +178,4 @@ def run():
     name_popular.to_csv(os.path.join(local_path, "namepop.csv"))
     read_connector.close()
 if __name__ =="__main__":
-    run()
+    run_db()
