@@ -39,7 +39,7 @@ N_POPULAR = ("CREATE TABLE `popular_names` ("
     ") ENGINE= {} CHARSET=utf8mb4")
 
 
-DBLP_QUERY = ("SELECT mdate,title,pub_year,author FROM {}.dblp_article").format("harvester")
+DBLP_QUERY = ("SELECT mdate,title,pub_year,author FROM backup.dblp")
 
 
 def setup():
@@ -100,7 +100,7 @@ def run_db():
     read_connector = pymysql.connect(user="root",
                                      password="master",
                                      host="localhost",
-                                     database="harvester",
+                                     database="backup",
                                      charset="utf8mb4")
     write_connector = pymysql.connect(user="root",
                                      password="master",
