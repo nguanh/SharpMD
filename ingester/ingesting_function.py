@@ -11,7 +11,7 @@ from .difference_storage import *
 from .helper import *
 import datetime
 
-
+@silk_profile(name='Ingester')
 def ingest_data(ingester_obj):
     if isinstance(ingester_obj, Iingester) is False:
         raise IIngester_Exception("Object is not of type IIngester")

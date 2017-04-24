@@ -1,7 +1,7 @@
 from .helper import *
 from .models import *
 from django.db.models import ObjectDoesNotExist
-
+@silk_profile(name='match author')
 def match_author(authors):
     results = []
     # iterate through all authors
@@ -52,7 +52,7 @@ def match_author(authors):
                 })
     return results
 
-
+@silk_profile(name='match title')
 def match_title(title):
     cluster_name = normalize_title(title)
     # check for matching cluster (so far ONLY COMPLETE MATCH)
@@ -92,7 +92,7 @@ def match_title(title):
         }
     return result
 
-
+@silk_profile(name='match medium')
 def match_pub_medium(mapping, url_obj):
     if mapping["key"] is None:
         return None

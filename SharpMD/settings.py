@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'ingester.apps.IngesterConfig',
    # 'weaver.apps.WeaverConfig',
     'django_extensions',
+    'silk'
 
 ]
 
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware'
 ]
 
 ROOT_URLCONF = 'SharpMD.urls'
@@ -151,3 +153,5 @@ CELERY_RESULT_BACKEND = 'django-db'
 # CELERY_RESULT_BACKEND = 'django-cache'
 CELERY_IMPORTS = ('harvester.tasks','ingester.tasks')
 CELERY_MAX_TASKS_PER_CHILD = 1
+
+SILKY_PYTHON_PROFILER = True

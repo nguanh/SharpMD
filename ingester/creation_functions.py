@@ -3,7 +3,7 @@ from .helper import *
 from .difference_storage import *
 from django.db.models import ObjectDoesNotExist
 
-
+@silk_profile(name='create author')
 def create_authors(matching_list, author_list, local_url_obj):
     result = []
     priority = 0
@@ -40,7 +40,7 @@ def create_authors(matching_list, author_list, local_url_obj):
         priority += 1
     return result
 
-
+@silk_profile(name='create title')
 def create_title(matching, cluster_name):
     if matching["match"] == Match.NO_MATCH:
         cluster_obj = cluster.objects.create(name=cluster_name)
@@ -48,7 +48,7 @@ def create_title(matching, cluster_name):
         cluster_obj = cluster.objects.get(id=matching["id"])
     return cluster_obj
 
-
+@silk_profile(name='create publication')
 def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_objs=[]):
     # find publication associated with cluster_id
     try:
