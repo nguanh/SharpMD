@@ -1,2 +1,17 @@
 tailer
+celery
+sqlalchemy
+django
+sickle
+unidecode
+nameparser
+msgpack-python
+django-celery-beat
+django-celery-results
+django-admin-row-actions
+lxml
 jsonfield
+mysqlclient
+requests
+django-extensions
+pymysql

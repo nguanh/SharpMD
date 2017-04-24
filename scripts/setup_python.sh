@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# start script with source setup_python.sh <envname>
 echo 'Downloading packages...'
 sudo apt-get install virtualenv python3.5
 pip install virtualenv
