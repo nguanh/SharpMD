@@ -1,6 +1,7 @@
 from .helper import *
 from .models import *
 from django.db.models import ObjectDoesNotExist
+from silk.profiling.profiler import silk_profile
 @silk_profile(name='match author')
 def match_author(authors):
     results = []

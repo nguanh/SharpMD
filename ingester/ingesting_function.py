@@ -10,6 +10,7 @@ from .creation_functions import create_publication,create_authors,create_title,u
 from .difference_storage import *
 from .helper import *
 import datetime
+from silk.profiling.profiler import silk_profile
 
 @silk_profile(name='Ingester')
 def ingest_data(ingester_obj):
