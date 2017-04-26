@@ -29,6 +29,8 @@ def ingest_data(ingester_obj):
     except Exception as e:
         raise IIngester_Exception(e)
 
+    globl_url_obj = global_url.objects.get(id=1)
+
     for query_dataset in read_connector.cursor:
         mapping = ingester_obj.mapping_function(query_dataset)
         write_connector.execute_ex(ingester_obj.update_harvested(), (mapping["local_url"],))
@@ -78,7 +80,12 @@ def ingest_data(ingester_obj):
             keyword_obj = match_keywords(mapping["keywords"],source_lurl_obj)
             cluster_obj = create_title(title_match, cluster_name)
             # 5.create default publication / or find existing one and link with authors and cluster
-            def_pub_obj, def_url_obj = create_publication(cluster_obj, author_ids, type_obj, pub_medium_obj, keyword_obj)
+            def_pub_obj, def_url_obj = create_publication(globl_url_obj,
+                                                          cluster_obj,
+                                                          author_ids,
+                                                          type_obj,
+                                                          pub_medium_obj,
+                                                          keyword_obj)
             # update local url with pub_medium_obj and study field
             source_lurl_obj.medium = pub_medium_obj
             source_lurl_obj.save()

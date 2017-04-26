@@ -33,8 +33,9 @@ class TestAuthors(TransactionTestCase):
 
     def test_long(self):
         for i in range(1000):
+            lurl = local_url.objects.create(url="a", global_url=self.gurl)
             matches = match_author(self.authors)
-            id_list = create_authors(matches, self.authors, self.lurl)
+            id_list = create_authors(matches, self.authors, lurl)
 
         for x in authors_model.objects.all():
             print(x.test())

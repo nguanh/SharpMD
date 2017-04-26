@@ -105,7 +105,7 @@ def create_title(matching, cluster_name):
     return cluster_obj
 
 @silk_profile(name='create publication')
-def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_objs=[]):
+def create_publication2(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_objs=[]):
     # find publication associated with cluster_id
     try:
         publication_data = publication.objects.get(cluster=cluster_obj)
@@ -128,6 +128,38 @@ def create_publication(cluster_obj, author_objs, type_obj=None, pub_medium_obj=N
         publication_keyword.objects.get_or_create(url=url_id, keyword=keyword)
     # get return publication_id
     return [publication_data, url_id]
+
+
+@silk_profile(name='create publication2')
+def create_publication(global_url, cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_objs=[]):
+    pub_aut_list = []
+    keyword_list = []
+    # find publication associated with cluster_id
+    try:
+        publication_data = publication.objects.select_related('url').get(cluster=cluster_obj)
+        url_id = publication_data.url
+        for priority, author_obj in enumerate(author_objs):
+            publication_author.objects.get_or_create(url=url_id, author=author_obj, priority=priority)
+
+        for keyword in keyword_objs:
+            publication_keyword.objects.get_or_create(url=url_id, keyword=keyword)
+
+    except ObjectDoesNotExist:
+        # create local url and default publication
+        url_id = local_url.objects.create(url="TODO PLATZHALTER", global_url=global_url,
+                                          medium=pub_medium_obj, type=type_obj)
+        publication_data = publication.objects.create(url=url_id, cluster=cluster_obj)
+        for priority, author_obj in enumerate(author_objs):
+            pub_aut_list.append(publication_author(url=url_id, author=author_obj, priority=priority))
+        for keyword in keyword_objs:
+            keyword_list.append(publication_keyword(url=url_id, keyword=keyword))
+
+        publication_author.objects.bulk_create(pub_aut_list)
+        publication_keyword.objects.bulk_create(keyword_list)
+    # get return publication_id
+    # publication_data is tuple with (id,url_id)
+    return [publication_data, url_id]
+
 
 
 
