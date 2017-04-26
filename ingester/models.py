@@ -175,6 +175,7 @@ class author_aliases(models.Model):
 
     class Meta:
         unique_together=('alias','author')
+        #index_together=('alias','author')
 
 
 

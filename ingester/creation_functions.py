@@ -81,7 +81,6 @@ def create_authors(matching_list, author_list, local_url_obj):
     for author_obj, name_data in zip(merged_objs,merged_names):
         # add ALIASES
         result.append(author_obj)
-        #publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, priority=name_data[2])
         orig = author_aliases.objects.get_or_create(alias=name_data[0], author=author_obj)[0]
         source_list.append(author_alias_source(alias=orig, url=local_url_obj))
         if name_data[0] != name_data[1]:
@@ -92,8 +91,8 @@ def create_authors(matching_list, author_list, local_url_obj):
     author_alias_source.objects.bulk_create(source_list)
     # add bulk publication authors
     publication_author.objects.bulk_create(authors_pub_list)
-    for author_obj,name_data in zip(sel_list, selection_name_list):
-        publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, priority=name_data[2])
+    for author_obj, name_data in zip(sel_list, selection_name_list):
+        publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, defaults={'priority': name_data[2]})
     return result
 
 
