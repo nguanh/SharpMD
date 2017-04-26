@@ -6,7 +6,7 @@ from django.db.models import ObjectDoesNotExist
 from silk.profiling.profiler import silk_profile
 
 @silk_profile(name='create author')
-def create_authors2(matching_list, author_list, local_url_obj):
+def create_authors(matching_list, author_list, local_url_obj):
     result = []
     priority = 0
     for match, author in zip(matching_list,author_list):
@@ -43,7 +43,7 @@ def create_authors2(matching_list, author_list, local_url_obj):
 
 
 @silk_profile(name='create author2')
-def create_authors(matching_list, author_list, local_url_obj):
+def create_authors2(matching_list, author_list, local_url_obj):
     result = []
     priority = 0
     creation_list = []
