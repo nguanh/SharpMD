@@ -4,8 +4,9 @@ from .difference_storage import *
 from django.db.models import ObjectDoesNotExist
 
 from silk.profiling.profiler import silk_profile
+
 @silk_profile(name='create author')
-def create_authors(matching_list, author_list, local_url_obj):
+def create_authors2(matching_list, author_list, local_url_obj):
     result = []
     priority = 0
     for match, author in zip(matching_list,author_list):
@@ -41,7 +42,8 @@ def create_authors(matching_list, author_list, local_url_obj):
     return result
 
 
-def create_authors2(matching_list, author_list, local_url_obj):
+@silk_profile(name='create author2')
+def create_authors(matching_list, author_list, local_url_obj):
     result = []
     priority = 0
     creation_list = []
@@ -60,7 +62,7 @@ def create_authors2(matching_list, author_list, local_url_obj):
                 "about": author["about"],
                 "orcid_id": author["orcid_id"]
             }
-            creation_list.append( authors_model.objects.create(**author_entry))
+            creation_list.append(authors_model.objects.create(**author_entry))
             creation_name_list.append([author["original_name"],author["parsed_name"],priority])
         else:
             # else add id
@@ -68,28 +70,29 @@ def create_authors2(matching_list, author_list, local_url_obj):
             selection_list.append(match["id"])
         priority += 1
 
-        # select bulk
-        bulk_select = authors_model.objects.in_bulk(selection_list)
-        sel_list = []
-        for element in bulk_select.values():
-            sel_list.append(element)
+    # select bulk
+    bulk_select = authors_model.objects.in_bulk(selection_list)
+    sel_list = []
+    for element in bulk_select.values():
+        sel_list.append(element)
 
-        # combine lists
-        merged_objs = creation_list + sel_list
-        merged_names = creation_name_list + selection_name_list
+    # combine lists
+    merged_objs = creation_list + sel_list
+    merged_names = creation_name_list + selection_name_list
 
-        source_list = []
-        for author_obj,name_data in zip(merged_objs,merged_names):
-            # add ALIASES
-            result.append(author_obj)
-            publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, priority=name_data[2])
-            orig = (author_aliases.objects.get_or_create(alias=name_data[0], author=author_obj)[0])
-            source_list.append(author_alias_source(alias=orig, url=local_url_obj))
-            if name_data[0] != name_data[1]:
-                parsed = (author_aliases.objects.get_or_create(alias=name_data[1], author=author_obj)[0])
-                source_list.append(author_alias_source(alias=parsed, url=local_url_obj))
-        # add alias sources
-        #author_alias_source.objects.bulk_create(source_list)
+    source_list = []
+    for author_obj, name_data in zip(merged_objs,merged_names):
+        # add ALIASES
+        result.append(author_obj)
+        publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, priority=name_data[2])
+        orig = author_aliases.objects.get_or_create(alias=name_data[0], author=author_obj)[0]
+        source_list.append(author_alias_source(alias=orig, url=local_url_obj))
+        if name_data[0] != name_data[1]:
+            parsed = author_aliases.objects.get_or_create(alias=name_data[1], author=author_obj)[0]
+            source_list.append(author_alias_source(alias=parsed, url=local_url_obj))
+
+    # add alias sources
+    author_alias_source.objects.bulk_create(source_list)
     return result
 
 

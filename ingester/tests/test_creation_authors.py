@@ -77,12 +77,14 @@ class TestCreateAuthors(TransactionTestCase):
 
         self.assertEqual(authors_model.objects.count(),4)
         self.assertEqual(author_aliases.objects.count(), 4)
+        self.assertEqual(author_alias_source.objects.count(),3)
         self.assertEqual(authors_model.objects.get(id=4).main_name, "Melvin Master")
         self.assertEqual(authors_model.objects.get(id=4).block_name, "melvin master")
 
         self.assertEqual(publication_author.objects.get(priority=0).author.main_name, "Melvin Master")
         self.assertEqual(publication_author.objects.get(priority=1).author.main_name, "Nina Nonsense")
         self.assertEqual(publication_author.objects.get(priority=2).author.main_name, "Ahmed Abdelli")
+
 
     def test_regression(self):
         gurl = global_url.objects.create(id=5, domain="http://dummy.de", url="http://dummy.de")
