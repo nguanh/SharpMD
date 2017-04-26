@@ -1,6 +1,6 @@
 from django.test import TransactionTestCase
 from ingester.helper import *
-from ingester.creation_functions import create_authors
+from ingester.creation_functions import create_authors,create_authors2
 from ingester.models import *
 
 
@@ -70,11 +70,10 @@ class TestCreateAuthors(TransactionTestCase):
             }
         ]
 
-        result = create_authors(matching_list, authors_list, lurl)
+        result = create_authors2(matching_list, authors_list, lurl)
         self.assertEqual(result[0].id, 4)
         self.assertEqual(result[1].id, 1)
         self.assertEqual(result[2].id, 2)
-
 
         self.assertEqual(authors_model.objects.count(),4)
         self.assertEqual(author_aliases.objects.count(), 4)

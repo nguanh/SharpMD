@@ -20,6 +20,7 @@ class Config(models.Model):
                                       related_name="ingester_task", on_delete=models.CASCADE)
 
 
+
     def __str__(self):
         return self.name
 
@@ -168,8 +169,14 @@ class author_aliases(models.Model):
 
     def test(self):
         return [self.author.id,self.alias]
+
+    def __str__(self):
+        return self.alias
+
     class Meta:
         unique_together=('alias','author')
+
+
 
 
 

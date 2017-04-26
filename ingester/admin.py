@@ -1,12 +1,11 @@
 from django.contrib import admin
 from .models import Config
-from django_celery_beat.admin import TaskChoiceField
 from django import forms
-# Register your models here.
+
 from django_admin_row_actions import AdminRowActionsMixin
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from kombu.utils.json import loads
+from .ingest_task import ingest_task
 
 
 
@@ -36,6 +35,11 @@ class ConfigForm(forms.ModelForm):
         return self.cleaned_data["module_name"]
 
 
+def test(modeladmin, request, queryset):
+    for config in queryset.all():
+        ingest_task(config.module_path,config.module_name,config.id)
+    test.short_description = 'test'
+
 class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
     form = ConfigForm
     model = Config
@@ -63,6 +67,8 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
             'classes': ('extrapretty', 'wide'),
         }),
     )
+
+    actions = [test]
 
 
 

@@ -44,8 +44,7 @@ INSTALLED_APPS = [
     'ingester.apps.IngesterConfig',
    # 'weaver.apps.WeaverConfig',
     'django_extensions',
-    'silk'
-
+    'silk',
 ]
 
 MIDDLEWARE = [
