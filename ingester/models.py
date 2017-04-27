@@ -162,7 +162,7 @@ class publication_author(models.Model):
         return[self.url.id, self.author.id,self.priority]
 
     class Meta:
-        index_together = unique_together = ('url', 'author')
+        unique_together = ('url', 'author')
 
 
 class author_aliases(models.Model):
@@ -176,7 +176,7 @@ class author_aliases(models.Model):
         return self.alias
 
     class Meta:
-        index_together = unique_together = ('alias', 'author')
+        unique_together = ('alias', 'author')
 
 
 class author_alias_source(models.Model):
@@ -187,7 +187,7 @@ class author_alias_source(models.Model):
         return [self.alias.id,self.url.id]
 
     class Meta:
-        index_together = unique_together = ("alias","url")
+        unique_together = ("alias","url")
 
 # ======================================= PUBLICATIONS ================================================================
 
