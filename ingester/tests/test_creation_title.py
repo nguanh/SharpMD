@@ -9,12 +9,12 @@ from ingester.models import *
 class TestCreateTitle(TransactionTestCase):
 
     def test_single_match(self):
-        cluster.objects.create(id=1, name= "matching title")
+        clus = cluster.objects.create(id=1, name= "matching title")
         title = "matching title"
         matching = {
             "status": Status.SAFE,
             "match": Match.SINGLE_MATCH,
-            "id": 1,
+            "id": clus,
             "reason": None,
         }
 

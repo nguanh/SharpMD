@@ -146,8 +146,6 @@ class PdfDownloader:
                                                authors=author_list,
                                                date = reference["pubyear"])
 
-            # TODO write single reference
-
     def process_pdf(self):
         while True:
             # get first entry in downloadqueue

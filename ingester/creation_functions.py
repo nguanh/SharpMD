@@ -97,12 +97,22 @@ def create_authors(matching_list, author_list, local_url_obj):
 
 
 @silk_profile(name='create title')
-def create_title(matching, cluster_name):
+def create_title2(matching, cluster_name):
     if matching["match"] == Match.NO_MATCH:
         cluster_obj = cluster.objects.create(name=cluster_name)
     else:
         cluster_obj = cluster.objects.get(id=matching["id"])
     return cluster_obj
+
+
+@silk_profile(name='create title2')
+def create_title(matching, cluster_name):
+    if matching["match"] == Match.NO_MATCH:
+        cluster_obj = cluster.objects.create(name=cluster_name)
+    else:
+        cluster_obj = matching["id"]
+    return cluster_obj
+
 
 @silk_profile(name='create publication')
 def create_publication2(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_objs=[]):
@@ -117,7 +127,6 @@ def create_publication2(cluster_obj, author_objs, type_obj=None, pub_medium_obj=
                                           medium=pub_medium_obj, type=type_obj)
         publication_data = publication.objects.create(url=url_id, cluster=cluster_obj)
     # publication_data is tuple with (id,url_id)
-
 
     # add authors to default pub
     for priority, author_obj in enumerate(author_objs):

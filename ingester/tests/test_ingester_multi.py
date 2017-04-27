@@ -17,6 +17,11 @@ ingester_path = os.path.dirname(test_path)
 
 class TestIngesterMulti(TransactionTestCase):
     fixtures = [os.path.join(ingester_path, "fixtures", "initial_data.json")]
+    @classmethod
+    def setUpClass(cls):
+        connector = MariaDb(db="test_storage")
+        connector.execute_ex(("CREATE FULLTEXT INDEX cluster_ft_idx  ON test_storage.ingester_cluster (name)"), ())
+        connector.close_connection()
 
     def setUp(self):
         self.connector = MariaDb(db="test_storage")
