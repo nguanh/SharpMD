@@ -15,3 +15,5 @@ mysqlclient
 requests
 django-extensions
 pymysql
+many-stop-words
+python-Levenshtein
