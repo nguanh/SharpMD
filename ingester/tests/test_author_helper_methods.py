@@ -27,5 +27,9 @@ class TestAuthorHelper(TestCase):
         result = get_author_search_query("Richard Dawson A. St. Louis")
         self.assertEqual(result,"+richard +dawson +louis")
 
+    def test_search_query_3(self):
+        result = get_author_search_query("kim lee  lu Meyers A. Bueno")
+        self.assertEqual(result,"+meyers +bueno +lux")
+
 
 
