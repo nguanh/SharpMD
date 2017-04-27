@@ -105,7 +105,7 @@ def search_title(title, threshold = 0.5):
     """
     threshold *= 100
     normal_title = normalize_title(title)
-    search_query = get_search_query(title)
+    search_query = get_search_query(normal_title)
     results = [element for element in cluster.objects.search(search_query)]
     similarity = [int((1-distance(normal_title,tit.name)/max(len(normal_title),len(tit.name)))*100) for tit in results]
     ret_val = [val if sim >= threshold else None for sim, val in zip(similarity,results)]
