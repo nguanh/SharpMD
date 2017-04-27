@@ -1,8 +1,10 @@
-from .helper import *
-from .models import *
 from django.db.models import ObjectDoesNotExist
 from silk.profiling.profiler import silk_profile
+
+from .helper import *
+from .models import *
 from Levenshtein import distance
+
 @silk_profile(name='match author')
 def match_author(authors):
     results = []
@@ -164,6 +166,12 @@ def search_title(title, threshold = 0.5):
     similarity = [int((1-distance(normal_title,tit.name)/max(len(normal_title),len(tit.name)))*100) for tit in results]
     ret_val = [val if sim >= threshold else None for sim, val in zip(similarity,results)]
     return ret_val
+
+def search_author(author_name):
+    normal_name = normalize_authors(author_name)
+    search_query = get_author_search_query(author_name)
+    results = [element for element in authors_model.objects.search(search_query)]
+
 
 @silk_profile(name='match title2')
 def match_title2(title):

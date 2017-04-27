@@ -3,6 +3,7 @@ from unidecode import unidecode
 from nameparser import HumanName
 from enum import Enum
 from many_stop_words import get_stop_words
+
 from .author_names import AMBIGUOUS_NAMES
 punctuation_dict = str.maketrans({key: None for key in (string.punctuation)})
 whitespace_dict = str.maketrans({key: None for key in (string.whitespace.replace(" ", ""))})
@@ -151,3 +152,35 @@ class Reason(Enum):
     AMB_ALIAS = 0
     AMB_CLUSTER = 1
     AMB_PUB = 2
+
+
+def calculate_author_similarity(orig_name, compare_name):
+    init_orig_list = orig_name.split(" ")
+    init_comp_list = compare_name.split(" ")
+
+    # step 1: match equal items
+    step1_orig_list = []
+    for o_name in init_orig_list:
+        if o_name in init_comp_list:
+            init_comp_list.remove(o_name)
+        else:
+            step1_orig_list.append(o_name)
+    # step 2: match initals
+    step1_comp_list = init_comp_list[:]
+    step2_orig_list = step1_orig_list[:]
+
+    for sim_name in init_comp_list:
+        for comp_name in step1_orig_list:
+            if comp_name.startswith(sim_name) or sim_name.startswith(comp_name):
+                try:
+                    step1_comp_list.remove(sim_name)
+                    step2_orig_list.remove(comp_name)
+                except:
+                    pass
+                break
+    # step 3: see what's left
+    if len(step2_orig_list) == 0 or len(step1_comp_list) == 0:
+        return True
+    return False
+
+

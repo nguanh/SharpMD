@@ -1,5 +1,5 @@
 from unittest import TestCase
-from ingester.helper import get_author_relevant_names,get_author_search_query, normalize_authors
+from ingester.helper import get_author_relevant_names,get_author_search_query, normalize_authors,calculate_author_similarity
 
 
 class TestAuthorHelper(TestCase):
@@ -31,5 +31,28 @@ class TestAuthorHelper(TestCase):
         result = get_author_search_query("kim lee  lu Meyers A. Bueno")
         self.assertEqual(result,"+meyers +bueno +lux")
 
+    def test_similarity(self):
+        result = calculate_author_similarity("Chin Jen Lin","Chin A lin")
+        self.assertEqual(result, False)
+
+    def test_similarity_2(self):
+        result = calculate_author_similarity("chin jen lin","chin j lin")
+        self.assertEqual(result, True)
+
+    def test_similarity_3(self):
+        result = calculate_author_similarity("chin jen lin","lin j chin")
+        self.assertEqual(result, True)
+
+    def test_similarity_4(self):
+        result = calculate_author_similarity("chin a jin","anton j chin")
+        self.assertEqual(result, True)
+
+    def test_similarity_5(self):
+        result = calculate_author_similarity("chin a jin","anton j b chin")
+        self.assertEqual(result, True)
+
+    def test_similarity_6(self):
+        result = calculate_author_similarity("chin a bing jin","anton j lin chin")
+        self.assertEqual(result, False)
 
 
