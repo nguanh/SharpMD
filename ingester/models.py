@@ -114,6 +114,7 @@ class global_url(models.Model):
     domain = models.CharField(max_length=150)
     url = models.URLField()
 
+
 class local_url(models.Model):
     global_url = models.ForeignKey(global_url, default=None)
     #auto set date on creation
@@ -144,7 +145,7 @@ class authors_model(models.Model):
         return self.block_name
 
     def save(self, *args, **kwargs):
-        #auto normalize author name
+        # auto normalize author name
         self.block_name = normalize_authors(self.main_name)
         super(authors_model, self).save(*args, **kwargs)
 
@@ -161,7 +162,7 @@ class publication_author(models.Model):
         return[self.url.id, self.author.id,self.priority]
 
     class Meta:
-        unique_together=('url','author')
+        index_together = unique_together = ('url', 'author')
 
 
 class author_aliases(models.Model):
@@ -169,17 +170,13 @@ class author_aliases(models.Model):
     author = models.ForeignKey(authors_model)
 
     def test(self):
-        return [self.author.id,self.alias]
+        return [self.author.id, self.alias]
 
     def __str__(self):
         return self.alias
 
     class Meta:
-        unique_together=('alias','author')
-        #index_together=('alias','author')
-
-
-
+        index_together = unique_together = ('alias', 'author')
 
 
 class author_alias_source(models.Model):
@@ -190,7 +187,7 @@ class author_alias_source(models.Model):
         return [self.alias.id,self.url.id]
 
     class Meta:
-        unique_together = ("alias","url")
+        index_together = unique_together = ("alias","url")
 
 # ======================================= PUBLICATIONS ================================================================
 
@@ -236,6 +233,8 @@ class pub_alias_source(models.Model):
 
     class Meta:
         unique_together = ("alias", "url")
+
+
 
 # =============================================== KEYWORDS ===============================================================
 
