@@ -141,6 +141,8 @@ class authors_model(models.Model):
     orcid_id = models.CharField(max_length=200,blank=True, null=True, default=None)
     modified = models.DateTimeField(auto_now=True)
 
+    objects = SearchManager(['block_name'])
+
     def __str__(self):
         return self.block_name
 

@@ -1,10 +1,9 @@
 import string
 from unidecode import unidecode
 from nameparser import HumanName
-import re
-from datetime import datetime
 from enum import Enum
 from many_stop_words import get_stop_words
+from .author_names import AMBIGUOUS_NAMES
 punctuation_dict = str.maketrans({key: None for key in (string.punctuation)})
 whitespace_dict = str.maketrans({key: None for key in (string.whitespace.replace(" ", ""))})
 ascii_dict = str.maketrans({key: None for key in (string.printable)})
@@ -29,6 +28,7 @@ def normalize_title(title, latex=False):
     return only_one_space.strip()
 
 
+#TODO extend names containing only 2 letters by adding x at the end
 def normalize_authors(author):
     # split double names connected by - into separate names
     name_split = author.replace("-", " ")
@@ -42,7 +42,10 @@ def normalize_authors(author):
     while '  ' in only_one_space:
         only_one_space = only_one_space.replace('  ', ' ')
 
-    return only_one_space.strip()
+    word_list = [word if len(word) != 2 else word+"x" for word in only_one_space.split(" ")]
+    combined_name = " ".join(word_list)
+
+    return combined_name.strip()
 
 def split_authors(author_csv):
     authors_list = author_csv.split(";")
@@ -95,6 +98,32 @@ def get_search_query(title):
 
     return search_query.strip()
 
+
+def get_author_relevant_names(name):
+    normal_name = normalize_authors(name)
+    name_list = normal_name.split(" ")
+    # get 3 longest name parts and remove abbreviations
+    full_name_list = [n for n in name_list if len(n) > 1]
+
+    sorted_list = sorted(full_name_list, key=len)
+    return sorted_list
+
+
+def get_author_search_query(name, max_length=3):
+    name_list = get_author_relevant_names(name)
+    search_query = ""
+    valid = 0
+    for word in reversed(name_list):
+        if valid >= max_length:
+            break
+        search_query += "+{} ".format(word)
+        if word not in AMBIGUOUS_NAMES:
+            valid += 1
+
+    return search_query.strip()
+
+
+    # filter out ambiguous names
 
 
 def parse_pages(pages, separator="-"):

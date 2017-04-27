@@ -8,7 +8,6 @@ def match_author(authors):
     results = []
     # iterate through all authors
     for author_index, author_dict in enumerate(authors):
-        #name_block = get_name_block(author_dict["parsed_name"])
         name_block = normalize_authors(author_dict["parsed_name"])
         # find matching existing author with name block
         author_block_match = authors_model.objects.filter(block_name=name_block)
@@ -53,6 +52,61 @@ def match_author(authors):
                     "reason": Reason.AMB_ALIAS
                 })
     return results
+
+
+@silk_profile(name='match author2')
+def match_author2(authors):
+    results = []
+    # iterate through all authors
+    for author_index, author_dict in enumerate(authors):
+        # Strategy 1: try to find all matching aliases and get author_model as well
+        alias_match = author_aliases.objects.select_related('author').filter(alias=author_dict["original_name"]).all()
+        alias_match_count = len(alias_match)
+        if alias_match_count == 1:
+            # one match, get author from matching alias
+            results.append({
+                "status": Status.SAFE,
+                "match": Match.SINGLE_MATCH,
+                "id": alias_match[0].author,
+                "reason": None,
+            })
+        elif alias_match_count > 1:
+            # multiple exact matches: ambiguous
+            results.append({
+                "status": Status.LIMBO,
+                "match": Match.MULTI_MATCH,
+                "id": None,
+                "reason": Reason.AMB_ALIAS
+            })
+        else:
+            # no match--> Strategy 2: match with similar authors
+            name_block = normalize_authors(author_dict["parsed_name"])
+        # find matching existing author with name block
+        author_block_match = authors_model.objects.filter(block_name=name_block)
+        author_match_count = author_block_match.count()
+        # case 0 matching name blocks: create new  publication author
+        if author_match_count == 0:
+            results.append({
+                "status": Status.SAFE,
+                "match": Match.NO_MATCH,
+                "id": None,
+                "reason": None,
+            })
+        # case more than 1 matching name blocks:  match by alias
+        else:
+            # count possible matching name blocks by matching alias
+            alias_count_match = author_aliases.objects.filter(alias=author_dict["original_name"],
+                                                              author__block_name= name_block)
+            if alias_count_match.count() == 1:
+                author_id = alias_count_match.first().author.id
+                results.append({
+                    "status": Status.SAFE,
+                    "match": Match.MULTI_MATCH,
+                    "id": author_id,
+                    "reason": None
+                })
+    return results
+
 
 @silk_profile(name='match title')
 def match_title(title):
