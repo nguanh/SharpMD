@@ -4,6 +4,7 @@ from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from .helper import get_name_block, normalize_title,normalize_authors
 import json
 from django.db.models.signals import pre_delete
+from SharpMD.fulltext import SearchManager
 
 class Config(models.Model):
     # Name of the harvester for identification
@@ -195,6 +196,7 @@ class author_alias_source(models.Model):
 
 
 class cluster(models.Model):
+    objects = SearchManager(['name'])
     name= models.TextField()
 
 

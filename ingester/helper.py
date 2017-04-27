@@ -4,11 +4,13 @@ from nameparser import HumanName
 import re
 from datetime import datetime
 from enum import Enum
+from many_stop_words import get_stop_words
 punctuation_dict = str.maketrans({key: None for key in (string.punctuation)})
 whitespace_dict = str.maketrans({key: None for key in (string.whitespace.replace(" ", ""))})
 ascii_dict = str.maketrans({key: None for key in (string.printable)})
 
 suffix_list = ["jr", "jnr", "sr", "snr"]
+stop_word_list = get_stop_words("en")
 
 # TODO regex for latex and html
 
@@ -42,7 +44,6 @@ def normalize_authors(author):
 
     return only_one_space.strip()
 
-
 def split_authors(author_csv):
     authors_list = author_csv.split(";")
     # remove last entry since its always empty
@@ -64,6 +65,36 @@ def get_name_block(author):
         result = norm_last_name + "," + norm_first_name
 
     return result
+
+
+def get_relevant_words(title, max_words=3):
+    word_list = title.split(" ")
+    sort_list = sorted(word_list, key=len)
+    clean_list = []
+    for word in reversed(sort_list):
+        if word in stop_word_list:
+            continue
+        clean_list.append(word)
+        if len(clean_list) >= max_words:
+            break
+    return clean_list
+
+
+def get_search_query(title):
+
+    word_list = get_relevant_words(title)
+    search_query = ""
+    invalid = 0
+    for word in word_list:
+        if len(word) < 4:
+            invalid += 1
+        search_query += "+{}* ".format(word)
+
+    if invalid == len(word_list):
+        return title
+
+    return search_query.strip()
+
 
 
 def parse_pages(pages, separator="-"):

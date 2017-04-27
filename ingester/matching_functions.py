@@ -2,6 +2,7 @@ from .helper import *
 from .models import *
 from django.db.models import ObjectDoesNotExist
 from silk.profiling.profiler import silk_profile
+from Levenshtein import distance
 @silk_profile(name='match author')
 def match_author(authors):
     results = []
@@ -57,8 +58,8 @@ def match_author(authors):
 def match_title(title):
     cluster_name = normalize_title(title)
     # check for matching cluster (so far ONLY COMPLETE MATCH)
-    cluster_matches = cluster.objects.filter(name=cluster_name)
-    cluster_count = cluster_matches.count()
+    cluster_matches = [element for element in cluster.objects.filter(name=cluster_name).all()]
+    cluster_count = len(cluster_matches)
 
     if cluster_count == 0:
         result={
@@ -68,13 +69,68 @@ def match_title(title):
             "reason": None,
         }
     elif cluster_count == 1:
-        cluster_id = cluster_matches.first()
+        cluster_id = cluster_matches[0]
         count_pub = publication.objects.filter(cluster=cluster_id).count()
         if count_pub == 1:
             result = {
                 "status": Status.SAFE,
                 "match": Match.SINGLE_MATCH,
                 "id": cluster_id.id,
+                "reason": None,
+            }
+        else:
+            result = {
+                "status": Status.LIMBO,
+                "match": Match.MULTI_MATCH,
+                "id": None,
+                "reason": Reason.AMB_PUB
+            }
+    else:
+        result = {
+            "status": Status.LIMBO,
+            "match": Match.MULTI_MATCH,
+            "id": None,
+            "reason": Reason.AMB_CLUSTER
+        }
+    return result
+
+
+def search_title(title, threshold = 0.5):
+    """
+    search for a given title in the db.
+    Use levenshtein algorithm on results and calculate similarity percentage.
+    :param title:  title to be searched
+    :param threshold: results with similarity percentage above threshold are returned
+    :return: list of matching cluster model objects
+    """
+    threshold *= 100
+    normal_title = normalize_title(title)
+    search_query = get_search_query(title)
+    results = [element for element in cluster.objects.search(search_query)]
+    similarity = [int((1-distance(normal_title,tit.name)/max(len(normal_title),len(tit.name)))*100) for tit in results]
+    ret_val = [val if sim >= threshold else None for sim, val in zip(similarity,results)]
+    return ret_val
+
+@silk_profile(name='match title2')
+def match_title2(title):
+    cluster_matches = search_title(title)
+    cluster_count = len(cluster_matches)
+
+    if cluster_count == 0:
+        result={
+            "status": Status.SAFE,
+            "match": Match.NO_MATCH,
+            "id": None,
+            "reason": None,
+        }
+    elif cluster_count == 1:
+        cluster_obj = cluster_matches[0]
+        count_pub = publication.objects.filter(cluster=cluster_obj).count()
+        if count_pub == 1:
+            result = {
+                "status": Status.SAFE,
+                "match": Match.SINGLE_MATCH,
+                "id": cluster_obj,
                 "reason": None,
             }
         else:
