@@ -50,10 +50,7 @@ def create_authors(matching_list, author_list, local_url_obj):
     publication_author.objects.bulk_create(authors_pub_list)
 
     for author_obj, name_data in zip(selection_list, selection_name_list):
-        try:
-            publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, defaults={'priority': name_data[2]})
-        except Exception as e:
-            print("FehlerX", e)
+        publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, defaults={'priority': name_data[2]})
     return result
 
 
@@ -103,7 +100,7 @@ def create_publication(g_url, cluster_obj, author_objs, type_obj=None, pub_mediu
             try:
                 publication_author.objects.get_or_create(url=url_id, author=author_obj, priority=priority)
             except Exception as e:
-                print("FehlerY", e)
+                print("FehlerY",url_id.test(), e)
         for keyword in keyword_objs:
             publication_keyword.objects.get_or_create(url=url_id, keyword=keyword)
 
