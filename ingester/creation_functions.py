@@ -47,6 +47,7 @@ def create_authors(matching_list, author_list, local_url_obj):
     # add alias sources
     author_alias_source.objects.bulk_create(source_list)
     # add bulk publication authors
+    #TODO hier potentieller fehler
     publication_author.objects.bulk_create(authors_pub_list)
     for author_obj, name_data in zip(selection_list, selection_name_list):
         publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, defaults={'priority': name_data[2]})
@@ -66,7 +67,7 @@ def create_title(matching, cluster_name):
 def create_publication2(cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_objs=[]):
     # find publication associated with cluster_id
     try:
-        publication_data = publication.objects.get(cluster=cluster_obj)
+        publication_data = publication.objects.select_related('url').get(cluster=cluster_obj)
         url_id = publication_data.url
     except ObjectDoesNotExist:
         # create local url and default publication
@@ -78,7 +79,7 @@ def create_publication2(cluster_obj, author_objs, type_obj=None, pub_medium_obj=
 
     # add authors to default pub
     for priority, author_obj in enumerate(author_objs):
-        publication_author.objects.get_or_create(url=url_id, author=author_obj, priority=priority)
+        publication_author.objects.get_or_create(url=url_id, author=author_obj, defaults={'priority': priority})
 
     # add keyword to default pub
     for keyword in keyword_objs:

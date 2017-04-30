@@ -25,6 +25,13 @@ class TestIngesterMulti(TransactionTestCase):
             "CREATE FULLTEXT INDEX authors_model_ft_idx ON test_storage.ingester_authors_model (block_name)", ())
         connector.close_connection()
 
+    @classmethod
+    def tearDownClass(cls):
+        connector = MariaDb(db="test_storage")
+        connector.execute_ex("ALTER TABLE test_storage.ingester_cluster DROP INDEX cluster_ft_idx", ())
+        connector.execute_ex("ALTER TABLE test_storage.ingester_authors_model DROP INDEX authors_model_ft_idx", ())
+        connector.close_connection()
+
     def setUp(self):
         self.connector = MariaDb(db="test_storage")
         storage_engine = get_config("MISC")["storage_engine"]

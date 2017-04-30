@@ -12,6 +12,12 @@ class TestMatchAuthors(TransactionTestCase):
         connector.execute_ex(("CREATE FULLTEXT INDEX authors_model_ft_idx ON test_storage.ingester_authors_model (block_name)"), ())
         connector.close_connection()
 
+    @classmethod
+    def tearDownClass(cls):
+        connector = MariaDb(db="test_storage")
+        connector.execute_ex("ALTER TABLE test_storage.ingester_authors_model DROP INDEX authors_model_ft_idx", ())
+        connector.close_connection()
+
     def test_success_empty_db(self):
         authors=[{
             "original_name": "Karl Bauer",
