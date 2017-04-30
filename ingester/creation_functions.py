@@ -97,11 +97,7 @@ def create_publication(g_url, cluster_obj, author_objs, type_obj=None, pub_mediu
         publication_data = publication.objects.select_related('url').get(cluster=cluster_obj)
         url_id = publication_data.url
         for priority, author_obj in enumerate(author_objs):
-            try:
-                publication_author.objects.get_or_create(url=url_id, author=author_obj, defaults={'priority': priority})
-            except Exception as e:
-                print("FehlerY",url_id.test(), e)
-                print(author_obj.test())
+            publication_author.objects.get_or_create(url=url_id, author=author_obj, defaults={'priority': priority})
         for keyword in keyword_objs:
             publication_keyword.objects.get_or_create(url=url_id, keyword=keyword)
 
