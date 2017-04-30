@@ -111,7 +111,7 @@ def create_publication(g_url, cluster_obj, author_objs, type_obj=None, pub_mediu
                                           medium=pub_medium_obj, type=type_obj)
         publication_data = publication.objects.create(url=url_id, cluster=cluster_obj)
         for priority, author_obj in enumerate(author_objs):
-            pub_aut_list.append(publication_author(url=url_id, author=author_obj, defaults={'priority': priority}))
+            pub_aut_list.append(publication_author(url=url_id, author=author_obj, priority= priority))
         for keyword in keyword_objs:
             keyword_list.append(publication_keyword(url=url_id, keyword=keyword))
         publication_author.objects.bulk_create(pub_aut_list)
