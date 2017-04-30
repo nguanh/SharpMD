@@ -21,6 +21,8 @@ class TestIngesterMulti(TransactionTestCase):
     def setUpClass(cls):
         connector = MariaDb(db="test_storage")
         connector.execute_ex(("CREATE FULLTEXT INDEX cluster_ft_idx  ON test_storage.ingester_cluster (name)"), ())
+        connector.execute_ex(
+            "CREATE FULLTEXT INDEX authors_model_ft_idx ON test_storage.ingester_authors_model (block_name)", ())
         connector.close_connection()
 
     def setUp(self):

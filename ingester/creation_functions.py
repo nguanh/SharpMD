@@ -5,42 +5,6 @@ from django.db.models import ObjectDoesNotExist
 
 from silk.profiling.profiler import silk_profile
 
-@silk_profile(name='create author')
-def create_authors2(matching_list, author_list, local_url_obj):
-    result = []
-    priority = 0
-    for match, author in zip(matching_list,author_list):
-        # create author record first depending on matching status
-        if match["match"] == Match.NO_MATCH:
-            # NOMATCH: create new  publication author
-            #author["block_name"] = name_block
-            # pass author dict as dict parameter
-            author_entry = {
-                "main_name": author["parsed_name"],
-                "website": author["website"],
-                "contact": author["contact"],
-                "about": author["about"],
-                "orcid_id": author["orcid_id"]
-            }
-            author_obj = authors_model.objects.create(**author_entry)
-        else:
-            # SINGLE MATCH:
-            # MULTIMATCH:  author id is already included
-            author_obj = authors_model.objects.get(id=match["id"])
-
-        # add ALIASES and alias SOURCES
-        # add original name as alias
-        orig,created = author_aliases.objects.get_or_create(alias=author["original_name"], author=author_obj)
-        # add parsed name as alias, if it's = original name, skip
-        parsed,created = author_aliases.objects.get_or_create(alias=author["parsed_name"], author=author_obj)
-        author_alias_source.objects.get_or_create(alias=orig, url=local_url_obj)
-        author_alias_source.objects.get_or_create(alias=parsed, url=local_url_obj)
-        publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, priority=priority)
-        # store author
-        result.append(author_obj)
-        priority += 1
-    return result
-
 
 @silk_profile(name='create author2')
 def create_authors(matching_list, author_list, local_url_obj):
@@ -66,15 +30,8 @@ def create_authors(matching_list, author_list, local_url_obj):
             selection_list.append(match["id"])
         priority += 1
 
-
-    # select bulk
-    bulk_select = authors_model.objects.in_bulk(selection_list)
-    sel_list = []
-    for element in bulk_select.values():
-        sel_list.append(element)
-
     # combine lists
-    merged_objs = creation_list + sel_list
+    merged_objs = creation_list + selection_list
     merged_names = creation_name_list + selection_name_list
 
     source_list = []
@@ -91,18 +48,9 @@ def create_authors(matching_list, author_list, local_url_obj):
     author_alias_source.objects.bulk_create(source_list)
     # add bulk publication authors
     publication_author.objects.bulk_create(authors_pub_list)
-    for author_obj, name_data in zip(sel_list, selection_name_list):
+    for author_obj, name_data in zip(selection_list, selection_name_list):
         publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, defaults={'priority': name_data[2]})
     return result
-
-
-@silk_profile(name='create title')
-def create_title2(matching, cluster_name):
-    if matching["match"] == Match.NO_MATCH:
-        cluster_obj = cluster.objects.create(name=cluster_name)
-    else:
-        cluster_obj = cluster.objects.get(id=matching["id"])
-    return cluster_obj
 
 
 @silk_profile(name='create title2')

@@ -9,11 +9,10 @@ class TestCreateAuthors(TransactionTestCase):
     def test_success(self):
         gurl = global_url.objects.create(id=5, domain="http://dummy.de", url="http://dummy.de")
         lurl = local_url.objects.create(id=1, url="a", global_url=gurl)
-        authors_model.objects.bulk_create([
-            authors_model(id=1, main_name="Nina Nonsense", block_name="nina nonsense"),
-            authors_model(id=2, main_name="Ahmed Abdelli", block_name="ahmed abdelli"),
-            authors_model(id=3, main_name="Ahmed Abdelli", block_name="ahmed abdelli"),
-        ])
+        author1 = authors_model.objects.create(id=1, main_name="Nina Nonsense", block_name="nina nonsense")
+        author2 = authors_model.objects.create(id=2, main_name="Ahmed Abdelli", block_name="ahmed abdelli")
+        author3 = authors_model.objects.create(id=3, main_name="Ahmed Abdelli", block_name="ahmed abdelli")
+
         author_aliases.objects.bulk_create([
             author_aliases(id=1, alias="Nina Nonsense", author=authors_model.objects.get(id=1)),
             author_aliases(id=2, alias="Ahmed Abdelli", author=authors_model.objects.get(id=2)),
@@ -59,18 +58,19 @@ class TestCreateAuthors(TransactionTestCase):
             {
                 "status": Status.SAFE,
                 "match": Match.SINGLE_MATCH,
-                "id": 1,
+                "id": author1,
                 "reason": None,
             },
             {
                 "status": Status.SAFE,
                 "match": Match.MULTI_MATCH,
-                "id": 2,
+                "id": author2,
                 "reason": None,
             }
         ]
 
         result = create_authors(matching_list, authors_list, lurl)
+        print(result)
         self.assertEqual(result[0].id, 4)
         self.assertEqual(result[1].id, 1)
         self.assertEqual(result[2].id, 2)
@@ -85,14 +85,12 @@ class TestCreateAuthors(TransactionTestCase):
         self.assertEqual(publication_author.objects.get(priority=1).author.main_name, "Nina Nonsense")
         self.assertEqual(publication_author.objects.get(priority=2).author.main_name, "Ahmed Abdelli")
 
-
     def test_regression(self):
         gurl = global_url.objects.create(id=5, domain="http://dummy.de", url="http://dummy.de")
         lurl = local_url.objects.create(id=1, url="a", global_url=gurl)
-        authors_model.objects.bulk_create([
-            authors_model(id=1, main_name="Nina Nonsense", block_name="nina nonsense"),
-            authors_model(id=2, main_name="Ahmed Abdelli", block_name="ahmed abdelli"),
-        ])
+        author1 = authors_model.objects.create(id=1, main_name="Nina Nonsense", block_name="nina nonsense")
+        author2 = authors_model.objects.create(id=2, main_name="Ahmed Abdelli", block_name="ahmed abdelli")
+
         author_aliases.objects.bulk_create([
             author_aliases(id=1, alias="Nina Nonsense", author=authors_model.objects.get(id=1)),
             author_aliases(id=2, alias="Ahmed Abdelli", author=authors_model.objects.get(id=2)),
@@ -138,13 +136,13 @@ class TestCreateAuthors(TransactionTestCase):
             {
                 "status": Status.SAFE,
                 "match": Match.SINGLE_MATCH,
-                "id": 1,
+                "id": author1,
                 "reason": None,
             },
             {
                 "status": Status.SAFE,
                 "match": Match.SINGLE_MATCH,
-                "id": 2,
+                "id": author2,
                 "reason": None,
             }
         ]

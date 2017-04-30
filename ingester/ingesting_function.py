@@ -4,7 +4,7 @@ from .models import *
 import logging
 from mysqlWrapper.mariadb import MariaDb
 from django.db.models import ObjectDoesNotExist
-from .matching_functions import match_type,match_pub_medium,simple_author_match,match_title2, match_keywords
+from .matching_functions import match_type,match_pub_medium,simple_author_match,match_title2, match_keywords, advanced_author_match
 from .limbo_functions import push_limbo
 from .creation_functions import create_publication,create_authors,create_title,update_diff_tree
 from .difference_storage import *
@@ -55,7 +55,7 @@ def ingest_data(ingester_obj):
             # ------------------------- MATCHINGS ----------------------------------------------------------------------
             # 3. find matching cluster for title and matching existing authors
             title_match = match_title2(mapping["publication"]["title"])
-            author_matches = simple_author_match(mapping["authors"])
+            author_matches = advanced_author_match(mapping["authors"])
 
             author_valid = True
             for author in author_matches:
