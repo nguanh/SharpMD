@@ -48,14 +48,13 @@ def create_authors(matching_list, author_list, local_url_obj):
     author_alias_source.objects.bulk_create(source_list)
     # add bulk publication authors
     #TODO hier potentieller fehler
-    try:
-        pass
-        #publication_author.objects.bulk_create(authors_pub_list)
-    except Exception as e:
-        print("Fehler", e)
+    #publication_author.objects.bulk_create(authors_pub_list)
+
     for author_obj, name_data in zip(selection_list, selection_name_list):
-        pass
-        #publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, defaults={'priority': name_data[2]})
+        try:
+            publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, defaults={'priority': name_data[2]})
+        except Exception as e:
+            print("Fehler1", e)
     return result
 
 
@@ -84,8 +83,10 @@ def create_publication2(cluster_obj, author_objs, type_obj=None, pub_medium_obj=
 
     # add authors to default pub
     for priority, author_obj in enumerate(author_objs):
-        pass
-        #publication_author.objects.get_or_create(url=url_id, author=author_obj, defaults={'priority': priority})
+        try:
+            publication_author.objects.get_or_create(url=url_id, author=author_obj, defaults={'priority': priority})
+        except Exception as e:
+            print("Fehler2", e)
 
     # add keyword to default pub
     for keyword in keyword_objs:
@@ -103,9 +104,10 @@ def create_publication(g_url, cluster_obj, author_objs, type_obj=None, pub_mediu
         publication_data = publication.objects.select_related('url').get(cluster=cluster_obj)
         url_id = publication_data.url
         for priority, author_obj in enumerate(author_objs):
-            pass
-            #publication_author.objects.get_or_create(url=url_id, author=author_obj, priority=priority)
-
+            try:
+                publication_author.objects.get_or_create(url=url_id, author=author_obj, priority=priority)
+            except Exception as e:
+                print("Fehler1", e)
         for keyword in keyword_objs:
             publication_keyword.objects.get_or_create(url=url_id, keyword=keyword)
 
@@ -118,8 +120,10 @@ def create_publication(g_url, cluster_obj, author_objs, type_obj=None, pub_mediu
             pub_aut_list.append(publication_author(url=url_id, author=author_obj, priority=priority))
         for keyword in keyword_objs:
             keyword_list.append(publication_keyword(url=url_id, keyword=keyword))
-
-        #publication_author.objects.bulk_create(pub_aut_list)
+        try:
+            publication_author.objects.bulk_create(pub_aut_list)
+        except Exception as e:
+            print("Fehler3", e)
         publication_keyword.objects.bulk_create(keyword_list)
     # get return publication_id as tuple with (id,url_id)
     return [publication_data, url_id]
