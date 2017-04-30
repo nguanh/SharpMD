@@ -2,7 +2,7 @@ from django.test import TestCase,TransactionTestCase
 
 from ingester.helper import *
 from ingester.matching_functions import match_title2
-from ingester.helper import search_title
+from ingester.matching_functions import search_title
 from ingester.models import cluster, publication, global_url, local_url
 from mysqlWrapper.mariadb import MariaDb
 

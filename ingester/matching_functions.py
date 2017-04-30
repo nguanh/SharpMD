@@ -6,7 +6,7 @@ from .models import *
 from Levenshtein import distance
 
 @silk_profile(name='match author')
-def match_author(authors):
+def simple_author_match(authors):
     results = []
     # iterate through all authors
     for author_index, author_dict in enumerate(authors):
@@ -56,11 +56,11 @@ def match_author(authors):
     return results
 
 
-@silk_profile(name='match author2')
-def match_author2(authors):
+@silk_profile(name='match author_advanced')
+def advanced_author_match(authors):
     results = []
     # iterate through all authors
-    for author_index, author_dict in enumerate(authors):
+    for author_dict in authors:
         # Strategy 1: try to find all matching aliases and get author_model as well
         alias_match = author_aliases.objects.select_related('author').filter(alias=author_dict["original_name"]).all()
         alias_match_count = len(alias_match)
@@ -83,29 +83,27 @@ def match_author2(authors):
         else:
             # no match--> Strategy 2: match with similar authors
             name_block = normalize_authors(author_dict["parsed_name"])
-        # find matching existing author with name block
-        author_block_match = authors_model.objects.filter(block_name=name_block)
-        author_match_count = author_block_match.count()
-        # case 0 matching name blocks: create new  publication author
-        if author_match_count == 0:
-            results.append({
-                "status": Status.SAFE,
-                "match": Match.NO_MATCH,
-                "id": None,
-                "reason": None,
-            })
-        # case more than 1 matching name blocks:  match by alias
-        else:
-            # count possible matching name blocks by matching alias
-            alias_count_match = author_aliases.objects.filter(alias=author_dict["original_name"],
-                                                              author__block_name= name_block)
-            if alias_count_match.count() == 1:
-                author_id = alias_count_match.first().author.id
+            matching_blocks = search_author(name_block)
+            if len( matching_blocks) == 0:
                 results.append({
                     "status": Status.SAFE,
+                    "match": Match.NO_MATCH,
+                    "id": None,
+                    "reason": None,
+                })
+            elif len(matching_blocks) == 1:
+                results.append({
+                    "status": Status.SAFE,
+                    "match": Match.SINGLE_MATCH,
+                    "id": matching_blocks[0],
+                    "reason": None,
+                })
+            else:
+                results.append({
+                    "status": Status.LIMBO,
                     "match": Match.MULTI_MATCH,
-                    "id": author_id,
-                    "reason": None
+                    "id": None,
+                    "reason": Reason.AMB_NAME_BLOCK
                 })
     return results
 
@@ -167,10 +165,12 @@ def search_title(title, threshold = 0.5):
     ret_val = [val if sim >= threshold else None for sim, val in zip(similarity,results)]
     return ret_val
 
+
 def search_author(author_name):
-    normal_name = normalize_authors(author_name)
     search_query = get_author_search_query(author_name)
     results = [element for element in authors_model.objects.search(search_query)]
+    similar = [obj for obj in results if calculate_author_similarity(author_name, obj.block_name)]
+    return similar
 
 
 @silk_profile(name='match title2')

@@ -1,7 +1,7 @@
 from django.test import TestCase,TransactionTestCase
 
 from ingester.helper import *
-from ingester.matching_functions import match_author
+from ingester.matching_functions import simple_author_match
 from ingester.models import authors_model, author_aliases, author_alias_source
 
 
@@ -27,7 +27,7 @@ class TestMatchAuthors(TransactionTestCase):
             "orcid_id": None,
         },
         ]
-        result = match_author(authors)
+        result = simple_author_match(authors)
         self.assertEqual(result,[{
                 "status": Status.SAFE,
                 "match": Match.NO_MATCH,
@@ -55,7 +55,7 @@ class TestMatchAuthors(TransactionTestCase):
             "orcid_id": None,
         },
         ]
-        result = match_author(authors)
+        result = simple_author_match(authors)
 
         self.assertEqual(result,[{
                 "status": Status.SAFE,
@@ -86,7 +86,7 @@ class TestMatchAuthors(TransactionTestCase):
             "orcid_id": None,
         },
         ]
-        result = match_author(authors)
+        result = simple_author_match(authors)
 
         self.assertEqual(result,[{
                 "status": Status.SAFE,
@@ -116,7 +116,7 @@ class TestMatchAuthors(TransactionTestCase):
             "orcid_id": None,
         },
         ]
-        result = match_author(authors)
+        result = simple_author_match(authors)
 
         self.assertEqual(result, [{
             "status": Status.LIMBO,
@@ -141,7 +141,7 @@ class TestMatchAuthors(TransactionTestCase):
             "orcid_id": None,
         },
         ]
-        result = match_author(authors)
+        result = simple_author_match(authors)
         print(result)
 
     def test_regression_2(self):
@@ -179,9 +179,9 @@ class TestMatchAuthors(TransactionTestCase):
             "orcid_id": None,
         },
         ]
-        result = match_author(authors)
-        result2 = match_author(authors2)
-        result3 = match_author(authors3)
+        result = simple_author_match(authors)
+        result2 = simple_author_match(authors2)
+        result3 = simple_author_match(authors3)
         print(result)
         print(result2)
         print(result3)

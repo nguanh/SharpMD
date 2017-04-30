@@ -1,5 +1,5 @@
 from django.test import TransactionTestCase
-from ingester.matching_functions import match_author
+from ingester.matching_functions import simple_author_match
 from ingester.creation_functions import create_authors
 from ingester.models import *
 
@@ -34,7 +34,7 @@ class TestAuthors(TransactionTestCase):
     def test_long(self):
         for i in range(1000):
             lurl = local_url.objects.create(url="a", global_url=self.gurl)
-            matches = match_author(self.authors)
+            matches = simple_author_match(self.authors)
             id_list = create_authors(matches, self.authors, lurl)
 
         for x in authors_model.objects.all():

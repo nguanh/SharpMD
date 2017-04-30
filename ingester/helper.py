@@ -152,6 +152,7 @@ class Reason(Enum):
     AMB_ALIAS = 0
     AMB_CLUSTER = 1
     AMB_PUB = 2
+    AMB_NAME_BLOCK = 3
 
 
 def calculate_author_similarity(orig_name, compare_name):
