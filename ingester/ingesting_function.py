@@ -12,6 +12,7 @@ from .helper import *
 import datetime
 from silk.profiling.profiler import silk_profile
 
+
 @silk_profile(name='Ingester')
 def ingest_data(ingester_obj):
     if isinstance(ingester_obj, Iingester) is False:

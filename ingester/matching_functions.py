@@ -84,7 +84,7 @@ def advanced_author_match(authors):
             # no match--> Strategy 2: match with similar authors
             name_block = normalize_authors(author_dict["parsed_name"])
             matching_blocks = search_author(name_block)
-            if len( matching_blocks) == 0:
+            if len(matching_blocks) == 0:
                 results.append({
                     "status": Status.SAFE,
                     "match": Match.NO_MATCH,
@@ -162,7 +162,7 @@ def search_title(title, threshold = 0.5):
     search_query = get_search_query(normal_title)
     results = [element for element in cluster.objects.search(search_query)]
     similarity = [int((1-distance(normal_title,tit.name)/max(len(normal_title),len(tit.name)))*100) for tit in results]
-    ret_val = [val if sim >= threshold else None for sim, val in zip(similarity,results)]
+    ret_val = [val for sim, val in zip(similarity,results) if sim >= threshold]
     return ret_val
 
 
@@ -179,7 +179,7 @@ def match_title2(title):
     cluster_count = len(cluster_matches)
 
     if cluster_count == 0:
-        result={
+        result ={
             "status": Status.SAFE,
             "match": Match.NO_MATCH,
             "id": None,
@@ -196,6 +196,7 @@ def match_title2(title):
                 "reason": None,
             }
         else:
+            # TODO potential bug, wenn count_pub = 0, ist das möglich ?
             result = {
                 "status": Status.LIMBO,
                 "match": Match.MULTI_MATCH,
@@ -239,6 +240,36 @@ def match_pub_medium(mapping, url_obj):
     alias, created = pub_medium_alias.objects.get_or_create(alias=mapping["main_name"], medium=pub_source_id)
     pub_alias_source.objects.get_or_create(alias=alias, url=url_obj)
     return pub_source_id
+
+
+@silk_profile(name='match medium2')
+def match_pub_medium_2(mapping, url_obj):
+    if mapping["key"] is None:
+        return None
+    normalized_key = normalize_title(mapping["key"])
+    mapping["block_name"] = normalized_key
+    mapping["main_name"] = mapping["key"]
+    del mapping["key"]
+    # strategy 1: find exact matching alias first
+    alias_matches = pub_medium_alias.objects.select_related("medium").filter(alias=mapping["main_name"]).all()
+    if len(alias_matches) == 1:
+        # one matching alias
+        pub_source_obj = alias_matches[0].medium
+    elif len(alias_matches) >= 1:
+        # more than one matching alias: unambiguous, create new medium
+        pub_source_obj = pub_medium.objects.create(**mapping)
+    else:
+        # strategy 2: find matching name blocks
+        medium_match = pub_medium.objects.filter(block_name=normalized_key).all()
+        if len(medium_match) == 1:
+            pub_source_obj = medium_match[0]
+        else:
+            pub_source_obj = pub_medium.objects.create(**mapping)
+    # TODO
+    # create alias and
+    alias, created = pub_medium_alias.objects.get_or_create(alias=mapping["main_name"], medium=pub_source_obj)
+    pub_alias_source.objects.get_or_create(alias=alias, url=url_obj)
+    return pub_source_obj
 
 
 def match_type(pub_type):

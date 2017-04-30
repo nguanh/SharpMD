@@ -89,7 +89,7 @@ def create_publication2(cluster_obj, author_objs, type_obj=None, pub_medium_obj=
 
 
 @silk_profile(name='create publication2')
-def create_publication(global_url, cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_objs=[]):
+def create_publication(g_url, cluster_obj, author_objs, type_obj=None, pub_medium_obj=None, keyword_objs=[]):
     pub_aut_list = []
     keyword_list = []
     # find publication associated with cluster_id
@@ -104,7 +104,7 @@ def create_publication(global_url, cluster_obj, author_objs, type_obj=None, pub_
 
     except ObjectDoesNotExist:
         # create local url and default publication
-        url_id = local_url.objects.create(url="TODO PLATZHALTER", global_url=global_url,
+        url_id = local_url.objects.create(url="TODO PLATZHALTER", global_url=g_url,
                                           medium=pub_medium_obj, type=type_obj)
         publication_data = publication.objects.create(url=url_id, cluster=cluster_obj)
         for priority, author_obj in enumerate(author_objs):
@@ -114,14 +114,8 @@ def create_publication(global_url, cluster_obj, author_objs, type_obj=None, pub_
 
         publication_author.objects.bulk_create(pub_aut_list)
         publication_keyword.objects.bulk_create(keyword_list)
-    # get return publication_id
-    # publication_data is tuple with (id,url_id)
+    # get return publication_id as tuple with (id,url_id)
     return [publication_data, url_id]
-
-
-
-
-
 
 
 def update_diff_tree(pub_obj, pub_dict, author_objs):

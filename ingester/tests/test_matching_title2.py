@@ -86,3 +86,16 @@ class TestMatchTitle2(TransactionTestCase):
         cluster.objects.create(id=6, name="lorem ipsum dolor")
         result = [obj.name for obj in search_title("funny bunny")]
         self.assertEqual(result, [])
+
+    def test_regression(self):
+        cluster.objects.create(id=1, name="shrec10 track nonrigid 3d shape retrieval")
+        cluster.objects.create(id=2, name="shrec 11 track shape retrieval on nonrigid 3d watertight meshes")
+        cluster.objects.create(id=3, name="retrieval of nonrigid textured shapes using low quality 3d models")
+        cluster.objects.create(id=4, name="canonical forms for nonrigid 3d shape retrieval")
+        result = [obj.name for obj in search_title("Non-rigid 3D Shape Retrieval.") if obj is not None]
+        self.assertEqual(len(result),2)
+
+    def test_regression_2(self):
+        cluster.objects.create(id=1, name="high temperature bonding solutions enabling thin wafer process and handling on 3dic manufacturing")
+        result = search_title("TSV process solution for 3D-IC.")
+        print(result)

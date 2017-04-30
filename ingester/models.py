@@ -57,7 +57,7 @@ class Config(models.Model):
 
 class pub_medium(models.Model):
     main_name = models.TextField()
-    block_name = models.TextField(blank=True)
+    block_name = models.CharField(max_length=150, db_index=True, blank=True)
     series = models.CharField( max_length=200,blank=True, null=True, default=None)
     edition = models.CharField( max_length=200,blank=True, null=True, default=None)
     location = models.CharField( max_length=200,blank=True, null=True, default=None)
@@ -222,7 +222,7 @@ class publication(models.Model):
 
 
 class pub_medium_alias(models.Model):
-    alias = models.CharField(max_length=200)
+    alias = models.CharField(max_length=200, db_index=True)
     medium = models.ForeignKey(pub_medium)
 
     class Meta:
