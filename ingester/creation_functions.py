@@ -48,7 +48,10 @@ def create_authors(matching_list, author_list, local_url_obj):
     author_alias_source.objects.bulk_create(source_list)
     # add bulk publication authors
     #TODO hier potentieller fehler
-    publication_author.objects.bulk_create(authors_pub_list)
+    try:
+        publication_author.objects.bulk_create(authors_pub_list)
+    except Exception as e:
+        print("Fehler", e)
     for author_obj, name_data in zip(selection_list, selection_name_list):
         publication_author.objects.get_or_create(url=local_url_obj, author=author_obj, defaults={'priority': name_data[2]})
     return result
