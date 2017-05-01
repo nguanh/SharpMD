@@ -42,7 +42,7 @@ def create_authors(matching_list, author_list, local_url_obj):
         source_list.append(author_alias_source(alias=orig, url=local_url_obj))
         if name_data[0] != name_data[1]:
             parsed = author_aliases.objects.get_or_create(alias=name_data[1], author=author_obj)[0]
-            source_list.append(author_alias_source(alias=parsed, url=local_url_obj))
+           # source_list.append(author_alias_source(alias=parsed, url=local_url_obj))
 
     # add alias sources
     author_alias_source.objects.bulk_create(source_list)
