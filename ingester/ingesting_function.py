@@ -31,6 +31,7 @@ def ingest_data(ingester_obj):
         raise IIngester_Exception(e)
 
     globl_url_obj = global_url.objects.get(id=1)
+    ingester_obj_global_url = ingester_obj.get_global_url()
 
     for query_dataset in read_connector.cursor:
         mapping = ingester_obj.mapping_function(query_dataset)
@@ -40,13 +41,12 @@ def ingest_data(ingester_obj):
             # ------------------------- LOCAL_URL ----------------------------------------------------------------------
             # check for duplicates by looking up the local URL
             try:
-                local_url.objects.get(url=mapping["local_url"], global_url=ingester_obj.get_global_url())
+                local_url.objects.get(url=mapping["local_url"], global_url=ingester_obj_global_url)
                 logger.info("%s: skip duplicate", mapping["local_url"])
                 pub_duplicate += 1
                 continue
             except ObjectDoesNotExist:
                 pass
-
 
             # 2. create local url entry for record
             type_obj = match_type(mapping["publication"]["type_ids"])
@@ -104,7 +104,7 @@ def ingest_data(ingester_obj):
             diff_tree = update_diff_tree(def_pub_obj, mapping['publication'], author_ids)
             # 7.get default values from diff tree and re-serialize tree
             publication_values = get_default_values(diff_tree)
-            get_default_ids(diff_tree,def_url_obj)
+            get_default_ids(diff_tree, def_url_obj)
 
             serialized_tree = serialize_diff_store(diff_tree)
             # set missing values that are not default
