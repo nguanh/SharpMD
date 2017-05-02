@@ -118,8 +118,8 @@ def ingest_data(ingester_obj):
                 setattr(def_pub_obj, key, value)
             def_pub_obj.save()
             logger.debug("%s: Publication added %s", mapping["local_url"], def_pub_obj)
-            # 9.set publication as harvested
-            #write_connector.execute_ex(ingester_obj.update_harvested(), (mapping["local_url"],))
+            # 9.set references for publication
+            ingester_obj.set_reference(source_lurl_obj, mapping['local_url'])
             pub_added += 1
         except Exception as e:
             logger.error("%s: %s", mapping["local_url"], e)

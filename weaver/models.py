@@ -1,5 +1,5 @@
 from django.db import models
-from ingester.models import local_url
+from ingester.models import local_url, cluster
 import msgpack
 # Create your models here.
 STATUS_CHOICES = (
@@ -16,7 +16,7 @@ class OpenReferences(models.Model):
     # key in harvester table
     source_key = models.CharField(max_length=150, db_index=True)
     # ingester local url id
-    ingester_key = models.ForeignKey(local_url, null=True,default=None)
+    ingester_key = models.ForeignKey(local_url, null=True, default=None)
 
     def __str__(self):
         return "{}-{}".format(self.source_table, self.source_key)
@@ -50,6 +50,9 @@ class PDFDownloadQueue(models.Model):
     last_try = models.DateTimeField(blank=True, null=True, default=None)
     source = models.ForeignKey(OpenReferences, null=True)
 
+    class Meta:
+        unique_together = ('url', 'source')
+
     def __str__(self):
         return self.url
 
@@ -57,6 +60,18 @@ class PDFDownloadQueue(models.Model):
         return [self.url, self.tries,self.source.id]
 
 
+class PubReference(models.Model):
+    """
+    Table storing, which publication references which reference
+    """
+    source = models.ForeignKey(local_url)
+    reference = models.ForeignKey(cluster)
+
+    def __str__(self):
+        return "{}->{}".format(self.source.id,self.reference.id)
+
+    def test(self):
+        return [self.source.id, self.reference.id]
 
 
 

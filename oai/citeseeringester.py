@@ -34,6 +34,10 @@ class CiteseerIngester(Iingester):
         return "UPDATE {}.oaipmh_articles SET last_harvested = CURRENT_TIMESTAMP  WHERE identifier = %s"\
                 .format(self.harvester_db)
 
+    def set_reference(self, ingester_url, harvester_id):
+        # TODO
+        pass
+
     def mapping_function(self, query_tuple):
         mapping = self.generate_empty_mapping()
         # is set later

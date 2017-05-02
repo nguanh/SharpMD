@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django_admin_row_actions',
     'harvester.apps.HarvesterConfig',
     'ingester.apps.IngesterConfig',
-   # 'weaver.apps.WeaverConfig',
+    'weaver.apps.WeaverConfig',
     'django_extensions',
     'silk',
 ]
@@ -150,7 +150,7 @@ STATIC_URL = '/static/'
 # user django db as celery result backend using django_celery_results
 CELERY_RESULT_BACKEND = 'django-db'
 # CELERY_RESULT_BACKEND = 'django-cache'
-CELERY_IMPORTS = ('harvester.tasks','ingester.tasks')
+CELERY_IMPORTS = ('harvester.tasks', 'ingester.tasks', 'weaver.tasks')
 CELERY_MAX_TASKS_PER_CHILD = 1
 
 SILKY_PYTHON_PROFILER = True

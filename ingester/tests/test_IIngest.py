@@ -17,6 +17,9 @@ class H1 (Iingester):
     def update_harvested(self):
         pass
 
+    def set_reference(self, ingester_url, harvester_id):
+        pass
+
 
 class TestIIngest(TestCase):
     def test_init(self):

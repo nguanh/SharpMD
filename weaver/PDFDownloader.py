@@ -11,6 +11,7 @@ from django.db.models import Q
 from lxml import etree
 import msgpack
 
+
 class PdfDownloader:
     namespace = "{http://www.tei-c.org/ns/1.0}"
 
@@ -39,11 +40,21 @@ class PdfDownloader:
 
     @staticmethod
     def nameDot(name):
+        """
+        method to remove dot from abbreviated names
+        :param name:
+        :return:
+        """
         if len(name) == 1:
             name += "."
         return name
 
     def parsePersName(self, element):
+        """
+        parse person names from an 'author' node.
+        :param element: 'author node'
+        :return: string containing full name
+        """
         lastname = ""
         firstname = ""
         middlename = ""
@@ -63,6 +74,12 @@ class PdfDownloader:
         return finalname
 
     def parseMonogr(self,element):
+        """
+        Method for extracting title,date and authors from a
+        <monogr> or <analytic> node
+        :param element: Lxml Element containing the data
+        :return: dict containing 'title','authors' as a list and 'pubyear'
+        """
         result = {
             "title": None,
             "pubyear": None,

@@ -32,6 +32,9 @@ class DblpIngester(Iingester):
         return "UPDATE {}.dblp_article SET last_harvested = CURRENT_TIMESTAMP  WHERE dblp_key = %s"\
                 .format(self.harvester_db)
 
+    def set_reference(self, ingester_url, harvester_id):
+        pass
+
     def mapping_function(self, query_tuple):
         mapping = self.generate_empty_mapping()
         # is set later

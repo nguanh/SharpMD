@@ -26,6 +26,11 @@ class Iingester(ABC):
         return self.query
 
     @abstractmethod
+    def set_reference(self, ingester_url, harvester_id):
+        pass
+
+
+    @abstractmethod
     def get_global_url(self):
         pass
     @abstractmethod

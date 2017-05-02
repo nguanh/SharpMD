@@ -19,6 +19,9 @@ class mockIngester(Iingester):
     def mapping_function(self, query_dataset):
         pass
 
+    def set_reference(self, ingester_url, harvester_id):
+        pass
+
 
 class TestIngestTask(TransactionTestCase):
     def setUp(self):
