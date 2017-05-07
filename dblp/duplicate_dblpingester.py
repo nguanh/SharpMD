@@ -12,6 +12,7 @@ class DuplicateDblpIngester(DblpIngester):
         self.query = ("SELECT * FROM {}.dblp_article WHERE last_harvested != 0").format(self.harvester_db)
 
     def mapping_function(self, query_tuple):
-        mapping = super(DblpIngester, self).mapping_function(query_tuple)
-        mapping['local_url'] = "XX" + mapping['local_url']
+        mapping = DblpIngester.mapping_function(self,query_tuple)
+        print(mapping['local_url'])
+        mapping['local_url'] = "XX{}".format(mapping['local_url'])
         return mapping
