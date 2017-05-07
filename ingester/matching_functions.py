@@ -149,7 +149,7 @@ def match_title(title):
     return result
 
 
-def search_title(title, threshold = 0.5):
+def search_title(title, threshold=0.5):
     """
     search for a given title in the db.
     Use levenshtein algorithm on results and calculate similarity percentage.
@@ -175,7 +175,7 @@ def search_author(author_name):
 
 @silk_profile(name='match title2')
 def match_title2(title):
-    cluster_matches = search_title(title)
+    cluster_matches = search_title(title, threshold=0.8)
     cluster_count = len(cluster_matches)
 
     if cluster_count == 0:
