@@ -10,7 +10,9 @@ log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
 
 
 @shared_task
-def pdfdownloader(limit=None):
+def pdfdownloader():
+    print("PDFDOWNLOADRT")
+    limit = 10
     """
     task for downloading pdf files, sending them to grobid and create single references
     :return:
