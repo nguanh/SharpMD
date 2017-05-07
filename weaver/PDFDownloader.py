@@ -184,7 +184,7 @@ class PdfDownloader:
                 self.skipped += 1
 
             # TODO alternating header and cookies
-            file_request = requests.get(url_dict["url"])
+            file_request = requests.get(url_dict["url"].strip())
             if file_request.status_code == 404:
                 # file does not exist, keep it deleted
                 self.logger.error("Error: file not found {}".format(filename))
