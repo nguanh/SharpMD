@@ -7,7 +7,7 @@ from dblp.dblpingester import DblpIngester
 from oai.arxivingester import ArxivIngester
 from ingester.ingesting_function import ingest_data
 from ingester.difference_storage import deserialize_diff_store
-from ingester.exception import IIngester_Exception
+from weaver.models import OpenReferences
 from ingester.models import *
 import datetime
 import os
@@ -140,6 +140,8 @@ class TestIngesterMulti2(TransactionTestCase):
         self.assertEqual(diff["type_ids"], [{"bitvector": 1, "votes": 0, "value": 2},
                                             {"bitvector": 2, "votes": 0, "value": 1}])
         self.assertEqual(diff["pages"], [{"bitvector": 2, "votes": 0, "value": "10-14"}])
+
+        self.assertEqual(OpenReferences.objects.first().test(), [1, 'arxivkey', None])
 
 
 

@@ -6,6 +6,7 @@ from dblp.dblpingester import DblpIngester
 from ingester.ingesting_function import ingest_data
 from ingester.exception import IIngester_Exception
 from ingester.models import *
+from weaver.models import OpenReferences
 from .ingester_tools import setup_tables, get_table_data
 import datetime
 import os
@@ -101,12 +102,17 @@ class TestIngester(TransactionTestCase):
         tmp = list(get_table_data("dblp_article", null_dates=False))
         self.assertEqual(tmp[0][-1].strftime("%Y-%m-%d"), datetime.datetime.now().strftime("%Y-%m-%d"))
 
+        # check open references
+        self.assertEqual(OpenReferences.objects.count(), 0)
+
     def test_success_limit(self):
         setup_tables(os.path.join(test_path, "dblp_test1.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
         ingester = DblpIngester("dblp.ingester", harvesterdb="test_storage")
         ingester.set_limit(1)
         result = ingest_data(ingester)
         self.assertEqual(result, 1)
+        # check open references
+        self.assertEqual(OpenReferences.objects.count(), 0)
 
     def test_complete_publication(self):
         # for this test a dataset with ALL ROWS filled, will be created to check if all values are
@@ -125,6 +131,8 @@ class TestIngester(TransactionTestCase):
         self.assertEqual(publ.note, None)
         self.assertEqual(publ.date_added, None)
         self.assertEqual(publ.date_published, datetime.date(1990,1,1))
+        # check open references
+        self.assertEqual(OpenReferences.objects.count(), 0)
 
     def test_limbo_multi_cluster(self):
         setup_tables(os.path.join(test_path, "dblp_test2.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
@@ -160,6 +168,8 @@ class TestIngester(TransactionTestCase):
         self.assertEqual(limbo_authors.objects.get(id=1).test(), [1, 'None', "An Author", 0])
         self.assertEqual(limbo_authors.objects.get(id=2).test(), [1, 'None', "Another Author", 1])
         self.assertEqual(local_url.objects.count(),1)
+        # check open references
+        self.assertEqual(OpenReferences.objects.count(), 0)
 
     def test_limbo_alias(self):
         setup_tables(os.path.join(test_path, "dblp_test3.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
@@ -169,6 +179,8 @@ class TestIngester(TransactionTestCase):
         self.assertEqual(limbo_pub.objects.count(), 0)
         self.assertEqual(cluster.objects.count(), 3)
         self.assertEqual(authors_model.objects.count(), 5)
+        # check open references
+        self.assertEqual(OpenReferences.objects.count(), 0)
 
     def test_set_last_harvested(self):
         setup_tables(os.path.join(test_path, "dblp_test3.csv"), DBLP_ARTICLE, ADD_DBLP_ARTICLE)
@@ -179,6 +191,8 @@ class TestIngester(TransactionTestCase):
         ingester.set_limit(3)
         result2 = ingest_data(ingester)
         self.assertEqual(result2, 2)
+        # check open references
+        self.assertEqual(OpenReferences.objects.count(), 0)
 
 
 

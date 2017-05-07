@@ -1,4 +1,4 @@
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 from dblp.queries import DBLP_ARTICLE, ADD_DBLP_ARTICLE
@@ -8,7 +8,7 @@ from oai.arxivingester import ArxivIngester
 from oai.citeseeringester import CiteseerIngester
 from ingester.ingesting_function import ingest_data
 from ingester.difference_storage import deserialize_diff_store
-from ingester.exception import IIngester_Exception
+from weaver.models import OpenReferences
 from ingester.models import *
 import datetime
 import os
@@ -174,6 +174,8 @@ class TestIngesterCiteseer(TransactionTestCase):
         self.assertEqual(keyword_aliases.objects.count(),3)
         self.assertEqual(keyword_alias_source.objects.count(),3)
         self.assertEqual(publication_keyword.objects.count(),6)
+
+        self.assertEqual(OpenReferences.objects.first().test(), [1, 'arxivkey', None])
 
 
 

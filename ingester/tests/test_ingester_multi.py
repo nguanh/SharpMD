@@ -1,4 +1,4 @@
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 from dblp.queries import DBLP_ARTICLE, ADD_DBLP_ARTICLE
@@ -7,7 +7,7 @@ from dblp.dblpingester import DblpIngester
 from oai.arxivingester import ArxivIngester
 from ingester.ingesting_function import ingest_data
 from ingester.difference_storage import deserialize_diff_store
-from ingester.exception import IIngester_Exception
+from weaver.models import OpenReferences
 from ingester.models import *
 import datetime
 import os
@@ -140,6 +140,10 @@ class TestIngesterMulti(TransactionTestCase):
         self.assertEqual(diff["type_ids"], [{"bitvector": 1, "votes": 0, "value": 2},
                                             {"bitvector": 2, "votes": 0, "value": 1}])
         self.assertEqual(diff["pages"], [{"bitvector": 2, "votes": 0, "value": "10-14"}])
+        # check open references
+        self.assertEqual(OpenReferences.objects.count(), 1)
+        self.assertEqual(OpenReferences.objects.first().test(), [1, 'arxivkey', None])
+
 
 
 
