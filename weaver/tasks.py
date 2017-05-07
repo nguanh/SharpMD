@@ -10,7 +10,7 @@ log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
 
 
 @shared_task
-def pdfdownloader():
+def pdfdownloader(limit=None):
     """
     task for downloading pdf files, sending them to grobid and create single references
     :return:
@@ -42,7 +42,7 @@ def pdfdownloader():
     grobid = get_config("WEAVER")["grobid"]
 
     logger.info("Init PDF Processing")
-    obj = PdfDownloader(tmp, grobid, logger=logger)
+    obj = PdfDownloader(tmp, grobid, logger=logger, limit=limit)
     logger.info("Start Processing")
     result = obj.process_pdf()
     logger.info(result)
