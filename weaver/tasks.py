@@ -11,7 +11,6 @@ log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
 
 @shared_task
 def pdfdownloader():
-    print("PDFDOWNLOADRT")
     limit = 10
     """
     task for downloading pdf files, sending them to grobid and create single references
@@ -21,7 +20,6 @@ def pdfdownloader():
     parameter_list = "[]"
     matches = 0
     active_queue = app.control.inspect().active()["celery@bremen"]
-    print(active_queue)
     for active_task in active_queue:
         if active_task["args"] == parameter_list:
             matches += 1
