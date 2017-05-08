@@ -121,7 +121,11 @@ class PdfDownloader:
         if not len(reference["authors"]) or not reference["title"]:
             return None
         if reference["pubyear"] is not None:
-            reference["pubyear"] = datetime.date(int(reference["pubyear"]),1,1)
+            try:
+                reference["pubyear"] = datetime.date(int(reference["pubyear"]),1,1)
+            except:
+                print("Invalid year",reference["pubyear"])
+                reference["pubyear"] = None
         return reference
 
     def parse_references(self, file_path,source):
@@ -145,15 +149,20 @@ class PdfDownloader:
         parser2.feed(ref_handler.text)
         result = {}
         for action, elem in parser2.read_events():
-            for i in elem:
+            try:
+                for i in elem:
+                    if i.tag.replace(self.namespace, '') == "monogr":
+                        result["monogr"] = self.parseMonogr(i)
+                    if i.tag.replace(self.namespace, '') == "analytic":
+                        result["analytic"] = self.parseMonogr(i)
 
-                if i.tag.replace(self.namespace, '') == "monogr":
-                    result["monogr"] = self.parseMonogr(i)
-                if i.tag.replace(self.namespace, '') == "analytic":
-                    result["analytic"] = self.parseMonogr(i)
-            reference = self.get_reference(result)
-            self.logger.debug("Original : %s", result)
-            self.logger.debug("Reference: %s", reference)
+                    reference = self.get_reference(result)
+                    self.logger.debug("Original : %s", result)
+                    self.logger.debug("Reference: %s", reference)
+            except Exception as e:
+                self.logger.error("Reference Error %s", e)
+                reference = None
+
             if reference is None:
                 self.logger.debug("Invalid reference")
             else:
