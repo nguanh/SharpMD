@@ -32,6 +32,7 @@ class SingleReference(models.Model):
     # authors are serialized
     authors = models.BinaryField()
     status = models.CharField(max_length=3, choices=STATUS_CHOICES, default='OP')
+    tries = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
