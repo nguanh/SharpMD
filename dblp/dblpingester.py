@@ -3,29 +3,26 @@ import re
 from ingester.Iingester import Iingester
 from ingester.helper import split_authors
 from conf.config import get_config
-from mysqlWrapper.mariadb import MariaDb
+from ingester.models import global_url
 
 
 def is_not_empty(var):
     return var is not None and len(var) > 0
 
+
 class DblpIngester(Iingester):
-    def __init__(self, ingester_db, harvester_db):
-        Iingester.__init__(self)
-        credentials = dict(get_config("MARIADB"))
-        connector = MariaDb(credentials)
-        connector.connector.database = ingester_db
+    def __init__(self, name, harvesterdb=None):
+        Iingester.__init__(self,name)
         # find global url/ add global URL
-        global_url_query = "SELECT id FROM global_url WHERE domain = 'http://dblp.uni-trier.de'"
-        result = connector.fetch_one((), global_url_query)
-        if result is None:
-            insert_global_url = ("INSERT INTO global_url(domain,url) "
-                                 "VALUES ('http://dblp.uni-trier.de','http://dblp.uni-trier.de/rec/xml/')")
-            connector.execute_ex(insert_global_url)
-            result = connector.fetch_one((), global_url_query)
-        connector.close_connection()
-        self.global_url = result
-        self.harvester_db = harvester_db
+        g_url,created = global_url.objects.get_or_create(
+            domain='http://dblp.uni-trier.de',
+            url='http://dblp.uni-trier.de/rec/xml/',
+        )
+        self.global_url = g_url
+        if harvesterdb is None:
+            self.harvester_db = get_config("DATABASES")["harvester"]
+        else:
+            self.harvester_db = harvesterdb
         self.query = ("SELECT * FROM {}.dblp_article WHERE last_harvested = 0").format(self.harvester_db)
 
     def get_global_url(self):
@@ -35,8 +32,8 @@ class DblpIngester(Iingester):
         return "UPDATE {}.dblp_article SET last_harvested = CURRENT_TIMESTAMP  WHERE dblp_key = %s"\
                 .format(self.harvester_db)
 
-    def get_name(self):
-        return "ingester.dblp"
+    def set_reference(self, ingester_url, harvester_id):
+        pass
 
     def mapping_function(self, query_tuple):
         mapping = self.generate_empty_mapping()

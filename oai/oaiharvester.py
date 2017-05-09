@@ -1,28 +1,14 @@
 from harvester.IHarvester import IHarvest
 from oai.queries import OAI_DATASET
-from harvester.exception import IHarvest_Exception
 from oai.oaimph_parser import harvestOAI
+import datetime
 
 
 class OaiHarvester(IHarvest):
 
-    def __init__(self, logger, name, path=None):
-        # mainly for testing
-        if path is not None:
-            self.HARVESTER_PATH = path
+    def __init__(self, config_id):
         # call constructor of base class for initiating values
-        IHarvest.__init__(self, logger, name)
-
-        # get config values
-        # required values
-        try:
-            self.link = self.configValues["link"]
-            self.table_name = self.configValues["table_name"]
-        except KeyError as e:
-            raise IHarvest_Exception("Error: config value {} not found".format(e))
-
-
-
+        IHarvest.__init__(self, config_id)
 
     def init(self):
         # create database if not available
@@ -35,19 +21,17 @@ class OaiHarvester(IHarvest):
 
     # time_begin and time_end are always valid datetime objects
     def run(self):
-        if self.start_date is not None:
-            start = self.start_date.strftime("%Y-%m-%d")
-        else:
-            start = None
-
-        if self.end_date is not None:
-            end = self.end_date.strftime("%Y-%m-%d")
-        else:
-            end= None
-        return harvestOAI(self.link, self.connector, self.logger,
+        start = None if self.start_date is None else self.start_date.strftime("%Y-%m-%d")
+        end = None if self.end_date is None else self.end_date.strftime("%Y-%m-%d")
+        return harvestOAI(self.url, self.connector, self.logger,
                           startDate=start,
                           endDate=end,
                           limit=self.limit)
+    def cleanup(self):
+        try:
+            self.connector.close_connection()
+        except:
+            pass
 
 
 

@@ -1,4 +1,5 @@
-from unittest import TestCase
+#from unittest import TestCase
+from django.test import TransactionTestCase
 from ingester.difference_storage import *
 from .ingester_tools import get_pub_dict
 import datetime
@@ -8,7 +9,7 @@ import msgpack
 import json
 
 
-class TestDifferenceStorage(TestCase):
+class TestDifferenceStorage(TransactionTestCase):
 
     def test_generate_node1(self):
         self.assertIsNone(generate_node(None))

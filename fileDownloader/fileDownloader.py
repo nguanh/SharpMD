@@ -3,12 +3,13 @@ import os
 from urllib.parse import urlparse
 from os.path import basename
 
+
 url1 = 'http://dblp.uni-trier.de/xml/dblp.xml.gz'
 url2 = 'http://dblp.uni-trier.de/xml/dblp.dtd'
 url3 = 'http://dblp.uni-trier.de/xml/docu/Person.java'
 
 
-def progress_bar(blocks_transferred, block_size, total_size):
+def progress_bar(blocks_transferred, block_size, total_size, output = False):
     """
     Function for displaying progress on currently downloaded file
     :param blocks_transferred:
@@ -23,7 +24,8 @@ def progress_bar(blocks_transferred, block_size, total_size):
 
     # only print progress if percentage value has changed
     if currentPercentage-previousPercentage > 0:
-        print("{}% downloaded".format(currentPercentage))
+        if output:
+            print("{}% downloaded".format(currentPercentage))
 
 
 def download_file(file_url, storage_path):

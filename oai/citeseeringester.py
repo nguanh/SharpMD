@@ -1,31 +1,30 @@
 from ingester.Iingester import Iingester
-from mysqlWrapper.mariadb import MariaDb
-from conf.config import get_config
+from ingester.models import global_url
 from ingester.helper import split_authors
+from conf.config import get_config
 import datetime
+
 
 def is_not_empty(var):
     return var is not None and len(var) > 0
 
+
 class CiteseerIngester(Iingester):
 
-    def __init__(self, ingester_db, harvester_db):
-        Iingester.__init__(self)
-        credentials = dict(get_config("MARIADB"))
-        connector = MariaDb(credentials)
-        connector.connector.database = ingester_db
+    def __init__(self, name, harvester_db=None):
+        Iingester.__init__(self,name)
+
         # find global url/ add global URL
-        global_url_query = "SELECT id FROM global_url WHERE domain = 'http://citeseerx.ist.psu.edu/'"
-        result = connector.fetch_one((), global_url_query)
-        if result is None:
-            insert_global_url = ("INSERT INTO global_url(domain,url) "
-                                 "VALUES ('http://citeseerx.ist.psu.edu/',"
-                                 "'http://citeseerx.ist.psu.edu/viewdoc/summary?doi=')")
-            connector.execute_ex(insert_global_url)
-            result = connector.fetch_one((), global_url_query)
-        connector.close_connection()
-        self.global_url = result
-        self.harvester_db = harvester_db
+        g_url, created = global_url.objects.get_or_create(
+            domain='http://citeseerx.ist.psu.edu/',
+            url='http://citeseerx.ist.psu.edu/viewdoc/summary?doi='
+        )
+        self.global_url = g_url
+        if harvester_db is None:
+            self.harvester_db = get_config("DATABASES")["harvester"]
+        else:
+            self.harvester_db = harvester_db
+
         self.query = "SELECT * FROM {}.oaipmh_articles WHERE last_harvested = 0".format(self.harvester_db)
 
     def get_global_url(self):
@@ -35,8 +34,9 @@ class CiteseerIngester(Iingester):
         return "UPDATE {}.oaipmh_articles SET last_harvested = CURRENT_TIMESTAMP  WHERE identifier = %s"\
                 .format(self.harvester_db)
 
-    def get_name(self):
-        return "ingester.citeseer"
+    def set_reference(self, ingester_url, harvester_id):
+        # TODO
+        pass
 
     def mapping_function(self, query_tuple):
         mapping = self.generate_empty_mapping()

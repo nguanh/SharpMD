@@ -51,7 +51,7 @@ def harvestOAI(link, sql_connector, logger,
     except exceptions.ConnectionError:
         raise IHarvest_Exception("Error: Link", link, "cannot be connected")
     except oaiexceptions.BadArgument:
-        raise IHarvest_Exception("Error: Invalid Parameters")
+        raise IHarvest_Exception("Error: Invalid Parameters, {},{}".format(startDate,endDate))
 
     for record in records:
             # header is xml

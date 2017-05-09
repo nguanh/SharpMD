@@ -95,6 +95,7 @@ class MariaDb:
         :return:
         """
         try:
+            self.connector.start_transaction(isolation_level="READ COMMITTED")
             self.cursor.execute(operation, params, multi)
             self.connector.commit()
         except mysql.connector.Error as err:
@@ -105,6 +106,7 @@ class MariaDb:
         if self.query is None:
             raise Exception("query not set")
         try:
+            self.connector.start_transaction(isolation_level="READ COMMITTED")
             self.cursor.execute(self.query, tup)
             self.connector.commit()
             return self.cursor.lastrowid

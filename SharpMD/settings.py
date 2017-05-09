@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     "django_celery_beat",
     'django_admin_row_actions',
     'harvester.apps.HarvesterConfig',
+    'ingester.apps.IngesterConfig',
+    'weaver.apps.WeaverConfig',
+    'django_extensions',
+    'silk',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware'
 ]
 
 ROOT_URLCONF = 'SharpMD.urls'
@@ -78,10 +83,28 @@ WSGI_APPLICATION = 'SharpMD.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+"""
+# settings.py
+DATABASES = {
+    'default': {
+        'HOST': "localhost",
+        'USER': "root",
+        'PASSWORD': "master",
+        'NAME': "storage",
+        'ENGINE': 'django.db.backends.mysql',
+        'PORT': '',
+        'OPTIONS':{
+            'read_default_file': os.path.join(BASE_DIR,"my.cnf"),
+        },
+
     }
 }
 
@@ -127,4 +150,7 @@ STATIC_URL = '/static/'
 # user django db as celery result backend using django_celery_results
 CELERY_RESULT_BACKEND = 'django-db'
 # CELERY_RESULT_BACKEND = 'django-cache'
-CELERY_IMPORTS = ('harvester.tasks','ingester.tasks')
+CELERY_IMPORTS = ('harvester.tasks', 'ingester.tasks', 'weaver.tasks')
+CELERY_MAX_TASKS_PER_CHILD = 1
+
+SILKY_PYTHON_PROFILER = True

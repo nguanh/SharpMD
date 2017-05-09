@@ -1,6 +1,7 @@
 *.pyc
 *.pyo
 .sqlite3
+.log
 .idea/dataSources.local.xml
 .idea/dataSources/
 .idea/encodings.xml

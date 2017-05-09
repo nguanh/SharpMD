@@ -1,7 +1,6 @@
 from sickle.models import Record,Header
 from datetime import datetime
 #TODO add suffix for authors
-#TODO handle exception
 class ArXivRecord(Record):
 
     def __init__(self, record_element, strip_ns=True):

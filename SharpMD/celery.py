@@ -20,3 +20,11 @@ app.autodiscover_tasks()
 @app.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))
+
+
+@app.task()
+def inspect_task():
+    print(app.control.inspect().active())
+    print(app.control.inspect().reserved())
+    # print(app.control.inspect().scheduled())
+

@@ -1,11 +1,13 @@
 import csv
 import datetime
 
-from ingester.setup_database import setup_database
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 
-TESTDB = "ingester_test"
+
+
+TESTDB = "test_storage"
+
 
 def get_table_data(table, null_dates = True):
     credentials = dict(get_config("MARIADB"))
@@ -13,10 +15,12 @@ def get_table_data(table, null_dates = True):
     connector = MariaDb(credentials)
     connector.connector.database = TESTDB
     # fetch everything
-    query = "SELECT * FROM {}".format(table)
+    query = "SELECT * FROM test_storage.{}".format(table)
     connector.cursor.execute(query)
+    print(query)
     result = set()
     for dataset in connector.cursor:
+        print(dataset)
         tmp = ()
         for element in dataset:
             # overwrite timestamps with generic date for easier testing
@@ -28,23 +32,6 @@ def get_table_data(table, null_dates = True):
     connector.close_connection()
     return result
 
-
-def compare_tables(self, comp_object, ignore_id = True):
-    # TODO ignore
-    for key,value in comp_object.items():
-        data = get_table_data(key, TESTDB)
-        self.assertEqual(data, value)
-
-
-def delete_database(database):
-    credentials = dict(get_config("MARIADB"))
-    # connect to database
-    connector = MariaDb(credentials)
-    connector.connector.database = database
-    connector.execute_ex("DROP DATABASE {}".format(database))
-    connector.close_connection()
-
-
 def setup_tables(filename, table_query, insert_query):
     # load testconfig
     credentials = dict(get_config("MARIADB"))
@@ -55,7 +42,7 @@ def setup_tables(filename, table_query, insert_query):
     connector.createTable("test dblp table", table_query)
 
     # setup test ingester database
-    setup_database(TESTDB)
+   # setup_database(TESTDB)
     # import records from csv
     with open(filename, newline='', encoding='utf-8') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
@@ -69,24 +56,6 @@ def setup_tables(filename, table_query, insert_query):
                 connector.execute_ex(insert_query, tup)
             else:
                 do_once = True
-    connector.close_connection()
-
-
-def insert_data(query, tup = None):
-    """
-    execute insertion query
-    :param query:
-    :return:
-    """
-    # load testconfig
-    credentials = dict(get_config("MARIADB"))
-    # setup database
-    connector = MariaDb(credentials)
-    connector.connector.database = TESTDB
-    if tup is None:
-        connector.execute_ex(query)
-    else:
-        connector.execute_ex(query,tup)
     connector.close_connection()
 
 

@@ -1,7 +1,8 @@
 from ingester.Iingester import Iingester
-from mysqlWrapper.mariadb import MariaDb
 from conf.config import get_config
 from ingester.helper import split_authors
+from ingester.models import global_url
+from weaver.models import OpenReferences, PDFDownloadQueue
 import re
 
 def is_not_empty(var):
@@ -9,23 +10,20 @@ def is_not_empty(var):
 
 class ArxivIngester(Iingester):
 
-    def __init__(self, ingester_db, harvester_db):
-        Iingester.__init__()
-        credentials = dict(get_config("MARIADB"))
-        connector = MariaDb(credentials)
-        connector.connector.database = ingester_db
+    def __init__(self, name, harvester_db=None):
+        Iingester.__init__(self,name)
         # find global url/ add global URL
-        global_url_query = "SELECT id FROM global_url WHERE domain = 'http://arxiv.org'"
-        result = connector.fetch_one((), global_url_query)
-        if result is None:
-            insert_global_url = ("INSERT INTO global_url(domain,url) "
-                                 "VALUES ('http://arxiv.org','http://arxiv.org/abs/')")
-            connector.execute_ex(insert_global_url)
-            result = connector.fetch_one((), global_url_query)
-        connector.close_connection()
-        self.global_url = result
-        self.harvester_db = harvester_db
+        g_url,created = global_url.objects.get_or_create(
+            domain='http://arxiv.org',
+            url='http://arxiv.org/abs/'
+        )
+        self.global_url = g_url
+        if harvester_db is None:
+            self.harvester_db = get_config("DATABASES")["harvester"]
+        else:
+            self.harvester_db = harvester_db
         self.query = "SELECT * FROM {}.arxiv_articles WHERE last_harvested = 0".format(self.harvester_db)
+        self.table_nr = 1
 
     def get_global_url(self):
         return self.global_url
@@ -34,8 +32,17 @@ class ArxivIngester(Iingester):
         return "UPDATE {}.arxiv_articles SET last_harvested = CURRENT_TIMESTAMP  WHERE identifier = %s"\
                 .format(self.harvester_db)
 
-    def get_name(self):
-        return "ingester.arxiv"
+    def set_reference(self, ingester_url, harvester_id):
+        url = "https://arxiv.org/pdf/{}.pdf".format(harvester_id)
+        ref, created = OpenReferences.objects.get_or_create(ingester_key=ingester_url,
+                                                            defaults={'source_table': self.table_nr,
+                                                                     'source_key': harvester_id}
+                                                            )
+        # add url to download queue
+        PDFDownloadQueue.objects.get_or_create(url=url, source=ref, defaults={'tries':0})
+
+
+
 
     def mapping_function(self, query_tuple):
         mapping = self.generate_empty_mapping()
@@ -54,5 +61,4 @@ class ArxivIngester(Iingester):
         mapping["study_fields"] = query_tuple[11]
         mapping["publication"]["type_ids"] = 1
 
-        #TODO try to extract some information from journalref
         return mapping
