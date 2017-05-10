@@ -17,6 +17,7 @@ class OpenReferences(models.Model):
     source_key = models.CharField(max_length=150, db_index=True)
     # ingester local url id
     ingester_key = models.ForeignKey(local_url, null=True, default=None)
+    last_updated = models.DateField(auto_now=True)
 
     def __str__(self):
         return "{}-{}".format(self.source_table, self.source_key)
