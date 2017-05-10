@@ -1,7 +1,9 @@
 from .models import *
+from ingester.helper import normalize_title
 from django.db import transaction
 from django.db.models import Q
 from datetime import date
+
 
 from ingester.matching_functions import search_title
 
@@ -36,12 +38,12 @@ class Referencer:
                     single_ref.status = 'INC' if single_ref.tries < LIMBO_LIMIT else 'LIM'
                 else:
                     # multi match:
+                    normal_title = normalize_title(single_ref.title)
+                    single_ref.status = 'LIM'
                     for title in title_matches:
-                        if title.title == single_ref.title:
+                        if title.name == normal_title:
                             single_ref.status = 'FIN'
                             reference_list.append(PubReference(reference=title, source=open_ref.ingester_key))
-                    else:
-                        single_ref.status = 'LIM'
                 single_ref.save()
             open_ref.save()
         PubReference.objects.bulk_create(reference_list)

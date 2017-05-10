@@ -84,3 +84,31 @@ class TestReferencer(TransactionTestCase):
         self.assertEqual(SingleReference.objects.get(id=2).status, 'LIM')
         self.assertEqual(SingleReference.objects.get(id=2).tries, 5)
 
+    def test_limbo_multi(self):
+        self.cluster1.name = "thesis obsolete title fung"
+        self.cluster1.save()
+        self.cluster2.name = "thesis obsolete title fing"
+        self.cluster2.save()
+        self.single11.title = "Thesis Obsolete Title"
+        self.single11.save()
+        ref = Referencer(limit=1)
+        ref.run()
+        self.assertEqual(PubReference.objects.count(), 0)
+        self.assertEqual(SingleReference.objects.count(), 6)
+        self.assertEqual(SingleReference.objects.get(id=1).status, 'LIM')
+
+    def test_limbo_match(self):
+        self.cluster1.name = "thesis obsolete title"
+        self.cluster1.save()
+        self.cluster2.name = "thesis obsolete title fing"
+        self.cluster2.save()
+        self.single11.title = "Thesis Obsolete Title"
+        self.single11.save()
+        ref = Referencer(limit=1)
+        ref.run()
+        self.assertEqual(PubReference.objects.count(), 1)
+        self.assertEqual(PubReference.objects.get(id=1).test(), [1, 1])
+        self.assertEqual(SingleReference.objects.count(), 5)
+
+
+
