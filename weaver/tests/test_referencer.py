@@ -42,6 +42,8 @@ class TestReferencer(TransactionTestCase):
         self.op3 = OpenReferences.objects.create(source_table=1,
                                                  source_key="test3",
                                                  ingester_key=self.url3)
+
+        OpenReferences.objects.all().update(last_updated=old_date)
         # titles are copied from a grobid parsing session
         self.single11 = SingleReference.objects.create(id=1,
                                                        source=self.op1,
@@ -76,6 +78,7 @@ class TestReferencer(TransactionTestCase):
     def test_limbo(self):
         self.single21.tries = 4
         self.single21.save()
+
         ref = Referencer(limit=2)
         ref.run()
         self.assertEqual(PubReference.objects.count(), 1)
@@ -128,6 +131,15 @@ class TestReferencer(TransactionTestCase):
         ref.run()
         self.assertEqual(PubReference.objects.count(), 0)
         self.assertEqual(SingleReference.objects.count(), 6)
+
+    def test_multiple_execution(self):
+        ref = Referencer(limit=2)
+        ref.run()
+
+        ref.run()
+        self.assertEqual(PubReference.objects.count(),2)
+        self.assertEqual(PubReference.objects.get(id=1).test(), [1, 1])
+        self.assertEqual(PubReference.objects.get(id=2).test(), [3, 3])
 
 
 
