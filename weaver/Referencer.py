@@ -25,7 +25,7 @@ class Referencer:
         openreference_list = OpenReferences.objects.select_related('ingester_key').only('ingester_key')[:self.limit]
 
         for open_ref in openreference_list:
-            single_ref_list = SingleReference.objects.filter(source=open_ref).only('tries', 'title', 'status').all()
+            single_ref_list = SingleReference.objects.filter(source=open_ref).filter(Q(status='OP')| Q(status='INC')).only('tries', 'title', 'status').all()
             for single_ref in single_ref_list:
                 title_matches = search_title(single_ref.title, threshold=0.5)
                 if len(title_matches) == 1:

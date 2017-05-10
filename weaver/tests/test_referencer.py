@@ -110,5 +110,25 @@ class TestReferencer(TransactionTestCase):
         self.assertEqual(PubReference.objects.get(id=1).test(), [1, 1])
         self.assertEqual(SingleReference.objects.count(), 5)
 
+    def test_inc(self):
+        # incomplete references are included as well
+        self.single11.status = "INC"
+        self.single11.save()
+        ref = Referencer(limit=1)
+        ref.run()
+        self.assertEqual(PubReference.objects.count(), 1)
+        self.assertEqual(PubReference.objects.get(id=1).test(), [1, 1])
+        self.assertEqual(SingleReference.objects.count(), 5)
+
+    def test_lim(self):
+        # incomplete references are included as well
+        self.single11.status = "LIM"
+        self.single11.save()
+        ref = Referencer(limit=1)
+        ref.run()
+        self.assertEqual(PubReference.objects.count(), 0)
+        self.assertEqual(SingleReference.objects.count(), 6)
+
+
 
 
