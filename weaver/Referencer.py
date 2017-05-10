@@ -16,8 +16,6 @@ class Referencer:
 
     def run(self):
         reference_list = []
-        # all matched refernces are deleted
-        delete_list = []
         # fetch all single_references of an open_ref
         # fetch open_references to gather all ingester url_objects
         #openreference_list = OpenReferences.objects.filter(Q(last_updated__lt=date.today()) | Q(last_updated__isnull=True)).select_related('ingester_key').values('ingester_key')[:self.limit]
@@ -31,16 +29,11 @@ class Referencer:
                 if len(title_matches) == 1:
                     # single match: create reference for only match
                     reference_list.append(PubReference(reference=title_matches[0], source=open_ref.ingester_key))
-                    delete_list.append(single_ref)
                     single_ref.status = 'FIN'
                 elif len(title_matches) == 0:
                     # no match: increment tries and set as incomplete
-                    # if tries are above LIMBO_LIMIT set status as Limbo
-                    if single_ref.tries < LIMBO_LIMIT:
-                        single_ref.tries += 1
-                        single_ref.status = 'INC'
-                    else:
-                        single_ref.status = 'LIM'
+                    single_ref.tries += 1
+                    single_ref.status = 'INC' if single_ref.tries < LIMBO_LIMIT else 'LIM'
                 else:
                     # multi match:
                     for title in title_matches:
@@ -51,11 +44,6 @@ class Referencer:
                         single_ref.status = 'LIM'
                 single_ref.save()
             open_ref.save()
-            """
-            for element in delete_list:
-                if element.id is not None:
-                    element.delete()
-            """
         PubReference.objects.bulk_create(reference_list)
         SingleReference.objects.filter(status='FIN').delete()
 

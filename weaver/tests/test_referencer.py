@@ -43,28 +43,44 @@ class TestReferencer(TransactionTestCase):
                                                  source_key="test3",
                                                  ingester_key=self.url3)
         # titles are copied from a grobid parsing session
-        self.single11 = SingleReference.objects.create(source=self.op1,
-                                                       title="Specialized research datasets in the CiteSeerX digital library",
+        self.single11 = SingleReference.objects.create(id=1,
+                                                       source=self.op1,
+                                                       title="Specialized research datasets in the CiteSeerX digital library bub",
                                                        authors=bytes(4))
-        self.single21 = SingleReference.objects.create(source=self.op2,
+        self.single21 = SingleReference.objects.create(id=2,source=self.op2,
                                                        title="Pattern Recognition and Machine Learning (Information Science and Statistics",
                                                        authors=bytes(4))
-        self.single22 = SingleReference.objects.create(source=self.op2, title="Citeseerx: A scholarly big dataset", authors=bytes(4))
-        self.single31 = SingleReference.objects.create(source=self.op3,
+        self.single22 = SingleReference.objects.create(id=3,source=self.op2, title="Citeseerx: A scholarly big dataset", authors=bytes(4))
+        self.single31 = SingleReference.objects.create(id=4,source=self.op3,
                                                        title="Layout and content extraction for pdf documents",
                                                        authors=bytes(4))
-        self.single32 = SingleReference.objects.create(source=self.op3,
+        self.single32 = SingleReference.objects.create(id=5,source=self.op3,
                                                        title="Figure metadata extraction from digital documents",
                                                        authors=bytes(4))
-        self.single33 = SingleReference.objects.create(source=self.op3,
+        self.single33 = SingleReference.objects.create(id=6,source=self.op3,
                                                        title="Collabseer: a search engine for collaboration discovery",
                                                        authors=bytes(4))
 
     def test_success(self):
+        # Test successful match and incomplete match
         ref = Referencer(limit=2)
         self.assertEqual(PubReference.objects.count(), 0)
-        self.assertEqual(SingleReference.objects.count(),6)
+        self.assertEqual(SingleReference.objects.count(), 6)
         ref.run()
-        self.assertEqual(PubReference.objects.count(),1)
-        self.assertEqual(SingleReference.objects.count(),5)
+        self.assertEqual(PubReference.objects.count(), 1)
+        self.assertEqual(SingleReference.objects.count(), 5)
         self.assertEqual(PubReference.objects.get(id=1).test(), [1, 1])
+        self.assertEqual(SingleReference.objects.get(id=2).status, 'INC')
+        self.assertEqual(SingleReference.objects.get(id=2).tries, 1)
+
+    def test_limbo(self):
+        self.single21.tries = 4
+        self.single21.save()
+        ref = Referencer(limit=2)
+        ref.run()
+        self.assertEqual(PubReference.objects.count(), 1)
+        self.assertEqual(SingleReference.objects.count(), 5)
+        self.assertEqual(PubReference.objects.get(id=1).test(), [1, 1])
+        self.assertEqual(SingleReference.objects.get(id=2).status, 'LIM')
+        self.assertEqual(SingleReference.objects.get(id=2).tries, 5)
+
