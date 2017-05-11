@@ -10,7 +10,7 @@ TESTDB = "test_storage"
 
 
 def get_table_data(table, null_dates = True):
-    credentials = dict(get_config("MARIADB"))
+    credentials = dict(get_config("MARIADBX"))
     # connect to database
     connector = MariaDb(credentials)
     connector.connector.database = TESTDB
@@ -34,7 +34,7 @@ def get_table_data(table, null_dates = True):
 
 def setup_tables(filename, table_query, insert_query):
     # load testconfig
-    credentials = dict(get_config("MARIADB"))
+    credentials = dict(get_config("MARIADBX"))
     # setup database
     connector = MariaDb(credentials)
     connector.create_db(TESTDB)

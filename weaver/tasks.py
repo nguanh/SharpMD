@@ -11,7 +11,6 @@ log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
 
 @shared_task
 def pdfdownloader():
-    limit = 10
     """
     task for downloading pdf files, sending them to grobid and create single references
     :return:
@@ -40,9 +39,15 @@ def pdfdownloader():
     # run actual task
     tmp = get_config("FOLDERS")["tmp"]
     grobid = get_config("WEAVER")["grobid"]
+    limit = get_config("WEAVER")["pdf_limit"]
 
     logger.info("Init PDF Processing")
     obj = PdfDownloader(tmp, grobid, logger=logger, limit=limit)
     logger.info("Start Processing")
     result = obj.process_pdf()
     logger.info(result)
+
+
+@shared_task
+def referencertask():
+    pass
