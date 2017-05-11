@@ -4,8 +4,6 @@ import datetime
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 
-
-
 TESTDB = "test_storage"
 
 
