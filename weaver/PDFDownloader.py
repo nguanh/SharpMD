@@ -160,7 +160,7 @@ class PdfDownloader:
                     self.logger.debug("Original : %s", result)
                     self.logger.debug("Reference: %s", reference)
             except Exception as e:
-                self.logger.error("Reference Error %s", e)
+                self.logger.critical("Reference Error %s", e)
                 reference = None
 
             if reference is None:
