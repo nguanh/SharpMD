@@ -3,7 +3,7 @@ from ingester.helper import normalize_title
 from django.db import transaction
 from django.db.models import Q
 from datetime import date
-
+import logging
 
 from ingester.matching_functions import search_title
 
@@ -11,8 +11,12 @@ LIMBO_LIMIT = 5
 
 
 class Referencer:
-    def __init__(self, limit):
+    def __init__(self, limit, logger=None):
         self.limit = limit
+        if logger is None:
+            self.logger = logging.getLogger()
+        else:
+            self.logger = logger
 
     def run(self):
         today = date.today()
