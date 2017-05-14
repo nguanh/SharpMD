@@ -9,7 +9,7 @@ app_name = 'ingester'
 
 urlpatterns = [
     url(r'^ingester/(?P<config_id>[0-9]+)/log/$', views.log, name='config_log'),
-    url(r'publications/$', ListView.as_view(paginate_by=10,
+    url(r'publications/$', ListView.as_view(paginate_by=50,
                                             model=local_url,
                                             queryset=publication.objects.all(),
                                             context_object_name="object_list",
