@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from django.shortcuts import get_object_or_404,render
-from .models import Config
+from django.views.generic import ListView
+from .models import Config, publication
 import os
 import tailer
 # Create your views here.
@@ -23,3 +24,7 @@ def log(request, config_id):
             'harvester_name': config.name,
             'log_text': log_text,
     })
+
+
+class PublicationList(ListView):
+    model = publication

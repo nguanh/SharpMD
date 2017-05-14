@@ -1,0 +1,33 @@
+
+
+{% block content %}
+{% load static %}
+    {# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+    <h2>Publications</h2>
+            <button type="submit" class="btn btn-danger">
+            {% bootstrap_icon "star" %} Submit
+        </button>
+    <div>
+        <div id= "content-col" class="col-md-5">
+        {% for publication in object_list %}
+            <div class="panel panel-primary">
+                <div class="panel-heading" >
+                    <span class="publication-date">{{ publication.date_published|date:"Y" }}</span>
+                    <span class="publication-title">{{ publication.title }}</span>
+                </div>
+                <div class="panel-body">
+                </div>
+            </div>
+        {% endfor %}
+         </div>
+    </div>
+
+{% endblock %}

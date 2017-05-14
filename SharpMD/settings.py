@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'weaver.apps.WeaverConfig',
     'django_extensions',
     'silk',
+    'bootstrap3',
 ]
 
 MIDDLEWARE = [

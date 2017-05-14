@@ -237,6 +237,11 @@ class TestPDFDownloader(TransactionTestCase):
         self.assertEqual(PDFDownloadQueue.objects.count(), 3)
         self.assertEqual(result["skipped"], 1)
 
+    def test_regression(self):
+        file_path = os.path.join(path, "0704.0251.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
 
 
 
