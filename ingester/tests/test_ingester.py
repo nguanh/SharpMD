@@ -96,8 +96,8 @@ class TestIngester(TransactionTestCase):
         self.assertEqual(limbo_pub.objects.count(),0)
 
         # publication
-        self.assertEqual(publication.objects.get(id=1).test(), [2, 1, "Bla Bla Bla"])
-        self.assertEqual(publication.objects.get(id=2).test(), [4, 2, "Kam? Kim! Kum."])
+        self.assertEqual(publication.objects.get(id=1).test(), [1, "Bla Bla Bla"])
+        self.assertEqual(publication.objects.get(id=2).test(), [2, "Kam? Kim! Kum."])
         # check if last harvested is set
         tmp = list(get_table_data("dblp_article", null_dates=False))
         self.assertEqual(tmp[0][-1].strftime("%Y-%m-%d"), datetime.datetime.now().strftime("%Y-%m-%d"))
@@ -146,8 +146,9 @@ class TestIngester(TransactionTestCase):
         self.assertEqual(limbo_authors.objects.get(id=2).test(), [1, 'None', "Another Author", 1])
         self.assertEqual(local_url.objects.count(),0)
         limbo = limbo_pub.objects.get(id=1).test_extended()
+        print(limbo)
         compare = ['Reason.AMB_CLUSTER','key',"title","1-5",None,"doi",None,None,
-                                datetime.date(2011,1,1),datetime.date(1990,1,1),"1","2","series",
+                                None,datetime.date(1990,1,1),"1","2","series",
                                 None,"publisher",None,"school","address",
                                 "isbn",None,"booktitle","journal"]
         self.assertEqual(limbo,compare)
@@ -158,8 +159,8 @@ class TestIngester(TransactionTestCase):
         gurl = global_url.objects.create(id=5,domain ="http://dummy.de", url="http://dummy.de")
         lurl = local_url.objects.create(id=1,url="jlkjöl", global_url=gurl)
         publication.objects.bulk_create([
-            publication(url=lurl,cluster=cl,title="Title"),
-            publication(url=lurl, cluster=cl, title="Title")
+            publication(local_url=lurl,cluster=cl,title="Title"),
+            publication(local_url=lurl, cluster=cl, title="Title")
         ])
         ingester = DblpIngester("dblp.ingester", harvesterdb="test_storage")
         ingest_data(ingester)

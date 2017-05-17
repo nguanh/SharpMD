@@ -45,7 +45,7 @@ class TestMatchTitle2(TransactionTestCase):
     def test_single_cluster_single_pub(self):
         multi = cluster.objects.create(id=1, name="multi title")
         single = cluster.objects.create(id=2, name="single title")
-        publication.objects.create(id=1, url=self.lurl, cluster=single, title="hi")
+        publication.objects.create(id=1, local_url=self.lurl, cluster=single, title="hi")
 
         result = match_title2("single Title")
         self.assertEqual(result, {

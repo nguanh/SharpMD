@@ -115,7 +115,6 @@ def generate_diff_store(pub_dict):
         "pub_source_ids": [],
         "type_ids": [],
         "study_field_ids": [],
-        "date_added":[],
     }
     for key in obj.keys():
             if key == "url_id":

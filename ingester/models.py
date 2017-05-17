@@ -108,37 +108,40 @@ class study_field(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True, default=None)
 
-# ======================================= URL =========================================================================
-class global_url(models.Model):
-    id = models.AutoField(primary_key=True)
-    domain = models.CharField(max_length=150)
-    url = models.URLField()
+# ======================================= PUBLICATIONS ================================================================
 
 
-class local_url(models.Model):
-    global_url = models.ForeignKey(global_url, default=None)
-    #auto set date on creation
-    last_updated = models.DateTimeField(auto_now_add=True)
-    url = models.CharField(max_length=150, db_index=True)
-    medium = models.ForeignKey(pub_medium, default=None, null=True, blank=True)
-    type = models.ForeignKey(publication_type, default=None, null=True, blank=True)
-    study_field = models.ForeignKey(study_field, default=None,null=True,blank=True)
+class cluster(models.Model):
+    objects = SearchManager(['name'])
+    name= models.TextField()
+
+
+class publication(models.Model):
+    cluster = models.ForeignKey(cluster)
+    differences = models.BinaryField(null=True, default= None)
+    title = models.TextField()
+    pages = models.CharField(max_length=20, null=True, default=None)
+    note = models.TextField(null=True, default=None)
+    doi = models.TextField(null=True, default=None)
+    abstract = models.TextField(null=True, default=None)
+    copyright = models.TextField(null=True, default=None)
+    date_added = models.DateField(auto_created=True, null=True)
+    date_published = models.DateField(null=True, default=None)
+    volume = models.CharField(max_length=20, null=True, default=None)
+    number = models.CharField(max_length=20, null=True, default=None)
+
     def test(self):
-        medium = None if self.medium is None else self.medium.id
-        u_type = None if self.type is None else self.type.id
-        sf = None if self.study_field is None else self.study_field.id
-        return [self.global_url.id, self.url, medium, u_type, sf]
-
+        return [self.cluster.id, self.title]
 
 # ======================================= AUTHORS =====================================================================
-#Visible on admin interface for editing
+# Visible on admin interface for editing
 class authors_model(models.Model):
     main_name = models.TextField()
     block_name = models.TextField(blank=True)
     website = models.TextField(blank=True, null=True, default=None)
     contact = models.TextField(blank=True, null=True, default=None)
     about = models.TextField(blank=True, null=True, default=None)
-    orcid_id = models.CharField(max_length=200,blank=True, null=True, default=None)
+    orcid_id = models.CharField(max_length=200, blank=True, null=True, default=None)
     modified = models.DateTimeField(auto_now=True)
 
     objects = SearchManager(['block_name'])
@@ -152,7 +155,31 @@ class authors_model(models.Model):
         super(authors_model, self).save(*args, **kwargs)
 
     def test(self):
-        return [self.main_name,self.block_name]
+        return [self.main_name, self.block_name]
+# ======================================= URL =========================================================================
+class global_url(models.Model):
+    id = models.AutoField(primary_key=True)
+    domain = models.CharField(max_length=150)
+    url = models.URLField()
+
+
+class local_url(models.Model):
+    global_url = models.ForeignKey(global_url, default=None)
+    # auto set date on creation
+    last_updated = models.DateTimeField(auto_now_add=True)
+    url = models.CharField(max_length=150, db_index=True)
+    # link to other entities
+    medium = models.ForeignKey(pub_medium, default=None, null=True, blank=True)
+    publication = models.OneToOneField(publication, default=None,null=True,blank=True)
+    authors = models.ManyToManyField(authors_model, through='publication_author', default=None)
+    type = models.ForeignKey(publication_type, default=None, null=True, blank=True)
+    study_field = models.ForeignKey(study_field, default=None, null=True, blank=True)
+
+    def test(self):
+        medium = None if self.medium is None else self.medium.id
+        u_type = None if self.type is None else self.type.id
+        sf = None if self.study_field is None else self.study_field.id
+        return [self.global_url.id, self.url, medium, u_type, sf]
 
 
 class publication_author(models.Model):
@@ -190,33 +217,6 @@ class author_alias_source(models.Model):
 
     class Meta:
         unique_together = ("alias","url")
-
-# ======================================= PUBLICATIONS ================================================================
-
-
-class cluster(models.Model):
-    objects = SearchManager(['name'])
-    name= models.TextField()
-
-
-class publication(models.Model):
-    url = models.ForeignKey(local_url)
-    cluster = models.ForeignKey(cluster)
-    differences = models.BinaryField(null=True, default= None)
-    title = models.TextField()
-    pages = models.CharField(max_length=20, null=True, default=None)
-    note = models.TextField(null=True, default=None)
-    doi = models.TextField(null=True, default=None)
-    abstract = models.TextField(null=True, default=None)
-    copyright = models.TextField(null=True, default=None)
-    date_added = models.DateField(null=True, default=None)
-    date_published = models.DateField(null=True, default=None)
-    volume = models.CharField(max_length=20, null=True, default=None)
-    number = models.CharField(max_length=20, null=True, default=None)
-
-    def test(self):
-        return [self.url.id, self.cluster.id, self.title]
-
 
 # ==================================== PUBLICATION MEDIUM =============================================================
 

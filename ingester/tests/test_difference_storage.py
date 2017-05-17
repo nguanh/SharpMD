@@ -57,7 +57,6 @@ class TestDifferenceStorage(TransactionTestCase):
         self.assertDictEqual(result,{
             "title": "Hello World",
             "date_published":datetime.datetime(1990,1,1,1,1,1),
-            "date_added": None,
             "abstract": "Test Text",
             "note": None,
             "pages": None,

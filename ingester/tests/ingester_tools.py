@@ -76,7 +76,6 @@ def get_pub_dict(url_id=None, title=None, pages=None, note=None, doi=None, abstr
         "type_ids": type_ids,
         "study_field_ids": study_field_ids,
         "pub_source_ids": pub_source_ids,
-        "date_added": date_added
     }
 
 

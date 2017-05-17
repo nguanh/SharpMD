@@ -20,7 +20,7 @@ class TestUpdateDiffTree(TransactionTestCase):
         self.author_dict = [self.author1,self.author4,self.author7]
 
     def test_no_diff_tree(self):
-        pub = publication.objects.create(id=5, url=self.lurl, cluster=self.cluster_id, title="test title")
+        pub = publication.objects.create(id=5, local_url=self.lurl, cluster=self.cluster_id, title="test title")
         # every table is empty
         pub_dict = get_pub_dict(url_id=1, title="Hello World", date_published=datetime(1990,1,1,1,1,1))
 
@@ -37,7 +37,7 @@ class TestUpdateDiffTree(TransactionTestCase):
         diff_tree = generate_diff_store(pub_dict)
         serialized_tree = serialize_diff_store(diff_tree)
         print(serialized_tree)
-        pub = publication.objects.create(id=5, url=self.lurl, cluster=self.cluster_id, title="test title",
+        pub = publication.objects.create(id=5, local_url=self.lurl, cluster=self.cluster_id, title="test title",
                                          differences=serialized_tree)
         pub_dict = get_pub_dict(url_id=2, title="Hello World", date_published=datetime(1990, 1, 1, 1, 1, 1))
         result = update_diff_tree(pub,pub_dict,self.author_dict)
@@ -64,11 +64,10 @@ class TestUpdateDiffTree(TransactionTestCase):
                                 doi="doi",
                                 abstract="abstract",
                                 copyright="copyright",
-                                date_added=datetime(1990, 1, 1, 1, 1, 1),
                                 author_ids=5)
         diff_tree = generate_diff_store(pub_dict)
         serialized_tree = serialize_diff_store(diff_tree)
-        pub = publication.objects.create(id=5, url=self.lurl, cluster=self.cluster_id, title="test title",
+        pub = publication.objects.create(id=5, local_url=self.lurl, cluster=self.cluster_id, title="test title",
                                          differences=serialized_tree)
         pub_dict = get_pub_dict(url_id=2, title="Hello World", date_published=datetime(1990, 1, 1, 1, 1, 1))
         result = update_diff_tree(pub, pub_dict, self.author_dict)
@@ -81,7 +80,6 @@ class TestUpdateDiffTree(TransactionTestCase):
         self.assertEqual(result["copyright"][0]["value"], "copyright")
         self.assertEqual(result["note"][0]["value"], "note")
         self.assertEqual(result["doi"][0]["value"], "doi")
-        self.assertEqual(result["date_added"][0]["value"], "1990-01-01 01:01:01")
         self.assertEqual(result["pages"][0]["value"], "1-3")
         self.assertEqual(result["number"][0]["value"], "5")
         self.assertEqual(result["volume"][0]["value"], "5")

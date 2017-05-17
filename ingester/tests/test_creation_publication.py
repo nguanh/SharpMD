@@ -39,14 +39,17 @@ class TestCreatePublication(TransactionTestCase):
         self.assertEqual(aut2.test(), [2, 2, 1])
         # test local url
         self.assertEqual(result[1].test(), [1, "TODO PLATZHALTER", 1, 3, None])
-        self.assertEqual(result[0].test(), [2, 1, ""])
+        self.assertEqual(result[0].test(), [1, ""])
 
     def test_existing_publication(self):
-        pub = publication.objects.create(id=5,url=self.lurl,cluster= self.cluster_id, title="my title")
+        pub = publication.objects.create(id=5, cluster=self.cluster_id, title="my title")
+        self.lurl.publication = pub
+        self.lurl.save()
         result = create_publication(self.gurl, self.cluster_id, [self.author1,self.author2], 3, self.medium2)
 
         self.assertEqual(result[0].id, pub.id)
         self.assertEqual(result[1].id, self.lurl.id)
+        self.assertEqual(result[0].local_url,self.lurl)
         aut1 = publication_author.objects.get(id=1)
         aut2 = publication_author.objects.get(id=2)
         self.assertEqual(aut1.test(), [1, 1, 0])
@@ -67,7 +70,7 @@ class TestCreatePublication(TransactionTestCase):
         self.assertEqual(aut2.test(), [2, 2, 1])
         # test local url
         self.assertEqual(result[1].test(), [1, "TODO PLATZHALTER", None, self.type.id,None])
-        self.assertEqual(result[0].test(), [2, 1, ""])
+        self.assertEqual(result[0].test(), [1, ""])
 
     def test_keywords(self):
         key1 = keywordsModel.objects.create(id=1, main_name="Hallo")

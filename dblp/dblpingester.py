@@ -39,7 +39,6 @@ class DblpIngester(Iingester):
         mapping = self.generate_empty_mapping()
         # is set later
         mapping["local_url"] = query_tuple[0]
-        mapping["publication"]["date_added"] = query_tuple[1].year
         authors_list = split_authors(query_tuple[2])
         for author in authors_list:
             stripped_numbers = re.sub(r'\d{4}', '', author).strip()

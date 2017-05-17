@@ -29,7 +29,6 @@ def normalize_title(title, latex=False):
     return only_one_space.strip()
 
 
-#TODO extend names containing only 2 letters by adding x at the end
 def normalize_authors(author):
     # split double names connected by - into separate names
     name_split = author.replace("-", " ")

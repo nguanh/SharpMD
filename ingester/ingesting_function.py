@@ -24,7 +24,7 @@ def ingest_data(ingester_obj):
     logger = logging.getLogger("ingester.{}".format(ingester_obj.get_name()))
     # mysql connector to read from harvester
     read_connector = MariaDb()
-    write_connector= MariaDb()
+    write_connector = MariaDb()
     try:
         read_connector.cursor.execute(ingester_obj.get_query())
     except Exception as e:
@@ -70,13 +70,13 @@ def ingest_data(ingester_obj):
                 source_lurl_obj.delete()
                 push_limbo(mapping, author_matches, str(title_match["reason"]))
                 pub_limbo += 1
-                #TODO include in test
                 write_connector.execute_ex(ingester_obj.update_harvested(), (mapping["local_url"],))
                 continue
 
             # ------------------------ CREATION ------------------------------------------------------------------------
-            pub_medium_obj = match_pub_medium(mapping["pub_release"], source_lurl_obj)
             cluster_name = normalize_title(mapping["publication"]["title"])
+
+            pub_medium_obj = match_pub_medium(mapping["pub_release"], source_lurl_obj)
             author_ids = create_authors(author_matches, mapping["authors"], source_lurl_obj)
             keyword_obj = match_keywords(mapping["keywords"],source_lurl_obj)
             cluster_obj = create_title(title_match, cluster_name)
@@ -111,7 +111,6 @@ def ingest_data(ingester_obj):
             publication_values["differences"] = serialized_tree
             publication_values["cluster"] = cluster_obj
             publication_values["url"] = def_url_obj
-            publication_values["date_added"] = None # is set to None because this value is ambiguous
             publication_values["date_published"] = datetime.date(publication_values["date_published"],1,1)
             # 8.store publication
             for key, value in publication_values.items():
@@ -122,6 +121,7 @@ def ingest_data(ingester_obj):
             ingester_obj.set_reference(source_lurl_obj, mapping['local_url'])
             pub_added += 1
         except Exception as e:
+            print(e)
             logger.error("%s: %s", mapping["local_url"], e)
             continue
     logger.debug("Terminate ingester %s", ingester_obj.get_name())
