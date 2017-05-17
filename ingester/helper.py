@@ -91,7 +91,7 @@ def get_search_query(title):
     for word in word_list:
         if len(word) < 4:
             invalid += 1
-        search_query += "+{}* ".format(word)
+        search_query += "{}* ".format(word)
 
     if invalid == len(word_list):
         return title

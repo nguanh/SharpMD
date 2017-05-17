@@ -75,7 +75,7 @@ class TestMatchTitle2(TransactionTestCase):
         cluster.objects.create(id=5, name="lorem ipsum dor")
         cluster.objects.create(id=6, name="lorem ipsum dolor")
         result = [obj.name for obj in search_title("lorem ipsum dolor")]
-        self.assertEqual(result, ["lorem ipsum dolor title", "lorem ipsum dolor"])
+        self.assertEqual(result, ["lorem ipsum dolor title", "lorem ipsum dolor","lorem ipsum dor"])
 
     def test_match2_no_results(self):
         cluster.objects.create(id=1, name="lorem ipsum dolor title")
@@ -99,3 +99,18 @@ class TestMatchTitle2(TransactionTestCase):
         cluster.objects.create(id=1, name="high temperature bonding solutions enabling thin wafer process and handling on 3dic manufacturing")
         result = search_title("TSV process solution for 3D-IC.")
         print(result)
+
+    def test_match_limit(self):
+        cluster.objects.create(id=1, name="lorem ipsum dolor title")
+        cluster.objects.create(id=2, name="lorem ipsum title")
+        cluster.objects.create(id=3, name="dolor lorem")
+        cluster.objects.create(id=4, name="dolor lorem")
+        cluster.objects.create(id=5, name="lorem ipsum dor")
+        cluster.objects.create(id=6, name="lorem ipsum dolor")
+        result = [obj.name for obj in search_title("lorem",threshold=0, limit=5)]
+        self.assertEqual(len(result), 5)
+
+    def test_regression_3(self):
+        cluster.objects.create(id=1, name="lorem ipsum dolor")
+        result = [obj.name for obj in search_title("lorem ipsum dolores",threshold=0.5, limit=5)]
+        self.assertEqual(len(result), 1)
