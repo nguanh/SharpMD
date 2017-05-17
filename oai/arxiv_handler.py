@@ -39,7 +39,10 @@ class ArXivRecord(Record):
                 if "forenames" in name_dict:
                     result += name_dict["keyname"]+"," + name_dict["forenames"] + ";"
                 else:
-                    result += name_dict["keyname"] + ";"
+                    # remov duplicate names indicated by ';', see http://export.arxiv.org/oai2?verb=GetRecord&identifier=oai:arXiv.org:0704.3204&metadataPrefix=arXiv
+                    if name_dict['keyname'] !=";":
+                        result += name_dict["keyname"] + ";"
+
         return result
 
     def __iter__(self):

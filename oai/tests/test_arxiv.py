@@ -37,4 +37,10 @@ class Test_Arxiv(TestCase):
         result = ArXivRecord(record)
         self.assertEqual(result.deleted, True)
 
+    def test_regression(self):
+        # university instance don't have a name and use ; instead
+        record = get_record("regression_1.xml")
+        result = ArXivRecord(record)
+        print(result.metadata['authors'])
+        self.assertEqual(result.metadata['authors'],'Wisniewski,John P.;Bjorkman,Karen S.;Magalhaes,Antonio M.;Pereyra,Antonio;')
 

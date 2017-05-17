@@ -1,0 +1,56 @@
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<responseDate>2017-05-17T13:58:07Z</responseDate>
+<request verb="GetRecord" identifier="oai:arXiv.org:0704.3204" metadataPrefix="arXiv">http://export.arxiv.org/oai2</request>
+<GetRecord>
+<record>
+<header>
+<identifier>oai:arXiv.org:0704.3204</identifier>
+<datestamp>2009-11-13</datestamp>
+<setSpec>physics:astro-ph</setSpec>
+</header>
+<metadata>
+<arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ http://arxiv.org/OAI/arXiv.xsd">
+<id>0704.3204</id>
+<created>2007-04-24</created>
+<authors>
+<author>
+<keyname>Wisniewski</keyname>
+<forenames>John P.</forenames>
+<affiliation>NASA GSFC;</affiliation>
+</author>
+<author>
+<keyname>Bjorkman</keyname>
+<forenames>Karen S.</forenames>
+<affiliation>University of Toledo;</affiliation>
+</author>
+<author>
+<keyname>Magalhaes</keyname>
+<forenames>Antonio M.</forenames>
+<affiliation>University of Sao Paulo</affiliation>
+</author>
+<author>
+<keyname>Pereyra</keyname>
+<forenames>Antonio</forenames>
+<affiliation>University of Sao Paulo</affiliation>
+</author>
+<author>
+<keyname>;</keyname>
+<affiliation>University of Toledo;</affiliation>
+</author>
+</authors>
+<title>
+The Magnetic Field Structure of the LMC 2 Supershell: NGC 2100
+</title>
+<categories>astro-ph</categories>
+<comments>
+12 pages, accepted by ApJ, emulateapj5 format, full-resolution figures available upon request (jwisnie@milkyway.gsfc.nasa.gov)
+</comments>
+<doi>10.1086/519155</doi>
+<abstract>
+We present U,B,V,R,I imaging polarimetry of NGC 2100 and its surrounding environment, which comprise a part of the LMC 2 supershell. The morphology of the observed position angle distribution provides a tracer of the projected magnetic field in this environment. Our polarization maps detail regions exhibiting similarly aligned polarization position angles, as well as more complex position angle patterns. We observe regions of coherent fields on spatial scales of 42 x 24 pc to 104 x 83 pc, and infer projected field strengths of $\sim14-30\mu$G. We propose that the superposition of global outflows from the LMC 2 environment, as well as outflows created within NGC 2100, produce the unique field geometry in the region.
+</abstract>
+</arXiv>
+</metadata>
+</record>
+</GetRecord>
+</OAI-PMH>
