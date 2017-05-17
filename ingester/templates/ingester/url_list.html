@@ -20,12 +20,12 @@
         {% for url in object_list %}
             <div class="panel panel-primary">
                 <div class="panel-heading" >
-                    <span class="publication-date">{{ url.url}}</span>
-                    <span class="publication-date">{{ url.medium.main_name}}</span>
-                    <span class="publication-date">{{ url.medium.main_name}}</span>
-                    <span class="publication-date">{{ url.type.name}}</span>
+                    <span class="publication-date">{{ url.publication.date_published|date:"Y" }}</span>
+                    <span class="publication-title">{{ url.publication.title }}</span>
                 </div>
                 <div class="panel-body">
+                    By{% for author in url.authors.all%} {{ author.main_name }},{% endfor%}<br/>
+                    Published in : <span class="publication-medium">{{ url.medium.main_name}}</span>
                 </div>
             </div>
         {% endfor %}
