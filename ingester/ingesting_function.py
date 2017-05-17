@@ -4,7 +4,7 @@ from .models import *
 import logging
 from mysqlWrapper.mariadb import MariaDb
 from django.db.models import ObjectDoesNotExist
-from .matching_functions import match_type,match_pub_medium,simple_author_match,match_title2, match_keywords, advanced_author_match
+from .matching_functions import match_type,match_pub_medium, match_title2, match_keywords, advanced_author_match
 from .limbo_functions import push_limbo
 from .creation_functions import create_publication,create_authors,create_title,update_diff_tree
 from .difference_storage import *

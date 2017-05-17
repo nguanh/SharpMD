@@ -1,5 +1,5 @@
 from django.test import TransactionTestCase
-from ingester.matching_functions import simple_author_match,advanced_author_match
+from ingester.matching_functions import advanced_author_match
 from ingester.creation_functions import create_authors
 from ingester.models import *
 from mysqlWrapper.mariadb import MariaDb
