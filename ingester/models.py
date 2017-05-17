@@ -39,6 +39,7 @@ class Config(models.Model):
             setattr(self.ingester_task, 'interval', self.schedule)
             setattr(self.ingester_task, 'task', task_name)
             setattr(self.ingester_task, 'args', json.dumps(id_pass))
+            setattr(self.ingester_task, 'enabled', self.enabled)
             self.ingester_task.save()
         else:
             obj = PeriodicTask(
@@ -46,6 +47,7 @@ class Config(models.Model):
                 interval=self.schedule,
                 task=task_name,
                 args=json.dumps(id_pass),
+                enabled=self.enabled
             )
             obj.save()
             self.ingester_task = obj
