@@ -14,6 +14,6 @@ urlpatterns = [
                                             model=local_url,
                                             queryset=local_url.objects.filter(global_url__id=1).select_related().all(),
                                             context_object_name="object_list",
-                                            template_name='ingester/url_list.html',)),
+                                            template_name='ingester/url_list.html',),name='bla'),
     url(r'search/$', views.search,name='search'),
 ]

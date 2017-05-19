@@ -1,5 +1,5 @@
 from __future__ import absolute_import, unicode_literals
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render,render_to_response
 from django.views.generic import ListView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Config, publication, local_url
@@ -32,8 +32,14 @@ def log(request, config_id):
 
 
 def search(request):
-    print(request.GET)
     qs = local_url.objects.filter(global_url__id=1).all()
+    if 'publication__title' in request.GET:
+        if request.GET['publication__title'] == ['']:
+            del request.GET['publication__title']
+
+    if 'authors__block_name' in request.GET:
+        if request.GET['authors__block_name'] == ['']:
+            del request.GET['authors__block_name']
     url_filter = PublicationFilter(request.GET, queryset=qs)
     return render(request, 'ingester/search_list.html', {'filter': url_filter})
 

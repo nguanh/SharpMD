@@ -17,11 +17,11 @@
       <button type="submit" class="btn btn-primary">
         <span class="glyphicon glyphicon-search"></span> Search
       </button>
-      <button type="reset" class="btn btn-default">
-          Reset
-      </button>
+        <a href="{% url 'ingester:search'  %}" class="btn btn-default">Reset</a>
     </div>
   </form>
+
+
 <div class="row">
  <div id= "content-col" class="col-md-offset-1 col-md-6">
     {% autopaginate filter.qs 10 as filter_list %}
