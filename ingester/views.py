@@ -32,6 +32,7 @@ def log(request, config_id):
 
 
 def search(request):
+    print(request.GET)
     qs = local_url.objects.filter(global_url__id=1).all()
     url_filter = PublicationFilter(request.GET, queryset=qs)
     return render(request, 'ingester/search_list.html', {'filter': url_filter})
