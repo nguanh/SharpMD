@@ -1,6 +1,7 @@
 from django.conf.urls import url
-from .views import PublicationList
-from .models import publication, local_url, global_url
+from django_filters.views import FilterView
+from .filters import PublicationFilter
+from .models import local_url
 from django.views.generic import ListView
 from . import views
 #der namespace
@@ -14,4 +15,5 @@ urlpatterns = [
                                             queryset=local_url.objects.filter(global_url__id=1).select_related().all(),
                                             context_object_name="object_list",
                                             template_name='ingester/url_list.html',)),
+    url(r'search/$', views.search,name='search'),
 ]

@@ -1,0 +1,58 @@
+
+{% block content %}
+{% load static %}
+    {# Load the tag library #}
+{% load bootstrap3 %}
+{% load pagination_tags %}
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+    <h2>Publications</h2>
+ <form method="get">
+    <div class="well">
+      <h4 style="margin-top: 0">Filter</h4>
+      <div class="row">
+        <div class="form-group col-sm-4 col-md-3">
+            {{ filter.form.as_p }}
+        </div>
+
+        <div class="form-group col-sm-8 col-md-6">
+          {{ filter.form.groups.label_tag }}
+          <div>
+            {% for choice in filter.form.groups %}
+              <label class="checkbox-inline">
+                {{ choice.tag }} {{ choice.choice_label }}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <span class="glyphicon glyphicon-search"></span> Search
+      </button>
+    </div>
+  </form>
+
+
+    <div id= "content-col" class="col-md-5">
+    {% autopaginate filter.qs 10 as filter_list %}
+    {% for url in filter_list %}
+            <div class="panel panel-primary">
+                <div class="panel-heading" >
+                    <span class="publication-date">{{ url.publication.date_published|date:"Y" }}</span>
+                    <span class="publication-title">{{ url.publication.title }}</span>
+                </div>
+                <div class="panel-body">
+                    By{% for author in url.authors.all%} {{ author.main_name }},{% endfor%}<br/>
+                    Published in : <span class="publication-medium">{{ url.medium.main_name}}</span>
+                </div>
+            </div>
+    {% endfor %}
+    </div>
+
+ {% paginate %}
+
+{% endblock %}

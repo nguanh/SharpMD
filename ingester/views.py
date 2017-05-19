@@ -1,9 +1,14 @@
 from __future__ import absolute_import, unicode_literals
-from django.shortcuts import get_object_or_404,render
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
-from .models import Config, publication
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .models import Config, publication, local_url
+from .filters import PublicationFilter
+from search_listview.list import SearchableListView
 import os
 import tailer
+
+
 # Create your views here.
 PROJECT_DIR = os.path.dirname(__file__)
 
@@ -26,5 +31,9 @@ def log(request, config_id):
     })
 
 
-class PublicationList(ListView):
-    model = publication
+def search(request):
+    qs = local_url.objects.filter(global_url__id=1).all()
+    url_filter = PublicationFilter(request.GET, queryset=qs)
+    return render(request, 'ingester/search_list.html', {'filter': url_filter})
+
+
