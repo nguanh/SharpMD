@@ -19,3 +19,4 @@ many-stop-words
 python-Levenshtein
 django-pagination-bootstrap
 django-filter
+django-bootstrap3
