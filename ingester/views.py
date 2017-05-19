@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import Config, local_url
 from .filters import PublicationFilter
 from django.views.generic.detail import DetailView
+from .difference_storage import deserialize_diff_store
 import os
 import tailer
 
@@ -46,4 +47,16 @@ class PublicationDetailView(DetailView):
     model = local_url
     queryset = local_url.objects.filter(global_url__id=1).all()
     template_name = 'ingester/pub_details.html'
+
+    def get_object(self, queryset=None):
+        obj = super(PublicationDetailView,self).get_object(queryset)
+        return obj
+
+    def get_context_data(self, **kwargs):
+        obj = super(PublicationDetailView, self).get_context_data(**kwargs)
+        diff_tree = deserialize_diff_store(obj['object'].publication.differences)
+        obj['diff_tree'] = diff_tree
+        obj['test'] = 'pupsi'
+        return obj
+
 

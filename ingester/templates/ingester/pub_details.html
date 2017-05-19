@@ -28,6 +28,7 @@
           <h4>Abstract</h4>
           {{ object.publication.abstract|default_if_none:" <i>not available </i>"}}
         </p>
+        {{ test }}
         <p id="obj_authors">
             <h4>Authors</h4>
             {% for author in object.authors.all%}
