@@ -1,10 +1,8 @@
 from __future__ import absolute_import, unicode_literals
-from django.shortcuts import get_object_or_404, render,render_to_response
-from django.views.generic import ListView
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import Config, publication, local_url
+from django.shortcuts import get_object_or_404, render
+from .models import Config, local_url
 from .filters import PublicationFilter
-from search_listview.list import SearchableListView
+from django.views.generic.detail import DetailView
 import os
 import tailer
 
@@ -43,4 +41,9 @@ def search(request):
     url_filter = PublicationFilter(request.GET, queryset=qs)
     return render(request, 'ingester/search_list.html', {'filter': url_filter})
 
+
+class PublicationDetailView(DetailView):
+    model = local_url
+    queryset = local_url.objects.filter(global_url__id=1).all()
+    template_name = 'ingester/pub_details.html'
 

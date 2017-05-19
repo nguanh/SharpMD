@@ -28,8 +28,10 @@
     {% for url in filter_list %}
             <div class="panel panel-primary">
                 <div class="panel-heading" >
-                    <span class="publication-date">{{ url.publication.date_published|date:"Y" }}</span>
-                    <span class="publication-title">{{ url.publication.title }}</span>
+                    <a href="{% url 'ingester:publication-detail' url.id %}">
+                        <span class="publication-date">{{ url.publication.date_published|date:"Y" }}</span>
+                        <span class="publication-title">{{ url.publication.title }}</span>
+                    </a>
                 </div>
                 <div class="panel-body">
                     By{% for author in url.authors.all%} {{ author.main_name }},{% endfor%}<br/>
