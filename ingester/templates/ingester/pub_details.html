@@ -44,6 +44,9 @@
         </p>
         <p id="obj_keywords">
             <h4>Keywords</h4>
+            {% for keyword in object.keywords.all %}
+                {{ keyword.main_name }}
+            {% endfor %}
         </p>
         <p id="obj_misc">
             <h4>Miscellaneous</h4>
