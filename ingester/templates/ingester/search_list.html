@@ -1,15 +1,10 @@
 {% extends "ingester/base.html" %}
 {% block main_content %}
 {% load static %}
+{% load staticfiles %}
     {# Load the tag library #}
-{% load bootstrap3 %}
 {% load pagination_tags %}
 {# Load CSS and JavaScript #}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
-
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
 
  <form method="get">
     <div class="well">
