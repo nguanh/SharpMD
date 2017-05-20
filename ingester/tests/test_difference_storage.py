@@ -134,7 +134,10 @@ class TestDifferenceStorage(TransactionTestCase):
 
         result = get_sources(store)
         self.assertEqual(result[0], {
-            "source": "url1/lurl1",
+            "source": {
+                "url": "url1/lurl1",
+                "domain": "domain1",
+            },
             "title": {
                 "value": "Hello World",
                 "votes": 0,
@@ -146,7 +149,10 @@ class TestDifferenceStorage(TransactionTestCase):
         }
         )
         self.assertEqual(result[1], {
-            "source": "url2/lurl2",
+            "source": {
+                "url":"url2/lurl2",
+                "domain": "domain2",
+            },
             "title": {
                 "value": "Hello World2",
                 "votes": 0,
@@ -158,7 +164,10 @@ class TestDifferenceStorage(TransactionTestCase):
         }
         )
         self.assertEqual(result[2], {
-            "source": "url3/lurl3",
+            "source": {
+                "url":"url3/lurl3",
+                "domain": "domain3",
+            },
             "title": {
                 "value": "Hello World3",
                 "votes": 0,

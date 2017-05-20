@@ -210,8 +210,10 @@ def get_sources(store):
         # get local url object
         url_obj = local_url.objects.select_related('global_url').get(id=element)
         source_dict = dict()
-        source_dict["source"] = "{}{}".format(url_obj.global_url.url,
-                                              url_obj.url)
+        source_dict["source"] = {
+            "url":"{}{}".format(url_obj.global_url.url,url_obj.url),
+            "domain": url_obj.global_url.domain
+        }
         sources.append(source_dict)
         obj_list.append(url_obj)
 

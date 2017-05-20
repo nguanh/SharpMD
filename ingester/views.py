@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import Config, local_url
 from .filters import PublicationFilter
 from django.views.generic.detail import DetailView
-from .difference_storage import deserialize_diff_store
+from .difference_storage import deserialize_diff_store, get_sources
 import os
 import tailer
 
@@ -55,8 +55,7 @@ class PublicationDetailView(DetailView):
     def get_context_data(self, **kwargs):
         obj = super(PublicationDetailView, self).get_context_data(**kwargs)
         diff_tree = deserialize_diff_store(obj['object'].publication.differences)
-        obj['diff_tree'] = diff_tree
-        obj['test'] = 'pupsi'
+        obj['sources'] = get_sources(diff_tree)
         return obj
 
 

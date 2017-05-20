@@ -28,7 +28,6 @@
           <h4>Abstract</h4>
           {{ object.publication.abstract|default_if_none:" <i>not available </i>"}}
         </p>
-        {{diff_tree.volume.0.bitvector }}
         <p id="obj_authors">
             <h4>Authors</h4>
             {% for author in object.authors.all%}
@@ -56,10 +55,22 @@
 
 
     <div id="ref_menu" class="tab-pane fade">
-      <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        TODO
     </div>
     <div id="source_menu" class="tab-pane fade">
-      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+       {% for source in sources%}
+            <div>
+                <h3><a href="{{ source.source.url }}">{{ source.source.domain }}</a> </h3>
+                <p class="well">
+                {% for key, values in source.items %}
+                    {% if key != 'source' %}
+                        {{ key }}: {{ values.value }} <br/>
+                    {% endif %}
+
+                {% endfor %}
+                </p>
+            </div>
+        {% endfor %}
     </div>
     <div id="edit_menu" class="tab-pane fade">
       <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
