@@ -172,3 +172,64 @@ def deserialize_diff_store(store):
     :return: diff tree
     """
     return msgpack.unpackb(store, encoding="utf-8")
+
+
+def get_url_indexes(bitvector):
+    """
+    return a list of indexes from the given bitvector
+    :param bitvector: int
+    :return: list of int
+    """
+    return_list = []
+    index = 1
+    counter = 0
+    while index <= bitvector:
+        if index & bitvector:
+            return_list.append(counter)
+        counter += 1
+        index <<= 1
+    return return_list
+
+
+id_list = ["keyword_ids", "author_ids", "pub_source_ids", "type_ids", "study_field_ids"]
+
+
+def get_sources(store):
+    """
+    generate a list of values containing the original sources and their values from a
+    diff tree
+    :param store: deserialized diff tree
+    :return: list of dicts
+    """
+    url_list = store["url_id"]
+    obj_list = []
+    sources = []
+
+    # generate list of dicts first containing only the source url
+    for element in url_list:
+        # get local url object
+        url_obj = local_url.objects.select_related('global_url').get(id=element)
+        source_dict = dict()
+        source_dict["source"] = "{}{}".format(url_obj.global_url.url,
+                                              url_obj.url)
+        sources.append(source_dict)
+        obj_list.append(url_obj)
+
+    # split values and votes up by source
+    for key, value in store.items():
+        if key == "url_id":
+            continue
+        else:
+            # iterate through values per key
+            for entry in value:
+                node_value = entry["value"]
+                nodes_vote = entry["votes"]
+                index_list = get_url_indexes(entry["bitvector"])
+                for index in index_list:
+                    sources[index][key] = {
+                        'votes': nodes_vote,
+                        'value': node_value
+                    }
+    #TODO  resolve ids
+
+    return sources

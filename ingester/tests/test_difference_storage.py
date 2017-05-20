@@ -108,6 +108,68 @@ class TestDifferenceStorage(TransactionTestCase):
         tmp = json.dumps(result)
         self.assertEqual(result, json.loads(tmp))
 
+    def test_url_indexes(self):
+        bitvector = 5 # 101
+        indices = get_url_indexes(bitvector)
+        self.assertEqual(indices, [0,2])
+
+    def test_get_url_1(self):
+        global_url.objects.bulk_create(
+            [
+                global_url(id=111, domain="domain1", url="url1"),
+                global_url(id=112, domain="domain2", url="url2"),
+                global_url(id=113, domain="domain3", url="url3"),
+            ]
+        )
+        local_url.objects.bulk_create([
+            local_url(id=1, global_url_id=111, url="/lurl1"),
+            local_url(id=2, global_url_id=112, url="/lurl2"),
+            local_url(id=3, global_url_id=113, url="/lurl3"),
+        ])
+        store = generate_diff_store(get_pub_dict(url_id=1,title="Hello World",abstract="Common Text"))
+        added_values1 = get_pub_dict(url_id=2,title="Hello World2",abstract="Unique Text")
+        added_values2 = get_pub_dict(url_id=3,title="Hello World3",abstract="Common Text")
+        insert_diff_store(added_values1,store)
+        insert_diff_store(added_values2,store)
+
+        result = get_sources(store)
+        self.assertEqual(result[0], {
+            "source": "url1/lurl1",
+            "title": {
+                "value": "Hello World",
+                "votes": 0,
+            },
+            "abstract": {
+                "value": "Common Text",
+                "votes": 0,
+            }
+        }
+        )
+        self.assertEqual(result[1], {
+            "source": "url2/lurl2",
+            "title": {
+                "value": "Hello World2",
+                "votes": 0,
+            },
+            "abstract": {
+                "value": "Unique Text",
+                "votes": 0,
+            }
+        }
+        )
+        self.assertEqual(result[2], {
+            "source": "url3/lurl3",
+            "title": {
+                "value": "Hello World3",
+                "votes": 0,
+            },
+            "abstract": {
+                "value": "Common Text",
+                "votes": 0,
+            }
+        }
+        )
+
 
 
 

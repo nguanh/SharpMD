@@ -69,6 +69,9 @@ class PubReference(models.Model):
     source = models.ForeignKey(local_url)
     reference = models.ForeignKey(cluster)
 
+    class Meta:
+        unique_together = ('source', 'reference')
+
     def __str__(self):
         return "{}->{}".format(self.source.id,self.reference.id)
 
