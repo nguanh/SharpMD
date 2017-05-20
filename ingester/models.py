@@ -176,6 +176,7 @@ class local_url(models.Model):
     authors = models.ManyToManyField(authors_model, through='publication_author', default=None)
     type = models.ForeignKey(publication_type, default=None, null=True, blank=True)
     study_field = models.ForeignKey(study_field, default=None, null=True, blank=True)
+    keywords = models.ManyToManyField(keywordsModel,through='publication_keyword', default=None)
 
     def test(self):
         medium = None if self.medium is None else self.medium.id

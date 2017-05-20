@@ -14,6 +14,7 @@ urlpatterns = [
                                             queryset=local_url.objects.filter(global_url__id=1).select_related().all(),
                                             context_object_name="object_list",
                                             template_name='ingester/url_list.html',),name='bla'),
-    url(r'search/$', views.search,name='search'),
+    url(r'search/$', views.search, name='search'),
+    url(r'main/$', views.home_view, name='home'),
     url(r'^(?P<pk>[0-9]+)/$', PublicationDetailView.as_view(), name='publication-detail'),
 ]

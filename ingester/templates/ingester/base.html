@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SharpMD</title>
+</head>
+<body>
+{% load static %}
+    {# Load the tag library #}
+{% load bootstrap3 %}
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="{% url 'ingester:home' %}">SharpMD</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="{%  url 'ingester:search' %}">Publications</a></li>
+          <li><a href="#">Authors</a></li>
+        </ul>
+      </div>
+    </nav>
+    {% block main_content %}
+        Empty Page
+    {% endblock %}
+</body>
+</html>

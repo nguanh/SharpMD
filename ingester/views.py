@@ -30,6 +30,10 @@ def log(request, config_id):
     })
 
 
+def home_view(request):
+    return render(request, 'ingester/base.html')
+
+
 def search(request):
     qs = local_url.objects.filter(global_url__id=1).all()
     if 'publication__title' in request.GET:

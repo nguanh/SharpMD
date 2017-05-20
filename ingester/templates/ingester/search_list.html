@@ -1,5 +1,5 @@
-
-{% block content %}
+{% extends "ingester/base.html" %}
+{% block main_content %}
 {% load static %}
     {# Load the tag library #}
 {% load bootstrap3 %}
@@ -10,9 +10,10 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
-    <h2>Publications</h2>
+
  <form method="get">
     <div class="well">
+        <h2>Publications</h2>
             {{ filter.form }}
       <button type="submit" class="btn btn-primary">
         <span class="glyphicon glyphicon-search"></span> Search
