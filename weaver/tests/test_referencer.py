@@ -69,7 +69,7 @@ class TestReferencer(TransactionTestCase):
         self.assertEqual(PubReference.objects.count(), 0)
         self.assertEqual(SingleReference.objects.count(), 6)
         ref.run()
-        self.assertEqual(PubReference.objects.count(), 1)
+        self.assertEqual(PubReference.objects.count(), 2)
         self.assertEqual(SingleReference.objects.count(), 5)
         self.assertEqual(PubReference.objects.get(id=1).test(), [1, 1])
         self.assertEqual(SingleReference.objects.get(id=2).status, 'INC')

@@ -1,5 +1,5 @@
 from django.db import models
-from ingester.models import local_url, cluster
+from ingester.models import local_url
 import msgpack
 # Create your models here.
 STATUS_CHOICES = (
@@ -62,21 +62,6 @@ class PDFDownloadQueue(models.Model):
         return [self.url, self.tries,self.source.id]
 
 
-class PubReference(models.Model):
-    """
-    Table storing, which publication references which reference
-    """
-    source = models.ForeignKey(local_url)
-    reference = models.ForeignKey(cluster)
-
-    class Meta:
-        unique_together = ('source', 'reference')
-
-    def __str__(self):
-        return "{}->{}".format(self.source.id,self.reference.id)
-
-    def test(self):
-        return [self.source.id, self.reference.id]
 
 
 

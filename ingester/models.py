@@ -115,7 +115,7 @@ class study_field(models.Model):
 
 class cluster(models.Model):
     objects = SearchManager(['name'])
-    name= models.TextField()
+    name = models.TextField()
 
 
 class publication(models.Model):
@@ -177,6 +177,7 @@ class local_url(models.Model):
     type = models.ForeignKey(publication_type, default=None, null=True, blank=True)
     study_field = models.ForeignKey(study_field, default=None, null=True, blank=True)
     keywords = models.ManyToManyField(keywordsModel,through='publication_keyword', default=None)
+    references = models.ManyToManyField(cluster,through='PubReference', default=None)
 
     def test(self):
         medium = None if self.medium is None else self.medium.id
@@ -318,6 +319,25 @@ class limbo_authors(models.Model):
 
     def test(self):
         return [self.publication.id, self.reason, self.name, self.priority]
+
+# ===========================================References=======================================================
+
+
+class PubReference(models.Model):
+    """
+    Table storing, which publication references which reference
+    """
+    source = models.ForeignKey(local_url)
+    reference = models.ForeignKey(cluster)
+
+    class Meta:
+        unique_together = ('source', 'reference')
+
+    def __str__(self):
+        return "{}->{}".format(self.source.id, self.reference.id)
+
+    def test(self):
+        return [self.source.id, self.reference.id]
 
 
 def delete_task(sender, instance, using, **kwargs):

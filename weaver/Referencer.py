@@ -1,4 +1,5 @@
-from .models import *
+from .models import SingleReference,OpenReferences
+from ingester.models import PubReference
 from ingester.helper import normalize_title
 from django.db import transaction
 from django.db.models import Q
