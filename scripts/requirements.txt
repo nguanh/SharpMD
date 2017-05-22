@@ -20,3 +20,4 @@ python-Levenshtein
 django-pagination-bootstrap
 django-filter
 django-bootstrap3
+django-jquery

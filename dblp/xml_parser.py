@@ -7,9 +7,11 @@ from harvester.exception import IHarvest_Exception
 from mysqlWrapper.mariadb import MariaDb
 from .helper import parse_mdate, parse_year, dict_to_tuple, parse_title
 from .queries import ADD_DBLP_ARTICLE
-
+from time import time
 COMPLETE_TAG_LIST = ("article", "inproceedings", "proceedings", "book", "incollection",
                      "phdthesis", "mastersthesis", "www", "person", "data")
+
+TRACK_LIMIT = 500
 
 
 def parse_xml(xmlPath, dtdPath, sql_connector, logger,
@@ -38,6 +40,7 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
     # init values
     success_count = 0
     overall_count = 0
+    start_track = time()
     etree.DTD(file=dtdPath)
     sql_connector.set_query(ADD_DBLP_ARTICLE)
     if endDate is None:
@@ -49,6 +52,8 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
     for event, element in etree.iterparse(xmlPath, tag=tagList, load_dtd=True):
         if limit is not None and overall_count >= limit:
             break
+        if overall_count % TRACK_LIMIT == 0:
+            start_track = time()
 
         try:
             dataset = {
@@ -110,6 +115,11 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
         else:
             success_count += 1
             logger.debug("%s: %s", success_count,element.get('key'))
+
+        if overall_count % TRACK_LIMIT == 0:
+            end_track = time()
+            logger.info("TRACK:{}".format(end_track-start_track))
+            start_track = time()
 
         if success_count % 10000 == 0:
             logger.info(success_count)
