@@ -51,6 +51,8 @@ class DblpHarvester(IHarvest):
         """
         if self.connector.createTable(self.table_name, DBLP_ARTICLE):
             self.logger.info("Table %s created", self.table_name)
+            # create temporary index
+            self.connector.execute_ex("CREATE FULLTEXT INDEX title_idx  ON dblp_article (title)", ())
         else:
             self.logger.critical("Table could not be created")
             return False
