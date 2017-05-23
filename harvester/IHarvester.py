@@ -38,7 +38,7 @@ class IHarvest(ABC):
         if self.limit == 0:
             self.limit = None
         # get logger from name
-        self.logger = logging.getLogger(self.name)
+        self.logger = logging.getLogger("ingester.{}".format(self.name))
 
         # connect to database
         try:
