@@ -195,7 +195,7 @@ class TestDifferenceStorage(TransactionTestCase):
                                      pages="1-2")
         insert_diff_store(added_values1, store)
         test = serialize_diff_store(store)
-        print(test)
+
 
 
 

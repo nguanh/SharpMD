@@ -45,7 +45,7 @@
         <p id="obj_keywords">
             <h4>Keywords</h4>
             {% for keyword in object.keywords.all %}
-                {{ keyword.main_name }}
+                {{ keyword.main_name }},
             {% endfor %}
         </p>
         <p id="obj_misc">
@@ -57,7 +57,18 @@
 
 
     <div id="ref_menu" class="tab-pane fade">
-        TODO
+        <h4>References:</h4>
+            <p>
+            {% for ref in references %}
+                <a href="{% url 'ingester:publication-detail'  ref.id %}"> {{ ref.publication.title }}</a>
+            {% endfor %}
+            </p>
+        <h4>Cited By:</h4>
+            <p>
+                {% for cite in cites %}
+                    <a href="{% url 'ingester:publication-detail' cite.id %}">{{ cite.publication.title }}</a>
+                {% endfor %}
+            </p>
     </div>
     <div id="source_menu" class="tab-pane fade">
        {% for source in sources%}

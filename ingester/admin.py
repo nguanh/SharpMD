@@ -56,7 +56,7 @@ def create_test_dataset(modeladmin,requst,queryset):
     # publication
     clus,x = cluster.objects.get_or_create(name="test title")
     # differences
-    store = generate_diff_store(get_pub_dict(url_id=1,
+    store = generate_diff_store(get_pub_dict(url_id=lurl1.id,
                                              title="TeSt TiTlE",
                                              abstract="This text is common among all sources",
                                              volume="33",
@@ -64,7 +64,7 @@ def create_test_dataset(modeladmin,requst,queryset):
                                              doi="http://dblp.uni-trier.de",
                                              note="DBLP NOte",
                                              pages="1-2"))
-    added_values1 = get_pub_dict(url_id=3,
+    added_values1 = get_pub_dict(url_id=lurl2.id,
                                  title="Test title.",
                                  abstract="This text is common among all sources",
                                  note="Arxiv Note",
@@ -81,6 +81,7 @@ def create_test_dataset(modeladmin,requst,queryset):
                                             number="66",
                                             doi="http://dblp.uni-trier.de",
                                             differences=serialized)
+
     pubUrl,x = local_url.objects.get_or_create(global_url=gurl, url="BIMBIMBIM", publication=pub, medium=med)
     # Authors
     aut1,x = authors_model.objects.get_or_create(main_name="Trick Wolf", block_name="trick wolf")
@@ -117,6 +118,33 @@ def create_test_dataset(modeladmin,requst,queryset):
     publication_keyword.objects.get_or_create(url=pubUrl, keyword=key1)
     publication_keyword.objects.get_or_create(url=pubUrl, keyword=key2)
     publication_keyword.objects.get_or_create(url=pubUrl, keyword=key3)
+
+    # references
+    # publication
+    clus2,x = cluster.objects.get_or_create(name="reference title")
+    # differences
+    store2 = generate_diff_store(get_pub_dict(url_id=lurl2.id,
+                                             title="Reference Title",
+                                             abstract="Reference Abstract",
+                                             volume="33",
+                                             number="66",
+                                             doi="http://dblp.uni-trier.de",
+                                             note="DBLP NOte",
+                                             pages="1-2"))
+    serialized2 = serialize_diff_store(store2)
+    pub2,x = publication.objects.get_or_create(cluster=clus2,
+                                            title="Reference Title",
+                                            pages="1-2",
+                                            note="Ref Note",
+                                            abstract="Reference Abstract",
+                                            date_published=date(1990,4,17),
+                                            volume="33",
+                                            number="66",
+                                            doi="http://dblp.uni-trier.de",
+                                            differences=serialized2)
+    pubUrl2, x = local_url.objects.get_or_create(global_url=gurl, url="Reference1", publication=pub2, medium=med)
+
+    PubReference.objects.get_or_create(source=pubUrl, reference=clus2)
 
 
 
