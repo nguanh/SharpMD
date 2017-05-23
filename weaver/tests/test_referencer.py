@@ -1,4 +1,5 @@
 from django.test import TransactionTestCase
+
 from weaver.models import *
 from ingester.models import *
 from weaver.Referencer import Referencer
@@ -70,13 +71,13 @@ class TestReferencer(TransactionTestCase):
         self.assertEqual(SingleReference.objects.count(), 6)
         ref.run()
         self.assertEqual(PubReference.objects.count(), 2)
-        self.assertEqual(SingleReference.objects.count(), 5)
+        self.assertEqual(SingleReference.objects.count(), 4)
         self.assertEqual(PubReference.objects.get(id=1).test(), [1, 1])
-        self.assertEqual(SingleReference.objects.get(id=2).status, 'INC')
-        self.assertEqual(SingleReference.objects.get(id=2).tries, 1)
+        self.assertEqual(PubReference.objects.get(id=2).test(), [2, 2])
 
     def test_limbo(self):
         self.single21.tries = 4
+        self.single21.title="jdlkjahflkjdh"
         self.single21.save()
 
         ref = Referencer(limit=2)
@@ -133,6 +134,8 @@ class TestReferencer(TransactionTestCase):
         self.assertEqual(SingleReference.objects.count(), 6)
 
     def test_multiple_execution(self):
+        self.single21.title="jdlkjahflkjdh"
+        self.single21.save()
         ref = Referencer(limit=2)
         ref.run()
 
@@ -140,6 +143,17 @@ class TestReferencer(TransactionTestCase):
         self.assertEqual(PubReference.objects.count(),2)
         self.assertEqual(PubReference.objects.get(id=1).test(), [1, 1])
         self.assertEqual(PubReference.objects.get(id=2).test(), [3, 3])
+
+
+    def test_regression(self):
+        # duplicate pub reference
+        PubReference.objects.create(id=1, source=self.url1, reference=self.cluster1)
+        ref = Referencer(limit=2)
+        self.assertEqual(PubReference.objects.count(), 1)
+        self.assertEqual(SingleReference.objects.count(), 6)
+        ref.run()
+        self.assertEqual(PubReference.objects.count(), 2)
+        self.assertEqual(SingleReference.objects.count(), 4)
 
 
 

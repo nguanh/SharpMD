@@ -5,7 +5,7 @@ from django.db import transaction
 from django.db.models import Q
 from datetime import date
 import logging
-
+from django.db.utils import IntegrityError
 from ingester.matching_functions import search_title
 
 LIMBO_LIMIT = 5
@@ -50,7 +50,16 @@ class Referencer:
                             single_ref.status = 'FIN'
                             reference_list.append(PubReference(reference=title, source=open_ref.ingester_key))
                 single_ref.save()
-        PubReference.objects.bulk_create(reference_list)
+        try:
+            PubReference.objects.bulk_create(reference_list)
+        except IntegrityError:
+            # duplicate key on insert, insert everything manually
+            for element in reference_list:
+                print("Rollback")
+                PubReference.objects.get_or_create(reference =element.reference, source=element.source)
+
+
+
         SingleReference.objects.filter(status='FIN').delete()
 
 
