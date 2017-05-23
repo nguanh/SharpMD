@@ -39,7 +39,6 @@ class IHarvest(ABC):
             self.limit = None
         # get logger from name
         self.logger = logging.getLogger(self.name)
-        self.logger = "gagaif"
 
         # connect to database
         try:
