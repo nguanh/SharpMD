@@ -3,6 +3,7 @@ from .queries import DBLP_ARTICLE
 from harvester.exception import IHarvest_Exception
 from .xml_parser import parse_xml
 from fileDownloader.fileDownloader import download_file
+from pymysql.err import InternalError
 import urllib.parse
 import subprocess
 import os
@@ -52,7 +53,10 @@ class DblpHarvester(IHarvest):
         if self.connector.createTable(self.table_name, DBLP_ARTICLE):
             self.logger.info("Table %s created", self.table_name)
             # create temporary index
-            self.connector.execute_ex("CREATE FULLTEXT INDEX title_idx  ON dblp_article (title)", ())
+            try:
+                self.connector.execute_ex("CREATE FULLTEXT INDEX title_idx  ON dblp_article (title)", ())
+            except:
+                self.logger.info("Index already exists")
         else:
             self.logger.critical("Table could not be created")
             return False
