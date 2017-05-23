@@ -31,7 +31,7 @@ def harvest_task(package, class_name, config_id):
     if not logger.handlers:
         log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
         log_name = config.name.strip().replace(" ", "_")
-        log_file = os.path.join(log_dir, "ingester.{}.log").format(log_name)
+        log_file = os.path.join(log_dir, "harvester.{}.log").format(log_name)
         logger.setLevel(logging.INFO)
         # create the logging file handler
         fh = logging.FileHandler(log_file)
