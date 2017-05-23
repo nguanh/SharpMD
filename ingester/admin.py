@@ -1,13 +1,13 @@
 from django.contrib import admin
-from .models import Config
+from .models import *
 from django import forms
-
+from .difference_storage import *
+from ingester.tests.ingester_tools import get_pub_dict
 from django_admin_row_actions import AdminRowActionsMixin
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from .ingest_task import ingest_task
-
-
+from datetime import  date
 
 
 class ConfigForm(forms.ModelForm):
@@ -40,6 +40,87 @@ def test(modeladmin, request, queryset):
         ingest_task(config.module_path,config.module_name,config.id)
     test.short_description = 'test'
 
+
+def create_test_dataset(modeladmin,requst,queryset):
+    # Medium
+    med,x = pub_medium.objects.get_or_create(main_name="Important Journal",
+                                           block_name= "important journal",
+                                           journal="Important Journal")
+
+    gurl = global_url.objects.get(id=1)
+    gurl1,x = global_url.objects.get_or_create(domain="DBLP", url="http:golem.de")
+    gurl2,x = global_url.objects.get_or_create(domain="Arxiv", url="google.de")
+    lurl1,x = local_url.objects.get_or_create(global_url=gurl1, url="test1", medium=med)
+    lurl2,x = local_url.objects.get_or_create(global_url=gurl2, url="test1")
+
+    # publication
+    clus,x = cluster.objects.get_or_create(name="test title")
+    # differences
+    store = generate_diff_store(get_pub_dict(url_id=1,
+                                             title="TeSt TiTlE",
+                                             abstract="This text is common among all sources",
+                                             volume="33",
+                                             number="66",
+                                             doi="http://dblp.uni-trier.de",
+                                             note="DBLP NOte",
+                                             pages="1-2"))
+    added_values1 = get_pub_dict(url_id=3,
+                                 title="Test title.",
+                                 abstract="This text is common among all sources",
+                                 note="Arxiv Note",
+                                 pages="1-2")
+    insert_diff_store(added_values1, store)
+    serialized = serialize_diff_store(store)
+    pub,x = publication.objects.get_or_create(cluster=clus,
+                                            title="TeSt TiTlE",
+                                            pages="1-2",
+                                            note="DBLP Note",
+                                            abstract="This text is common among all sources",
+                                            date_published=date(1990,4,17),
+                                            volume="33",
+                                            number="66",
+                                            doi="http://dblp.uni-trier.de",
+                                            differences=serialized)
+    pubUrl,x = local_url.objects.get_or_create(global_url=gurl, url="BIMBIMBIM", publication=pub, medium=med)
+    # Authors
+    aut1,x = authors_model.objects.get_or_create(main_name="Trick Wolf", block_name="trick wolf")
+    aut2,x = authors_model.objects.get_or_create(main_name="Track Wolf", block_name="track wolf")
+    aut3,x = authors_model.objects.get_or_create(main_name="Truck Wolf", block_name="truck wolf")
+
+    alias1,x = author_aliases.objects.get_or_create(alias="Trick Wolf",author=aut1)
+    alias2,x = author_aliases.objects.get_or_create(alias="Track Wolf", author=aut2)
+    alias3,x = author_aliases.objects.get_or_create(alias="TRACK Wolf", author=aut2)
+    alias4,x = author_aliases.objects.get_or_create(alias="Truck Wolf", author=aut3)
+
+    author_alias_source.objects.get_or_create(alias=alias1, url=lurl1)
+    author_alias_source.objects.get_or_create(alias=alias2, url=lurl1)
+    author_alias_source.objects.get_or_create(alias=alias3, url=lurl2)
+    author_alias_source.objects.get_or_create(alias=alias4, url=lurl2)
+
+    publication_author.objects.get_or_create(url=lurl1, author=aut1, priority=1)
+    publication_author.objects.get_or_create(url=lurl1, author=aut2, priority=0)
+    publication_author.objects.get_or_create(url=lurl2, author=aut2, priority=0)
+    publication_author.objects.get_or_create(url=lurl2, author=aut3, priority=1)
+
+    publication_author.objects.get_or_create(url=pubUrl, author=aut1, priority=1)
+    publication_author.objects.get_or_create(url=pubUrl, author=aut2, priority=0)
+    publication_author.objects.get_or_create(url=pubUrl, author=aut3, priority=2)
+
+
+    # Keywords
+    key1,x = keywordsModel.objects.get_or_create(main_name="Key1", block_name="key1")
+    key2, x = keywordsModel.objects.get_or_create(main_name="Key2", block_name="key2")
+    key3, x = keywordsModel.objects.get_or_create(main_name="Key3", block_name="key3")
+    publication_keyword.objects.get_or_create(url=lurl1, keyword=key1)
+    publication_keyword.objects.get_or_create(url=lurl1, keyword=key2)
+    publication_keyword.objects.get_or_create(url=lurl1, keyword=key3)
+    publication_keyword.objects.get_or_create(url=pubUrl, keyword=key1)
+    publication_keyword.objects.get_or_create(url=pubUrl, keyword=key2)
+    publication_keyword.objects.get_or_create(url=pubUrl, keyword=key3)
+
+
+
+
 class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
     form = ConfigForm
     model = Config
@@ -68,7 +149,7 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
         }),
     )
 
-    actions = [test]
+    actions = [test,create_test_dataset]
 
 
 

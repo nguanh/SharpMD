@@ -179,6 +179,23 @@ class TestDifferenceStorage(TransactionTestCase):
         }
         )
 
+    def test_regression(self):
+        store = generate_diff_store(get_pub_dict(url_id=1,
+                                                 title="ThIs Is An ExEmPlArY PuBlIcAtIoN",
+                                                 abstract="This text is common among all sources",
+                                                 volume="33",
+                                                 number=66,
+                                                 doi="http://dblp.uni-trier.de",
+                                                 note="DBLP NOte",
+                                                 pages="1-2"))
+        added_values1 = get_pub_dict(url_id=3,
+                                     title="This is an Exemplary Publication",
+                                     abstract="This text is common among all sources",
+                                     note="Arxiv Note",
+                                     pages="1-2")
+        insert_diff_store(added_values1, store)
+        test = serialize_diff_store(store)
+        print(test)
 
 
 
