@@ -27,7 +27,7 @@ def harvest_task(package, class_name, config_id):
 
     name = config.name
     # init logger and prevent duplicates
-    logger = get_task_logger(name)
+    logger = logging.getLogger(name)
     if not logger.handlers:
         log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
         log_name = config.name.strip().replace(" ", "_")
@@ -39,6 +39,7 @@ def harvest_task(package, class_name, config_id):
         fh.setFormatter(formatter)
         # add handler to logger object
         logger.addHandler(fh)
+    logger.error("Hello world!")
     try:
         # add path to system
         file_path = os.path.realpath(__file__)

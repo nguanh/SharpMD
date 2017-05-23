@@ -39,10 +39,7 @@ class IHarvest(ABC):
             self.limit = None
         # get logger from name
         self.logger = logging.getLogger(self.name)
-        if self.logger.handlers:
-            print("logging active!")
-        else:
-            print("NOO logging")
+        self.logger = "gagaif"
 
         # connect to database
         try:
