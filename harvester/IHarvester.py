@@ -38,7 +38,7 @@ class IHarvest(ABC):
         if self.limit == 0:
             self.limit = None
         # get logger from name
-        self.logger = logging.getLogger("harvester.{}".format(self.name))
+        self.logger = logging.getLogger(self.name)
         if self.logger.handlers:
             print("logging active!")
         else:
