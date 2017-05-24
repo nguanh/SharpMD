@@ -52,8 +52,6 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
     for event, element in etree.iterparse(xmlPath, tag=tagList, load_dtd=True):
         if limit is not None and overall_count >= limit:
             break
-        if overall_count % TRACK_LIMIT == 0:
-            start_track = time()
 
         try:
             dataset = {

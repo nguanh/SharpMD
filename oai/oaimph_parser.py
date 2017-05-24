@@ -7,12 +7,9 @@ from harvester.exception import IHarvest_Exception
 from mysqlWrapper.mariadb import MariaDb
 from .helper import parse_metadata_default
 from .queries import ADD_OAI_DEFAULT
+from time import time
 
-'''
-TODO
-resumption token in case of emergency stop
-
-'''
+TRACK_LIMIT = 500
 
 
 def harvestOAI(link, sql_connector, logger,
@@ -29,6 +26,7 @@ def harvestOAI(link, sql_connector, logger,
     sql_connector.set_query(query)
     success_count = 0
     overall_count = 0
+    start_track = time()
     # init connection to OAI provider
     sickle = Sickle(link)
     # set record parser
@@ -58,8 +56,14 @@ def harvestOAI(link, sql_connector, logger,
             # header = record.header
             # metadata is a dict
             overall_count += 1
+
+            if overall_count % TRACK_LIMIT == 0:
+                end_track = time()
+                logger.info("TRACK:{}".format(end_track - start_track))
+                start_track = time()
             metadata = record.metadata
             identifier = record.header.identifier
+
             if not metadata:
                 logger.error("Skipping deleted record")
                 continue
