@@ -1,6 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 from django.shortcuts import get_object_or_404, render
-from .models import Config, local_url, PubReference
+from .models import Config, local_url, PubReference,publication_author, authors_model
 from .filters import PublicationFilter
 from django.views.generic.detail import DetailView
 from .difference_storage import deserialize_diff_store, get_sources
@@ -58,9 +58,13 @@ class PublicationDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         obj = super(PublicationDetailView, self).get_context_data(**kwargs)
-        #deserialize diff tree and split into sources
+        # deserialize diff tree and split into sources
         diff_tree = deserialize_diff_store(obj['object'].publication.differences)
         obj['sources'] = get_sources(diff_tree)
+        # resolve author ids into authors
+        for element in obj['sources']:
+            element['authors'] = authors_model.objects.filter(id__in=element['author_values']).all()
+            del element['author_values']
         # references
         references =[x.reference.id for x in PubReference.objects.select_related('reference').filter(source=obj['local_url']).all()]
         ref_url_list = local_url.objects.filter(publication__cluster_id__in= references).all()
@@ -69,6 +73,7 @@ class PublicationDetailView(DetailView):
         cluster = obj['local_url'].publication.cluster
         cited = [x.source for x in PubReference.objects.select_related('source').filter(reference=cluster).all()]
         obj['cites'] = cited
+
         return obj
 
 

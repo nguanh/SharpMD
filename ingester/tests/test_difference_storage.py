@@ -126,9 +126,16 @@ class TestDifferenceStorage(TransactionTestCase):
             local_url(id=2, global_url_id=112, url="/lurl2"),
             local_url(id=3, global_url_id=113, url="/lurl3"),
         ])
+
         store = generate_diff_store(get_pub_dict(url_id=1,title="Hello World",abstract="Common Text"))
         added_values1 = get_pub_dict(url_id=2,title="Hello World2",abstract="Unique Text")
         added_values2 = get_pub_dict(url_id=3,title="Hello World3",abstract="Common Text")
+        # add authors
+        store['author_ids'] = [
+            {'bitvector': 3, 'value': 4, 'votes': 0},
+            {'bitvector': 3, 'value': 5, 'votes': 0},
+            {'bitvector': 5, 'value': 6, 'votes': 0}
+        ]
         insert_diff_store(added_values1,store)
         insert_diff_store(added_values2,store)
 
@@ -145,7 +152,9 @@ class TestDifferenceStorage(TransactionTestCase):
             "abstract": {
                 "value": "Common Text",
                 "votes": 0,
-            }
+            },
+            'author_values': [4, 5, 6],
+            'author_votes': [0, 0, 0],
         }
         )
         self.assertEqual(result[1], {
@@ -160,7 +169,9 @@ class TestDifferenceStorage(TransactionTestCase):
             "abstract": {
                 "value": "Unique Text",
                 "votes": 0,
-            }
+            },
+            'author_values': [4, 5],
+            'author_votes': [0, 0],
         }
         )
         self.assertEqual(result[2], {
@@ -175,7 +186,9 @@ class TestDifferenceStorage(TransactionTestCase):
             "abstract": {
                 "value": "Common Text",
                 "votes": 0,
-            }
+            },
+            'author_values': [6],
+            'author_votes': [0],
         }
         )
 

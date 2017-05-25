@@ -205,6 +205,7 @@ def get_sources(store):
     obj_list = []
     sources = []
 
+
     # generate list of dicts first containing only the source url
     for element in url_list:
         # get local url object
@@ -212,15 +213,27 @@ def get_sources(store):
         source_dict = dict()
         source_dict["source"] = {
             "url":"{}{}".format(url_obj.global_url.url,url_obj.url),
-            "domain": url_obj.global_url.domain
+            "domain": url_obj.global_url.domain,
         }
+        source_dict['author_values'] = []
+        source_dict['author_votes'] = []
         sources.append(source_dict)
         obj_list.append(url_obj)
+
+    author_list = [ element['value'] for element in store['author_ids']]
 
     # split values and votes up by source
     for key, value in store.items():
         if key == "url_id":
             continue
+        if key == 'author_ids':
+            for entry in value:
+                node_value = entry["value"]
+                nodes_vote = entry["votes"]
+                index_list = get_url_indexes(entry["bitvector"])
+                for index in index_list:
+                    sources[index]['author_values'].append(node_value)
+                    sources[index]['author_votes'].append(nodes_vote)
         else:
             # iterate through values per key
             for entry in value:
@@ -233,9 +246,6 @@ def get_sources(store):
                         'value': node_value
                     }
     #TODO  resolve ids
-
-    #sources['authors'] = authors_model.objects.filter(id__in=sources['author_ids']).all()
-    #del sources['author_ids']
 
 
     return sources

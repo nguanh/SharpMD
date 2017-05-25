@@ -76,7 +76,11 @@
                 <h3><a href="{{ source.source.url }}">{{ source.source.domain }}</a> </h3>
                 <p class="well">
                 {% for key, values in source.items %}
-                    {% if key != 'source' %}
+                    {% if key == 'authors'%}
+                        {{ key }}:  {% for author in values%}
+                                        {{ author.main_name }},
+                                    {% endfor %} <br/>
+                    {% elif key != 'source' %}
                         {{ key }}: {{ values.value }} <br/>
                     {% endif %}
 
