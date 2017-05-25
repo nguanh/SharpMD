@@ -18,8 +18,12 @@ def display(path):
             #plot_data =plot_data.append(pandas.Series([time_cost]), ignore_index=True)
 
             # get seconds
-    plot_data = pandas.Series(time_list, index=range(0,len(time_list)*500,500))
-    plot_data = plot_data.astype('float')
+    plot_data = pandas.Series(time_list, index=range(0, len(time_list) * 500, 500))
+    #sorted view
+    # plot_data = pandas.Series(sorted(time_list,key=float), index=range(0,len(time_list)*500,500))
+
+
+
     axis =plot_data.plot()
     axis.set_ylim(0,32)
     print(plot_data)
