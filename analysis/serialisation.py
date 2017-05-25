@@ -1,4 +1,4 @@
-from backend.ingester.difference_storage import *
+from ingester.difference_storage import *
 import datetime
 import pickle
 import msgpack
