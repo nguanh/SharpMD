@@ -15,11 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url,include
 from django.contrib import admin
+from ingester.views import home_view,search
 
 urlpatterns = [
     url(r'^admin/harvester/', include('harvester.urls')),  # harvester admin
     url(r'^admin/ingester/', include('ingester.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^silk/', include('silk.urls', namespace='silk'))
+    url(r'^silk/', include('silk.urls', namespace='silk')),
+
+    url(r'', home_view, name='home'),
+    url(r'search/$', search, name='search'),
 
 ]

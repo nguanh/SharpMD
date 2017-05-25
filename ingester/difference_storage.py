@@ -234,4 +234,8 @@ def get_sources(store):
                     }
     #TODO  resolve ids
 
+    #sources['authors'] = authors_model.objects.filter(id__in=sources['author_ids']).all()
+    #del sources['author_ids']
+
+
     return sources
