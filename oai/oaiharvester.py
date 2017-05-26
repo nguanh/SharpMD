@@ -14,6 +14,10 @@ class OaiHarvester(IHarvest):
         # create database if not available
         if self.connector.createTable(self.table_name, OAI_DATASET):
             self.logger.info("Table %s created", self.table_name)
+            try:
+                self.connector.execute_ex("CREATE FULLTEXT INDEX title_idx  ON oaipmh_articles (title)", ())
+            except:
+                self.logger.info("Index already exists")
             return True
         else:
             self.logger.critical("Table could not be created")
