@@ -1,0 +1,1 @@
+SELECT harvester.dblp_article.dblp_key,harvester.arxiv_articles.identifier FROM harvester.dblp_article,harvester.arxiv_articles WHERE harvester.dblp_article.title = harvester.arxiv_articles.title;
