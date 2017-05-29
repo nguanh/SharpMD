@@ -89,7 +89,7 @@ def setup():
     connector.createTable("Normal Titles", NORMAL_TITLES.format(storage_engine))
     # create index
     try:
-        connector.execute_ex("CREATE FULLTEXT INDEX title_idx  ON normal_title (title)", ())
+        connector.execute_ex("CREATE FULLTEXT INDEX title_idx  ON normal_title (titles)", ())
     except:
         print("Index already exists")
 
