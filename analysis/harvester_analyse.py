@@ -9,7 +9,7 @@ import os
 local_path = os.path.dirname(os.path.abspath(__file__))
 #=========================================== TABLE NAME ===============================================================
 #DB_NAME = "dblp_analyse"
-DB_NAME = "arxiv_analyse"
+DB_NAME = "citeseerx_analyse"
 #=========================================== ANALYSE TABLES ===========================================================
 DATE_TABLE = ("CREATE TABLE `mdates` ("
     "  `mdate` date NOT NULL,"
@@ -105,6 +105,16 @@ def dblp_mapping(query_tuple):
         "author": split_authors(query_tuple[3]),
     }
 
+def oai_mapping(query_tuple):
+    dates = query_tuple[2]
+    return {
+        "pub":  datetime.datetime.strptime(dates[-1],"%Y-%m-%d")
+        "mdate": datetime.datetime.strptime(dates[0],"%Y-%m-%d"),
+        "normal": normalize_title(query_tuple[0]),
+        "author": split_authors(query_tuple[1]),
+    }
+
+
 def set_mdate(connector,mdate):
     connector.execute(("INSERT INTO `mdates`(mdate,counter) VALUES(%s,1)"
                        "ON DUPLICATE KEY UPDATE counter= counter+1"), (mdate,))
@@ -167,9 +177,10 @@ def run_db():
     with read_connector.cursor() as cursor:
         with write_connector.cursor() as wcursor:
             #cursor.execute(DBLP_QUERY, ())
-            cursor.execute(ARXIV_QUERY, ())
+            cursor.execute(OAI_QUERY, ())
             for query_dataset in cursor:
-                mapping = dblp_mapping(query_dataset)
+                #mapping = dblp_mapping(query_dataset)
+                mapping = oai_mapping(query_dataset)
                 set_pubyear(wcursor, mapping["pub"])
                 set_mdate(wcursor, mapping["mdate"])
                 set_title(wcursor, mapping["normal"])
