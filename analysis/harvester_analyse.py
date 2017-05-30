@@ -8,7 +8,8 @@ import datetime
 import os
 local_path = os.path.dirname(os.path.abspath(__file__))
 #=========================================== TABLE NAME ===============================================================
-DB_NAME = "dblp_analyse"
+#DB_NAME = "dblp_analyse"
+DB_NAME = "arxiv_analyse"
 #=========================================== ANALYSE TABLES ===========================================================
 DATE_TABLE = ("CREATE TABLE `mdates` ("
     "  `mdate` date NOT NULL,"
@@ -165,7 +166,8 @@ def run_db():
     count = 0
     with read_connector.cursor() as cursor:
         with write_connector.cursor() as wcursor:
-            cursor.execute(DBLP_QUERY, ())
+            #cursor.execute(DBLP_QUERY, ())
+            cursor.execute(ARXIV_QUERY, ())
             for query_dataset in cursor:
                 mapping = dblp_mapping(query_dataset)
                 set_pubyear(wcursor, mapping["pub"])
