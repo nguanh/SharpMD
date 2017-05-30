@@ -65,7 +65,7 @@ NORMAL_TITLES =("CREATE TABLE `normal_title` ("
 DBLP_QUERY = ("SELECT mdate,title,pub_year,author FROM harvester.dblp_article")
 ARXIV_QUERY = ("SELECT mdate,title,created,author FROM harvester.arxiv_articles")
 #TODO
-OAI_QUERY = ("SELECT title,author,dates FROM harvester.arxiv_articles")
+OAI_QUERY = ("SELECT title,author,dates FROM backup.citeseerx")
 
 
 
