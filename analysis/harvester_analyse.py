@@ -108,7 +108,7 @@ def dblp_mapping(query_tuple):
 def oai_mapping(query_tuple):
     dates = query_tuple[2]
     return {
-        "pub":  datetime.datetime.strptime(dates[-1],"%Y-%m-%d")
+        "pub":  datetime.datetime.strptime(dates[-1],"%Y-%m-%d"),
         "mdate": datetime.datetime.strptime(dates[0],"%Y-%m-%d"),
         "normal": normalize_title(query_tuple[0]),
         "author": split_authors(query_tuple[1]),
