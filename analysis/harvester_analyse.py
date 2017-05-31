@@ -65,8 +65,8 @@ NORMAL_TITLES =("CREATE TABLE `normal_title` ("
 DBLP_QUERY = ("SELECT mdate,title,pub_year,author FROM harvester.dblp_article")
 ARXIV_QUERY = ("SELECT mdate,title,created,author FROM harvester.arxiv_articles")
 #TODO
-OAI_QUERY = ("SELECT title,author,dates FROM backup.citeseerx")
-
+#OAI_QUERY = ("SELECT title,author,dates FROM backup.citeseerx")
+OAI_QUERY = ("SELECT title,author,dates FROM harvester.oaipmh_articles")
 
 
 def setup():
@@ -106,9 +106,20 @@ def dblp_mapping(query_tuple):
     }
 
 def oai_mapping(query_tuple):
-    dates = query_tuple[2]
+    dates = query_tuple[2].split(";")
+    del dates [-1]
+
+    try:
+        publication_date = datetime.datetime.strptime(dates[-1],"%Y")
+    except ValueError:
+        try:
+            publication_date = datetime.datetime.strptime(dates[-1], "%Y-%m-%d")
+        except ValueError:
+            print(dates)
+            raise Exception()
+
     return {
-        "pub":  datetime.datetime.strptime(dates[-1],"%Y-%m-%d"),
+        "pub":  publication_date,
         "mdate": datetime.datetime.strptime(dates[0],"%Y-%m-%d"),
         "normal": normalize_title(query_tuple[0]),
         "author": split_authors(query_tuple[1]),
@@ -182,8 +193,7 @@ def run_db():
                 #mapping = dblp_mapping(query_dataset)
                 try:
                     mapping = oai_mapping(query_dataset)
-                except ValueError as e:
-                    print(e)
+                except Exception:
                     continue
                 set_pubyear(wcursor, mapping["pub"])
                 set_mdate(wcursor, mapping["mdate"])
