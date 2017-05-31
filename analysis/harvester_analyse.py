@@ -180,7 +180,11 @@ def run_db():
             cursor.execute(OAI_QUERY, ())
             for query_dataset in cursor:
                 #mapping = dblp_mapping(query_dataset)
-                mapping = oai_mapping(query_dataset)
+                try:
+                    mapping = oai_mapping(query_dataset)
+                except ValueError as e:
+                    print(e)
+                    continue
                 set_pubyear(wcursor, mapping["pub"])
                 set_mdate(wcursor, mapping["mdate"])
                 set_title(wcursor, mapping["normal"])
