@@ -176,7 +176,7 @@ def run_db():
     read_connector = pymysql.connect(user="root",
                                      password="master",
                                      host="localhost",
-                                     database="harvester",
+                                     database="backup",
                                      charset="utf8mb4")
     write_connector = pymysql.connect(user="root",
                                      password="master",
