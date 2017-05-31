@@ -186,19 +186,18 @@ def run_db():
     count = 0
     print("starting")
     with read_connector.cursor() as cursor:
-        print("read")
         with write_connector.cursor() as wcursor:
-            print("write")
             #cursor.execute(DBLP_QUERY, ())
             cursor.execute(OAI_QUERY, ())
             for query_dataset in cursor:
                 #mapping = dblp_mapping(query_dataset)
                 try:
                     mapping = oai_mapping(query_dataset)
+                    print("mapping")
                 except Exception:
                     print("hkj")
                     continue
-
+                print("Done")
                 set_pubyear(wcursor, mapping["pub"])
                 set_mdate(wcursor, mapping["mdate"])
                 set_title(wcursor, mapping["normal"])
