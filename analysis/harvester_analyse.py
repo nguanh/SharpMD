@@ -194,11 +194,13 @@ def run_db():
                     mapping = oai_mapping(query_dataset)
                 except Exception:
                     continue
+
                 set_pubyear(wcursor, mapping["pub"])
                 set_mdate(wcursor, mapping["mdate"])
                 set_title(wcursor, mapping["normal"])
                 set_authors(wcursor, mapping["author"])
                 write_connector.commit()
+                print("test")
                 count += 1
                 if count % 10000 == 0:
                     print(count)
