@@ -64,7 +64,7 @@ NORMAL_TITLES =("CREATE TABLE `normal_title` ("
 # ================================================= HARVESTER SELECTION QUERIES ========================================
 DBLP_QUERY = ("SELECT mdate,title,pub_year,author FROM harvester.dblp_article")
 ARXIV_QUERY = ("SELECT mdate,title,created,author FROM harvester.arxiv_articles")
-OAI_QUERY = ("SELECT title,author,dates FROM backup.citeseerx")
+OAI_QUERY = ("SELECT title,author,dates FROM harvester.oaipmh_articles")
 #OAI_QUERY = ("SELECT title,author,dates FROM harvester.oaipmh_articles")
 
 
@@ -176,7 +176,7 @@ def run_db():
     read_connector = pymysql.connect(user="root",
                                      password="master",
                                      host="localhost",
-                                     database="backup",
+                                     database="harvester",
                                      charset="utf8mb4")
     write_connector = pymysql.connect(user="root",
                                      password="master",
