@@ -93,11 +93,15 @@
         {% for attribute, values in value_view.items %}
             <p>
                 <h4>{{ attribute }}</h4>
-                <form action="{% url 'ingester:vote' object.id attribute %}" method="post">
+                <form  class="form-horizontal" action="{% url 'ingester:vote' object.id attribute %}" method="post">
                 {% csrf_token %}
                 {% for inner_key, inner_value in values.items %}
-                    <label for="choice{{ inner_key}}">{{ inner_key }}:{{ inner_value }}</label><br />
-                    <input type="radio" name="choice" id="choice{{ inner_key }}" value="{{ inner_key }}" />
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="choice{{ inner_key}}">{{ inner_key }}:{{ inner_value }}</label>
+                        <div class="col-sm-10">
+                            <input type="radio" name="choice" id="choice{{ inner_key }}" value="{{ inner_key }}" />
+                        </div>
+                    </div>
                 {% endfor %}
                 <input type="submit" value="Vote" />
                 </form>

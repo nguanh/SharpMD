@@ -259,7 +259,7 @@ class TestDifferenceStorage(TransactionTestCase):
 
             result = upvote(store, "title", "Hello World2", 5)
             title = store['title']
-            self.assertEqual(title[1]['votes'], 5)
+            self.assertEqual(title[0]['votes'], 5)
 
 
 

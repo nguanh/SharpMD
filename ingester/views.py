@@ -68,9 +68,10 @@ class PublicationDetailView(DetailView):
             element['authors'] = authors_model.objects.filter(id__in=element['author_values']).all()
             del element['author_values']
         # resolve medium id
-            element['medium'] = {'value': pub_medium.objects.get(id=element['pub_source_ids']['value']).main_name,
-                                 'votes': element['pub_source_ids']['votes']
-                                 }
+            if 'pub_source_ids' in element:
+                element['medium'] = {'value': pub_medium.objects.get(id=element['pub_source_ids']['value']).main_name,
+                                    'votes': element['pub_source_ids']['votes']
+                                    }
         # TODO resolve keywords
         # ============================REFERENCE VIEW ==================================================================
         references =[x.reference.id for x in PubReference.objects.select_related('reference').filter(source=obj['local_url']).all()]
@@ -94,7 +95,9 @@ def vote(request, object_id,attribute):
     upvote(diff_tree, attribute, request.POST['choice'])
     # get new default values
     new_defaults = get_default_values(diff_tree)
-    new_defaults['date_published']=datetime.date(new_defaults["date_published"], 1, 1)
+    print(new_defaults)
+    if 'date_published' in new_defaults and  new_defaults['date_published'] is not None:
+        new_defaults['date_published'] = datetime.date(new_defaults["date_published"], 1, 1)
     new_defaults['differences'] = serialize_diff_store(diff_tree)
 
     for key, value in new_defaults.items():

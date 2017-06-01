@@ -258,7 +258,7 @@ def get_value_list(store):
     for key, value in store.items():
         if key == "url_id":
             continue
-        if key == 'author_ids' or key =='keyword_ids':
+        if key == 'author_ids' or key == 'keyword_ids' or key == 'type_ids' or key == 'pub_source_ids':
             continue
         inner_dict = {}
         for entry in value:
@@ -273,11 +273,12 @@ def get_value_list(store):
 
 
 def upvote(store, attribute, voted_value, votes=1):
+    attr_list = store[attribute]
+    for index,entry in enumerate(attr_list):
+        if entry['value'] == voted_value:
+            entry['votes'] += votes
+        if entry['votes'] > store[attribute][0]['votes']:
+            attr_list[0], attr_list[index] = attr_list[index], attr_list[0]
 
-    for key,value in store.items():
-        if key == attribute:
-            for entry in value:
-                if entry['value'] == voted_value:
-                    entry['votes'] += votes
 
     return store
