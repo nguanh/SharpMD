@@ -192,22 +192,78 @@ class TestDifferenceStorage(TransactionTestCase):
         }
         )
 
-    def test_regression(self):
-        store = generate_diff_store(get_pub_dict(url_id=1,
-                                                 title="ThIs Is An ExEmPlArY PuBlIcAtIoN",
-                                                 abstract="This text is common among all sources",
-                                                 volume="33",
-                                                 number=66,
-                                                 doi="http://dblp.uni-trier.de",
-                                                 note="DBLP NOte",
-                                                 pages="1-2"))
-        added_values1 = get_pub_dict(url_id=3,
-                                     title="This is an Exemplary Publication",
-                                     abstract="This text is common among all sources",
-                                     note="Arxiv Note",
-                                     pages="1-2")
-        insert_diff_store(added_values1, store)
-        test = serialize_diff_store(store)
+    def test_get_value_list(self):
+            global_url.objects.bulk_create(
+                [
+                    global_url(id=111, domain="domain1", url="url1"),
+                    global_url(id=112, domain="domain2", url="url2"),
+                    global_url(id=113, domain="domain3", url="url3"),
+                ]
+            )
+            local_url.objects.bulk_create([
+                local_url(id=1, global_url_id=111, url="/lurl1"),
+                local_url(id=2, global_url_id=112, url="/lurl2"),
+                local_url(id=3, global_url_id=113, url="/lurl3"),
+            ])
+
+            store = generate_diff_store(get_pub_dict(url_id=1, title="Hello World", abstract="Common Text"))
+            added_values1 = get_pub_dict(url_id=2, title="Hello World2", abstract="Unique Text")
+            added_values2 = get_pub_dict(url_id=3, title="Hello World3", abstract="Common Text")
+            # add authors
+            store['author_ids'] = [
+                {'bitvector': 3, 'value': 4, 'votes': 0},
+                {'bitvector': 3, 'value': 5, 'votes': 0},
+                {'bitvector': 5, 'value': 6, 'votes': 0}
+            ]
+            insert_diff_store(added_values1, store)
+            insert_diff_store(added_values2, store)
+
+            result = get_value_list(store)
+            self.assertEqual(result, {
+                "title": {
+                    "Hello World": 0,
+                    "Hello World2": 0,
+                    "Hello World3": 0,
+                },
+                "abstract": {
+                    "Common Text": 0,
+                    "Unique Text": 0,
+                },
+            })
+
+    def test_upvote(self):
+            global_url.objects.bulk_create(
+                [
+                    global_url(id=111, domain="domain1", url="url1"),
+                    global_url(id=112, domain="domain2", url="url2"),
+                    global_url(id=113, domain="domain3", url="url3"),
+                ]
+            )
+            local_url.objects.bulk_create([
+                local_url(id=1, global_url_id=111, url="/lurl1"),
+                local_url(id=2, global_url_id=112, url="/lurl2"),
+                local_url(id=3, global_url_id=113, url="/lurl3"),
+            ])
+
+            store = generate_diff_store(get_pub_dict(url_id=1, title="Hello World", abstract="Common Text"))
+            added_values1 = get_pub_dict(url_id=2, title="Hello World2", abstract="Unique Text")
+            added_values2 = get_pub_dict(url_id=3, title="Hello World3", abstract="Common Text")
+            # add authors
+            store['author_ids'] = [
+                {'bitvector': 3, 'value': 4, 'votes': 0},
+                {'bitvector': 3, 'value': 5, 'votes': 0},
+                {'bitvector': 5, 'value': 6, 'votes': 0}
+            ]
+            insert_diff_store(added_values1, store)
+            insert_diff_store(added_values2, store)
+
+            result = upvote(store, "title", "Hello World2", 5)
+            title = store['title']
+            self.assertEqual(title[1]['votes'], 5)
+
+
+
+
 
 
 

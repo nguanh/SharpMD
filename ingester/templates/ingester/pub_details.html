@@ -90,7 +90,20 @@
         {% endfor %}
     </div>
     <div id="edit_menu" class="tab-pane fade">
-      <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        {% for attribute, values in value_view.items %}
+            <p>
+                <h4>{{ attribute }}</h4>
+                <form action="{% url 'ingester:vote' object.id attribute %}" method="post">
+                {% csrf_token %}
+                {% for inner_key, inner_value in values.items %}
+                    <label for="choice{{ inner_key}}">{{ inner_key }}:{{ inner_value }}</label><br />
+                    <input type="radio" name="choice" id="choice{{ inner_key }}" value="{{ inner_key }}" />
+                {% endfor %}
+                <input type="submit" value="Vote" />
+                </form>
+
+            </p>
+        {% endfor %}
     </div>
   </div>
 </div>

@@ -151,7 +151,7 @@ def insert_diff_store(pub_dict, diff_store):
             # skip empty values
             if pub_dict[key] is None:
                 continue
-            append_node(pub_dict[key], idx ,diff_store[key])
+            append_node(pub_dict[key], idx, diff_store[key])
 
 
 def serialize_diff_store(store):
@@ -205,7 +205,6 @@ def get_sources(store):
     obj_list = []
     sources = []
 
-
     # generate list of dicts first containing only the source url
     for element in url_list:
         # get local url object
@@ -245,7 +244,40 @@ def get_sources(store):
                         'votes': nodes_vote,
                         'value': node_value
                     }
-    #TODO  resolve ids
-
-
     return sources
+
+
+def get_value_list(store):
+    """
+    generate a dict containing the keys and values of the store
+    additionally  every value itself a key-value store for value->votes
+    :param store:
+    :return:
+    """
+    result = {}
+    for key, value in store.items():
+        if key == "url_id":
+            continue
+        if key == 'author_ids' or key =='keyword_ids':
+            continue
+        inner_dict = {}
+        for entry in value:
+            node_value = entry["value"]
+            nodes_vote = entry["votes"]
+            inner_dict[node_value] = nodes_vote
+        if inner_dict == {}:
+            continue
+        result[key] = inner_dict
+
+    return result
+
+
+def upvote(store, attribute, voted_value, votes=1):
+
+    for key,value in store.items():
+        if key == attribute:
+            for entry in value:
+                if entry['value'] == voted_value:
+                    entry['votes'] += votes
+
+    return store

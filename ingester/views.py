@@ -1,12 +1,14 @@
 from __future__ import absolute_import, unicode_literals
 from django.shortcuts import get_object_or_404, render
-from .models import Config, local_url, PubReference,authors_model, pub_medium
-from .filters import PublicationFilter
 from django.views.generic.detail import DetailView
-from .difference_storage import deserialize_diff_store, get_sources
+from django.http import HttpResponseRedirect, HttpResponse
+from django.urls import reverse
+from .difference_storage import deserialize_diff_store, get_sources, get_value_list, upvote, get_default_values, serialize_diff_store
+from .models import Config, local_url, PubReference,authors_model, pub_medium, publication
+from .filters import PublicationFilter
 import os
 import tailer
-
+import datetime
 
 # Create your views here.
 PROJECT_DIR = os.path.dirname(__file__)
@@ -58,7 +60,7 @@ class PublicationDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         obj = super(PublicationDetailView, self).get_context_data(**kwargs)
-        # deserialize diff tree and split into sources
+        # ===========================SOURCE VIEW =======================================================================
         diff_tree = deserialize_diff_store(obj['object'].publication.differences)
         obj['sources'] = get_sources(diff_tree)
         # resolve author ids into authors
@@ -70,7 +72,7 @@ class PublicationDetailView(DetailView):
                                  'votes': element['pub_source_ids']['votes']
                                  }
         # TODO resolve keywords
-        # references
+        # ============================REFERENCE VIEW ==================================================================
         references =[x.reference.id for x in PubReference.objects.select_related('reference').filter(source=obj['local_url']).all()]
         ref_url_list = local_url.objects.filter(publication__cluster_id__in= references).all()
         obj['references'] = ref_url_list
@@ -78,7 +80,24 @@ class PublicationDetailView(DetailView):
         cluster = obj['local_url'].publication.cluster
         cited = [x.source for x in PubReference.objects.select_related('source').filter(reference=cluster).all()]
         obj['cites'] = cited
-
+        # ============================EDIT VIEW=========================================================================
+        obj['value_view'] = get_value_list(diff_tree)
         return obj
 
 
+def vote(request, object_id,attribute):
+    # get diff tree
+    obj = get_object_or_404(local_url, pk=object_id)
+    pub = obj.publication
+    diff_tree = deserialize_diff_store(pub.differences)
+    # upvote
+    upvote(diff_tree, attribute, request.POST['choice'])
+    # get new default values
+    new_defaults = get_default_values(diff_tree)
+    new_defaults['date_published']=datetime.date(new_defaults["date_published"], 1, 1)
+    new_defaults['differences'] = serialize_diff_store(diff_tree)
+
+    for key, value in new_defaults.items():
+        setattr(pub, key, value)
+    pub.save()
+    return HttpResponseRedirect(reverse('ingester:publication-detail', args=(object_id,)))
