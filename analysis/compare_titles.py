@@ -88,4 +88,5 @@ def run_db(table1,table2,table_name):
     read_connector.close()
 
 if __name__ =="__main__":
-    run_db(sys.argv[1],sys.argv[2], sys.argv[3])
+    #run_db(sys.argv[1],sys.argv[2], sys.argv[3])
+    run_db(3,4, "da_normal")
