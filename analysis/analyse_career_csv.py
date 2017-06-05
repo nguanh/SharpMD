@@ -14,10 +14,20 @@ career_mean_dblp = pandas.Series.from_csv(os.path.join(file_path,"career_mean_db
 mean = []
 for absolut,relativ in zip(career_dblp,career_mean_dblp):
     mean.append(absolut/relativ)
-    print(absolut,relativ)
 
 
+"""
 mean_series = pandas.Series(mean)
-mean_series.plot.bar()
-#career_length_dblp.plot.bar()
+axis = mean_series.plot.bar(title="Mean Publications per year of career (DBLP)")
+axis.set_xlabel("Years of Work")
+axis.set_ylabel("Mean Publication per year")
+axis.set_xlim(0, 80)
+"""
+
+axis = career_length_dblp.plot(title="Author Career Duration")
+axis.set_xlabel("Years of Work")
+axis.set_ylabel("Authors")
+axis.set_xlim(0, 50)
+axis.set_ylim(0, 200000)
+#axis2 = career_dblp.plot.bar()
 plt.show()

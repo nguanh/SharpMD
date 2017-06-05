@@ -205,13 +205,13 @@ def run_db():
             cursor.execute(OAI_QUERY, ())
             #cursor.execute(ARXIV_QUERY, ())
             for query_dataset in cursor:
-                mapping = dblp_mapping(query_dataset)
-                """
+                #mapping = dblp_mapping(query_dataset)
+
                 try:
                     mapping = oai_mapping(query_dataset)
                 except Exception:
                     continue
-                """
+
                 #set_pubyear(wcursor, mapping["pub"])
                 #set_mdate(wcursor, mapping["mdate"])
                 #set_title(wcursor, mapping["normal"])
