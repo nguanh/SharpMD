@@ -8,8 +8,8 @@ import datetime
 import os
 local_path = os.path.dirname(os.path.abspath(__file__))
 #=========================================== TABLE NAME ===============================================================
-#DB_NAME = "dblp_analyse"
-DB_NAME = "citeseerx_analyse"
+DB_NAME = "dblp_analyse"
+#DB_NAME = "citeseerx_analyse"
 #=========================================== ANALYSE TABLES ===========================================================
 DATE_TABLE = ("CREATE TABLE `mdates` ("
     "  `mdate` date NOT NULL,"
@@ -60,12 +60,19 @@ NORMAL_TITLES =("CREATE TABLE `normal_title` ("
     ") ENGINE= {} CHARSET=utf8mb4")
 
 
+CAREER =("CREATE TABLE `career` ("
+    " `author` VARCHAR(100) NOT NULL ,"
+    " `pub_year` DATE NOT NULL ,"
+    " `counter` INT DEFAULT 1,"
+    "  UNIQUE KEY (`author`,`pub_year`),"
+    "  INDEX (`pub_year`)"
+    ") ENGINE= {} CHARSET=utf8mb4")
+
 
 # ================================================= HARVESTER SELECTION QUERIES ========================================
 DBLP_QUERY = ("SELECT mdate,title,pub_year,author FROM harvester.dblp_article")
 ARXIV_QUERY = ("SELECT mdate,title,created,author FROM harvester.arxiv_articles")
 OAI_QUERY = ("SELECT title,author,dates FROM harvester.oaipmh_articles")
-#OAI_QUERY = ("SELECT title,author,dates FROM harvester.oaipmh_articles")
 
 
 def setup():
@@ -87,6 +94,7 @@ def setup():
     connector.createTable("number authors", NUM_AUTHOR.format(storage_engine))
     connector.createTable("Authors", AUTHORS.format(storage_engine))
     connector.createTable("Normal Titles", NORMAL_TITLES.format(storage_engine))
+    connector.createTable("Career",CAREER.format(storage_engine))
     # create index
     try:
         connector.execute_ex("CREATE FULLTEXT INDEX title_idx  ON normal_title (titles)", ())
@@ -103,6 +111,7 @@ def dblp_mapping(query_tuple):
         "normal": normalize_title(query_tuple[1]),
         "author": split_authors(query_tuple[3]),
     }
+
 
 def oai_mapping(query_tuple):
     dates = query_tuple[2].split(";")
@@ -170,6 +179,11 @@ def set_authors(connector, authors):
                                    "ON DUPLICATE KEY UPDATE counter= counter+1"), (normal_name,))
 
 
+def set_career(connector, authors, pub_year):
+
+    for guy in authors:
+        connector.execute(("INSERT INTO `career`(author,pub_year) VALUES(%s,%s)"
+                           "ON DUPLICATE KEY UPDATE counter= counter+1"), (guy,pub_year))
 
 
 
@@ -186,21 +200,23 @@ def run_db():
                                      database=DB_NAME,
                                      charset="utf8mb4")
     count = 0
-    print("starting")
     with read_connector.cursor() as cursor:
         with write_connector.cursor() as wcursor:
-            #cursor.execute(DBLP_QUERY, ())
-            cursor.execute(OAI_QUERY, ())
+            cursor.execute(DBLP_QUERY, ())
+            #cursor.execute(OAI_QUERY, ())
             for query_dataset in cursor:
-                #mapping = dblp_mapping(query_dataset)
+                mapping = dblp_mapping(query_dataset)
+                """
                 try:
                     mapping = oai_mapping(query_dataset)
                 except Exception:
                     continue
-                set_pubyear(wcursor, mapping["pub"])
-                set_mdate(wcursor, mapping["mdate"])
-                set_title(wcursor, mapping["normal"])
-                set_authors(wcursor, mapping["author"])
+                """
+                #set_pubyear(wcursor, mapping["pub"])
+                #set_mdate(wcursor, mapping["mdate"])
+                #set_title(wcursor, mapping["normal"])
+                #set_authors(wcursor, mapping["author"])
+                set_career(wcursor,mapping["author"], mapping["pub"])
                 write_connector.commit()
 
                 count += 1
