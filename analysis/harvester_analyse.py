@@ -148,6 +148,8 @@ def set_title(connector, title):
 
 def set_authors(connector, authors):
     # set number of authors
+    print(len(authors))
+    print(str(len(authors)))
     connector.execute(("INSERT INTO `number_author`(number,counter) VALUES(%s,1)"
                        "ON DUPLICATE KEY UPDATE counter= counter+1"), (str(len(authors)),))
 
@@ -193,17 +195,14 @@ def run_db():
                 #mapping = dblp_mapping(query_dataset)
                 try:
                     mapping = oai_mapping(query_dataset)
-                    print("mapping")
                 except Exception:
-                    print("hkj")
                     continue
-                print("Done")
                 set_pubyear(wcursor, mapping["pub"])
                 set_mdate(wcursor, mapping["mdate"])
                 set_title(wcursor, mapping["normal"])
                 set_authors(wcursor, mapping["author"])
                 write_connector.commit()
-                print("test")
+
                 count += 1
                 if count % 10000 == 0:
                     print(count)

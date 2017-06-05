@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 local_path = os.path.dirname(os.path.abspath(__file__))
 def display(path):
     file_path = os.path.join(local_path,'data',path)
-    #plot_data = pandas.Series([])
     time_list = []
     with open(file_path,'r') as f:
 

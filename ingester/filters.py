@@ -9,3 +9,8 @@ class PublicationFilter(django_filters.FilterSet):
         fields = ['publication__title','authors__block_name']
 
 
+class AuthorFilter(django_filters.FilterSet):
+    block_name = django_filters.CharFilter(lookup_expr='icontains', label="Author")
+    class Meta:
+        model = local_url
+        fields = ['block_name']

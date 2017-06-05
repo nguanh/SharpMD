@@ -1,0 +1,42 @@
+{% extends "ingester/base.html" %}
+{% block main_content %}
+{% load static %}
+{% load staticfiles %}
+    {# Load the tag library #}
+{% load pagination_tags %}
+{# Load CSS and JavaScript #}
+
+ <form method="get">
+    <div class="well">
+        <h2>Authors</h2>
+            {{ filter.form }}
+      <button type="submit" class="btn btn-primary">
+        <span class="glyphicon glyphicon-search"></span> Search
+      </button>
+        <a href="{% url 'ingester:author-search'  %}" class="btn btn-default">Reset</a>
+    </div>
+  </form>
+
+
+<div class="row">
+ <div id= "content-col" class="col-md-offset-1 col-md-6">
+    {% autopaginate filter.qs 10 as filter_list %}
+    {% for author in filter_list %}
+            <div class="panel panel-primary">
+                <div class="panel-heading" >
+                    <a href="">
+                        <span class="publication-date"></span>
+                        <span class="publication-title">{{ author.main_name }}</span>
+                    </a>
+                </div>
+                <div class="panel-body">
+                    Publications:
+                </div>
+            </div>
+    {% endfor %}
+    </div>
+</div>
+ <div id="pagination-col" class="col-md-offset-1 row col-md-6">
+ {% paginate %}
+</div>
+{% endblock %}

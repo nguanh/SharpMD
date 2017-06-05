@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from .difference_storage import deserialize_diff_store, get_sources, get_value_list, upvote, get_default_values, serialize_diff_store
 from .models import Config, local_url, PubReference,authors_model, pub_medium, publication
-from .filters import PublicationFilter
+from .filters import PublicationFilter,AuthorFilter
 import os
 import tailer
 import datetime
@@ -47,6 +47,12 @@ def search(request):
             del request.GET['authors__block_name']
     url_filter = PublicationFilter(request.GET, queryset=qs)
     return render(request, 'ingester/search_list.html', {'filter': url_filter})
+
+
+def author_search(request):
+    qs = authors_model.objects.all()
+    url_filter = AuthorFilter(request.GET, queryset=qs)
+    return render(request, 'ingester/author_list.html', {'filter': url_filter})
 
 
 class PublicationDetailView(DetailView):
