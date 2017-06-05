@@ -45,12 +45,16 @@ def parse_xml(xmlPath, dtdPath, tagList=COMPLETE_TAG_LIST):
             continue
         if dataset['type'] == "book":
             year = str(dataset['year'].year)
+            #if int(year) < 2000:
+            #    continue
             if year in book_year:
                 book_year[year] += 1
             else:
                 book_year[year] = 1
         if dataset['type'] == "proceedings":
             year = str(dataset['year'].year)
+            #if int(year) < 2000:
+            #    continue
             try:
                 proceeding_year[year] += 1
             except KeyError:
@@ -62,14 +66,18 @@ def parse_xml(xmlPath, dtdPath, tagList=COMPLETE_TAG_LIST):
         if success_count % 10000 == 0:
             print(success_count)
 
+    print(success_count)
+    fig, axes = plt.subplots(nrows=1, ncols=2)
+    book_data = pandas.Series(book_year, name="Books")
+    proceeding_data = pandas.Series(proceeding_year, name="Proceedings")
+    axis = book_data.plot(ax=axes[0])
+    axis2 = proceeding_data.plot(ax=axes[1])
+    axis.set_ylim(0, 3000)
+    axis2.set_ylim(0, 3000)
+    axes[0].set_title('Books')
+    axes[1].set_title('Proceedings')
 
-    book_data = pandas.Series(book_year, name="Test")
-    axis = book_data.plot()
-    data2 = pandas.Series(proceeding_year, name="Proceedings")
-    axis2 = data2.plot()
     plt.show()
-    # https://stackoverflow.com/questions/22483588/how-can-i-plot-separate-pandas-dataframes-as-subplots
-    return success_count
 
 
 if __name__ =="__main__":

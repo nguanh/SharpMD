@@ -1,15 +1,14 @@
 from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 from ingester.helper import normalize_title,split_authors, normalize_authors
-import pandas
 import pymysql
 from conf.config import get_config
 import datetime
 import os
 local_path = os.path.dirname(os.path.abspath(__file__))
 #=========================================== TABLE NAME ===============================================================
-DB_NAME = "arxiv_analyse"
-#DB_NAME = "citeseerx_analyse"
+#DB_NAME = "arxiv_analyse"
+DB_NAME = "citeseerx_analyse"
 #=========================================== ANALYSE TABLES ===========================================================
 DATE_TABLE = ("CREATE TABLE `mdates` ("
     "  `mdate` date NOT NULL,"
@@ -203,8 +202,8 @@ def run_db():
     with read_connector.cursor() as cursor:
         with write_connector.cursor() as wcursor:
             #cursor.execute(DBLP_QUERY, ())
-            #cursor.execute(OAI_QUERY, ())
-            cursor.execute(ARXIV_QUERY, ())
+            cursor.execute(OAI_QUERY, ())
+            #cursor.execute(ARXIV_QUERY, ())
             for query_dataset in cursor:
                 mapping = dblp_mapping(query_dataset)
                 """
