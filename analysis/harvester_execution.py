@@ -25,7 +25,6 @@ def display(path):
 
     axis =plot_data.plot()
     axis.set_ylim(0,32)
-    print(plot_data)
     plt.show()
 if __name__ =="__main__":
     display("DBLP_Harvester.log")

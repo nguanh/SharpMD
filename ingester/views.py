@@ -4,7 +4,7 @@ from django.views.generic.detail import DetailView
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from .difference_storage import deserialize_diff_store, get_sources, get_value_list, upvote, get_default_values, serialize_diff_store
-from .models import Config, local_url, PubReference,authors_model, pub_medium, publication
+from .models import Config, local_url, PubReference,authors_model, pub_medium, publication, author_alias_source
 from .filters import PublicationFilter,AuthorFilter
 import os
 import tailer
@@ -110,3 +110,19 @@ def vote(request, object_id,attribute):
         setattr(pub, key, value)
     pub.save()
     return HttpResponseRedirect(reverse('ingester:publication-detail', args=(object_id,)))
+
+
+class AuthorDetailView(DetailView):
+    model = authors_model
+    template_name = 'ingester/author_details.html'
+
+
+    def get_context_data(self, **kwargs):
+        obj = super(AuthorDetailView, self).get_context_data(**kwargs)
+        print(obj)
+        #-----------------ALIAS -------------------------------
+        obj['alias'] = author_alias_source.objects.select_related('alias').filter(alias__author=obj['object']).all()
+        #----------------Publication---------------------------
+
+        # Alias
+        return obj

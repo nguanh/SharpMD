@@ -1,0 +1,39 @@
+{% extends "ingester/base.html" %}
+
+{% block main_content %}
+{% load static %}
+    {# Load the tag library #}
+{% load bootstrap3 %}
+<script src="/static/admin/js/vendor/jquery/jquery.js"></script>
+
+{# Load CSS and JavaScript #}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+<div class="container">
+  <h2 id="obj_title">{{ object.publication.title }}</h2>
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#home">Overview</a></li>
+    <li><a data-toggle="tab" href="#pub_menu">Publications</a></li>
+
+    <li><a data-toggle="tab" href="#edit_menu">Alias</a></li>
+  </ul>
+
+  <div class="tab-content">
+
+    <div id="home" class="tab-pane fade in active">
+    </div>
+      <div id="pub_menu" class="tab-pane fade">
+
+    </div>
+    <div id="edit_menu" class="tab-pane fade">
+        {% for alias in alias %}
+            <p>
+                {{ alias.alias }}
+            </p>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -24,7 +24,7 @@
     {% for author in filter_list %}
             <div class="panel panel-primary">
                 <div class="panel-heading" >
-                    <a href="">
+                    <a href="{% url 'ingester:author-detail' author.id %}">
                         <span class="publication-date"></span>
                         <span class="publication-title">{{ author.main_name }}</span>
                     </a>
