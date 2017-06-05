@@ -17,20 +17,27 @@
     <li class="active"><a data-toggle="tab" href="#home">Overview</a></li>
     <li><a data-toggle="tab" href="#pub_menu">Publications</a></li>
 
+
     <li><a data-toggle="tab" href="#edit_menu">Alias</a></li>
   </ul>
 
   <div class="tab-content">
 
     <div id="home" class="tab-pane fade in active">
+
     </div>
       <div id="pub_menu" class="tab-pane fade">
+        {% for obj in publications %}
+            <a href="{% url 'ingester:publication-detail' obj.id %}">
+                {{ obj.publication.title}}
+            </a><br/>
 
+      {% endfor %}
     </div>
     <div id="edit_menu" class="tab-pane fade">
         {% for alias in alias %}
             <p>
-                {{ alias.alias }}
+                {{ alias.alias }}: {{ alias.vote }}
             </p>
         {% endfor %}
     </div>

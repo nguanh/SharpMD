@@ -119,10 +119,9 @@ class AuthorDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         obj = super(AuthorDetailView, self).get_context_data(**kwargs)
-        print(obj)
         #-----------------ALIAS -------------------------------
         obj['alias'] = author_alias_source.objects.select_related('alias').filter(alias__author=obj['object']).all()
         #----------------Publication---------------------------
-
+        obj['publications'] = obj['object'].local_url_set.filter(global_url__id=1).select_related('publication').all()
         # Alias
         return obj
