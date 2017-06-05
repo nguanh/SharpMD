@@ -11,6 +11,8 @@ from .difference_storage import *
 from .helper import *
 import datetime
 from silk.profiling.profiler import silk_profile
+from time import time
+TRACK_LIMIT = 500
 
 
 @silk_profile(name='Ingester')
@@ -32,7 +34,7 @@ def ingest_data(ingester_obj):
 
     globl_url_obj = global_url.objects.get(id=1)
     ingester_obj_global_url = ingester_obj.get_global_url()
-
+    start_track = time()
     for query_dataset in read_connector.cursor:
         mapping = ingester_obj.mapping_function(query_dataset)
         write_connector.execute_ex(ingester_obj.update_harvested(), (mapping["local_url"],))
@@ -120,10 +122,13 @@ def ingest_data(ingester_obj):
             # 9.set references for publication
             ingester_obj.set_reference(source_lurl_obj, mapping['local_url'])
             pub_added += 1
+
         except Exception as e:
             print(e)
             logger.error("%s: %s", mapping["local_url"], e)
             continue
+    end_track = time()
+    logger.info("TRACK:{}".format(end_track - start_track))
     logger.debug("Terminate ingester %s", ingester_obj.get_name())
     logger.info("publications added %s / limbo %s / skipped %s", pub_added,pub_limbo,pub_duplicate)
     read_connector.close_connection()
