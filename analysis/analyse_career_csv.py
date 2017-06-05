@@ -18,6 +18,6 @@ for absolut,relativ in zip(career_dblp,career_mean_dblp):
 
 
 mean_series = pandas.Series(mean)
-#mean_series.plot()
+mean_series.plot.bar()
 #career_length_dblp.plot.bar()
 plt.show()
