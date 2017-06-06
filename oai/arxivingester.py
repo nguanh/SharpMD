@@ -49,7 +49,6 @@ class ArxivIngester(Iingester):
         # is set later
         mapping["local_url"] = query_tuple[0]
         mapping["publication"]["date_published"] = query_tuple[1].year #TODO parse date
-        mapping["publication"]["date_added"] = query_tuple[13].year #TODO parse date
         authors_list = split_authors(query_tuple[3])
         for author in authors_list:
             stripped_numbers = re.sub(r'\d{4}', '', author).strip()
