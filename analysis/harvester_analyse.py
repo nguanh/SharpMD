@@ -1,4 +1,3 @@
-from conf.config import get_config
 from mysqlWrapper.mariadb import MariaDb
 from ingester.helper import normalize_title,split_authors, normalize_authors
 import pymysql
