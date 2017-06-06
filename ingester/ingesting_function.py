@@ -128,7 +128,7 @@ def ingest_data(ingester_obj):
             logger.error("%s: %s", mapping["local_url"], e)
             continue
     end_track = time()
-    logger.info("TRACK:{}".format(end_track - start_track))
+    logger.error("TRACK:{}".format(end_track - start_track))
     logger.debug("Terminate ingester %s", ingester_obj.get_name())
     logger.info("publications added %s / limbo %s / skipped %s", pub_added,pub_limbo,pub_duplicate)
     read_connector.close_connection()

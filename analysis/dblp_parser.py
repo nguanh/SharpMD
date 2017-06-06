@@ -45,16 +45,24 @@ def parse_xml(xmlPath, dtdPath, tagList=COMPLETE_TAG_LIST):
             continue
         if dataset['type'] == "book":
             year = str(dataset['year'].year)
-            #if int(year) < 2000:
-            #    continue
+            if int(year) < 2000:
+                element.clear()
+                continue
+            if int(year) >2016:
+                element.clear()
+                continue
             if year in book_year:
                 book_year[year] += 1
             else:
                 book_year[year] = 1
         if dataset['type'] == "proceedings":
             year = str(dataset['year'].year)
-            #if int(year) < 2000:
-            #    continue
+            if int(year) < 2000:
+                element.clear()
+                continue
+            if int(year) >2016:
+                element.clear()
+                continue
             try:
                 proceeding_year[year] += 1
             except KeyError:
@@ -68,13 +76,13 @@ def parse_xml(xmlPath, dtdPath, tagList=COMPLETE_TAG_LIST):
 
     print(success_count)
     fig, axes = plt.subplots(nrows=1, ncols=2)
-    book_data = pandas.Series(book_year, name="Books")
+    book_data = pandas.Series(book_year, name="Journals")
     proceeding_data = pandas.Series(proceeding_year, name="Proceedings")
     axis = book_data.plot(ax=axes[0])
     axis2 = proceeding_data.plot(ax=axes[1])
     axis.set_ylim(0, 3000)
     axis2.set_ylim(0, 3000)
-    axes[0].set_title('Books')
+    axes[0].set_title('Journals')
     axes[1].set_title('Proceedings')
 
     plt.show()
