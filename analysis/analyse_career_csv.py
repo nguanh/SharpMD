@@ -44,7 +44,7 @@ axes[0].set_title('DBLP')
 axes[1].set_title('ArXiv')
 plt.suptitle("Mean Publications Per Year of Work")
 """
-
+"""
 axis = career_length_dblp.plot(ax=axes[0])
 axis.set_xlabel("Years of Work")
 axis.set_ylabel("Authors")
@@ -59,5 +59,17 @@ axis2.set_ylim(0, 200000)
 axes[0].set_title('DBLP')
 axes[1].set_title('ArXiv')
 plt.suptitle("Author Career Duration")
+"""
+axis = career_dblp.plot(ax=axes[0])
+axis.set_xlabel("Years of Work")
+axis.set_ylabel("Authors")
 
+
+axis2 = career_arxiv.plot(ax=axes[1])
+axis2.set_xlabel("Years of Work")
+axis2.set_ylabel("Authors")
+
+axes[0].set_title('DBLP')
+axes[1].set_title('ArXiv')
+plt.suptitle("Author Career Duration")
 plt.show()
