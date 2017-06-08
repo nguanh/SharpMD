@@ -45,7 +45,7 @@ def parse_xml(xmlPath, dtdPath, tagList=COMPLETE_TAG_LIST):
             continue
         if dataset['type'] == "book":
             year = str(dataset['year'].year)
-            if int(year) < 2000:
+            if int(year) < 1990:
                 element.clear()
                 continue
             if int(year) >2016:
@@ -57,7 +57,7 @@ def parse_xml(xmlPath, dtdPath, tagList=COMPLETE_TAG_LIST):
                 book_year[year] = 1
         if dataset['type'] == "proceedings":
             year = str(dataset['year'].year)
-            if int(year) < 2000:
+            if int(year) < 1990:
                 element.clear()
                 continue
             if int(year) >2016:

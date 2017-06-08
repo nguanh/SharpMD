@@ -32,6 +32,7 @@ def normalize_title(title, latex=False):
 def normalize_authors(author):
     # split double names connected by - into separate names
     name_split = author.replace("-", " ")
+    name_split = name_split.replace(".", " ")
     # translate unicode characters to closest ascii characters
     ascii_decoded = unidecode(name_split)
     remove_punctuation = ascii_decoded.translate(punctuation_dict)
@@ -91,7 +92,7 @@ def get_search_query(title):
     for word in word_list:
         if len(word) < 4:
             invalid += 1
-        search_query += "{}* ".format(word)
+        search_query += "{} ".format(word)
 
     if invalid == len(word_list):
         return title
@@ -100,8 +101,8 @@ def get_search_query(title):
 
 
 def get_author_relevant_names(name):
-    normal_name = normalize_authors(name)
-    name_list = normal_name.split(" ")
+    #normal_name = normalize_authors(name)
+    name_list = name.split(" ")
     # get 3 longest name parts and remove abbreviations
     full_name_list = [n for n in name_list if len(n) > 1]
 
@@ -154,7 +155,7 @@ class Reason(Enum):
     AMB_NAME_BLOCK = 3
 
 
-def calculate_author_similarity(orig_name, compare_name):
+def calculate_author_similarity_old(orig_name, compare_name):
     init_orig_list = orig_name.split(" ")
     init_comp_list = compare_name.split(" ")
 
@@ -166,21 +167,95 @@ def calculate_author_similarity(orig_name, compare_name):
         else:
             step1_orig_list.append(o_name)
     # step 2: match initals
-    step1_comp_list = init_comp_list[:]
     step2_orig_list = step1_orig_list[:]
 
     for sim_name in init_comp_list:
+        match = None
         for comp_name in step1_orig_list:
-            if comp_name.startswith(sim_name) or sim_name.startswith(comp_name):
+            if (len(sim_name)==1 and comp_name.startswith(sim_name)) or \
+                    (len(comp_name)==1 and sim_name.startswith(comp_name)):
                 try:
-                    step1_comp_list.remove(sim_name)
+                    match = comp_name
                     step2_orig_list.remove(comp_name)
                 except:
                     pass
                 break
+
+        if match is not None:
+            step1_orig_list.remove(match)
     # step 3: see what's left
-    if len(step2_orig_list) == 0 or len(step1_comp_list) == 0:
+    if len(step2_orig_list) == 0 or len(step1_orig_list) == 0:
         return True
     return False
 
+
+def calculate_author_similarity(orig_name, compare_name):
+    init_orig_list = orig_name.split(" ")
+    init_comp_list = compare_name.split(" ")
+
+    orig_obj = [{"name": name, "match": None} for name in init_orig_list]
+    comp_obj = [{"name": name, "match": None} for name in init_comp_list]
+    # step 1: match equal items
+    for x in orig_obj:
+        for y in comp_obj:
+            # match from x to y EXACT MATCH
+            if (x['name'] == y['name']) and (x['match'] is None and y['match'] is None):
+                x["match"] = "EXACT_MATCH"
+                y["match"] = "EXACT_MATCH"
+    # step 2: match abbreviations
+    for x in orig_obj:
+        for y in comp_obj:
+            # x name is abbreviation from y name
+            if len(x['name']) == 1 and y['name'].startswith(x['name']) and \
+                            x['match'] is None and y['match'] is None:
+                x['match'] = "ABBR_FROM"
+                y['match'] = "ABBR_TO"
+                break
+            # y name is abbreviation from x name
+            if len(y['name']) == 1 and x['name'].startswith(y['name']) and \
+                            y['match'] is None and x['match'] is None:
+                y['match'] = "ABBR_FROM"
+                x['match'] = "ABBR_TO"
+                break
+
+    # step 3: evaluate results
+    no_matches_orig = 0
+    no_matches_comp = 0
+    abbr_to_orig = 0
+    abbr_from_orig = 0
+    abbr_to_comp = 0
+    abbr_from_comp = 0
+
+    for element in orig_obj:
+        # element has no match
+        if element['match'] is None:
+            no_matches_orig += 1
+        elif element['match'] == "ABBR_FROM":
+            abbr_from_orig += 1
+        elif element['match'] == "ABBR_TO":
+            abbr_to_orig += 1
+
+
+    for element in comp_obj:
+        # element has no match
+        if element['match'] is None:
+            no_matches_comp += 1
+        elif element['match'] == "ABBR_FROM":
+            abbr_from_comp += 1
+        elif element['match'] == "ABBR_TO":
+            abbr_to_comp += 1
+
+    if abbr_from_orig > 0 and abbr_to_orig > 0:
+        return False
+
+    if abbr_from_comp > 0 and abbr_to_comp > 0:
+        return False
+
+    if no_matches_orig > 0 and no_matches_comp > 0:
+        return False
+
+    if no_matches_orig > 1 or no_matches_comp > 1:
+        return False
+
+    return True
 
