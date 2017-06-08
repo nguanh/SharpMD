@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS analysis.references (
 );
 #: \\Users\\anhtu\\PycharmProjects\\SharpMD\\scripts\\test.csv
 LOAD DATA CONCURRENT LOCAL INFILE '/home/nguyen/raw_file/test.csv' INTO TABLE analysis.references
-FIELDS TERMINATED BY ',' 
+FIELDS TERMINATED BY '\t'
 LINES TERMINATED BY '\r\n'
 (@hexvar, @hexvar2) 
 set 
