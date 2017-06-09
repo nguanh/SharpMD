@@ -10,7 +10,7 @@ data_path = os.path.join(local_path,"data")
 def resolve(input_data, output):
     raw = pandas.read_csv(os.path.join(data_path, "count_ref.csv"), index_col='ID')
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.ERROR)
+    logger.setLevel(logging.INFO)
     # create the logging file handler
     fh = logging.FileHandler(output)
     formatter = logging.Formatter('%(message)s')
