@@ -28,7 +28,7 @@ def resolve(input_data, output):
 
     # receive non duplicate list
     with open(input_data, newline='') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter='\t', quotechar='|')
+        spamreader = csv.reader(csvfile, delimiter='\t', quoting=csv.QUOTE_NONE)
         for row in spamreader:
             idx = row[0]
             title = row[1]
