@@ -63,14 +63,15 @@ def start(attribute,transformation_function=default_func):
             #name_list = ','.join(str(x['name']) for x in similar if x['name'] != transformed_name)
 
             result_id[key] =str(key) + " "+id_list
-            #result_names[name] =str(transformed_name)+" "+ name_list
+            #result_names[name] =str(transformed_name)+","+ name_list
 
             counter += 1
             if counter % 5000 == 0:
                 print(counter)
+                #break
 
-    result_id.to_csv(os.path.join(file_path,"test_id4.csv"))
-    #result_names.to_csv(os.path.join(file_path, "test_names4.csv"))
+    result_id.to_csv(os.path.join(file_path,"test_id7.csv"))
+    #result_names.to_csv(os.path.join(file_path, "test_names6.csv"))
     read_connector.close()
 
 

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from ingester.helper import get_author_relevant_names,get_author_search_query, normalize_authors,calculate_author_similarity
+from ingester.helper import get_author_relevant_names,get_author_search_query, normalize_authors,calculate_author_similarity, similarity_helper
 
 
 class TestAuthorHelper(TestCase):
@@ -45,7 +45,7 @@ class TestAuthorHelper(TestCase):
 
     def test_similarity_3(self):
         result = calculate_author_similarity("chin jen lin","lin j chin")
-        self.assertEqual(result, True)
+        self.assertEqual(result, False)
 
     def test_similarity_4(self):
         result = calculate_author_similarity("chin anton jin","anton j chin")
@@ -73,7 +73,7 @@ class TestAuthorHelper(TestCase):
 
     def test_similarity_regression_4(self):
         result = calculate_author_similarity("p d h hill", "hillary d protas")
-        self.assertEqual(result, True)
+        self.assertEqual(result, False)
 
     def test_similarity_regression_6(self):
         result = calculate_author_similarity("pedro bernaola galva n", "pedro neto")
@@ -86,6 +86,21 @@ class TestAuthorHelper(TestCase):
         self.assertEqual(result, True)
         result2 = calculate_author_similarity("dah ming chiu", "chiu dah ming")
         self.assertEqual(result2, True)
+
+    def test_similarity_regression_5(self):
+        self.assertEqual(calculate_author_similarity("howard ottensen", "howard o meyer"), False)
+        self.assertEqual(calculate_author_similarity("howard ottensen", "h ottensen"), True)
+
+    def test_sim_helper_1(self):
+        self.assertEqual(similarity_helper("chim sum cha".split(" "), "chim sum cha".split(" ")),True)
+        self.assertEqual(similarity_helper("chim sum cha".split(" "), "chim s cha".split(" ")), True)
+        self.assertEqual(similarity_helper("chim sum".split(" "), "chim sum cha".split(" ")), True)
+        self.assertEqual(similarity_helper("chim s c".split(" "), "chim sum cha".split(" ")), True)
+        self.assertEqual(similarity_helper("chim sum c".split(" "), "chim s cha".split(" ")), False)
+        self.assertEqual(similarity_helper("chim sum c ban tu".split(" "), "chim sum cha".split(" ")), False)
+        self.assertEqual(similarity_helper("chim cha sum".split(" "), "chim sum cha".split(" ")), False)
+        self.assertEqual(similarity_helper("la lu mu".split(" "),"la le lu mu".split(" ")),True)
+        self.assertEqual(similarity_helper("la le lu mu".split(" "), "la lu mu".split(" ")), False)
 
     """
     #TODO gute heuristik für diesen namen entwickeln

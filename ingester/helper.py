@@ -155,64 +155,78 @@ class Reason(Enum):
     AMB_NAME_BLOCK = 3
 
 
-def calculate_author_similarity_old(orig_name, compare_name):
-    init_orig_list = orig_name.split(" ")
-    init_comp_list = compare_name.split(" ")
+def calculate_author_similarity(orig_name, compare_name):
+    orig_default = orig_name.split(" ")
+    comp_default = compare_name.split(" ")
 
-    # step 1: match equal items
-    step1_orig_list = []
-    for o_name in init_orig_list:
-        if o_name in init_comp_list:
-            init_comp_list.remove(o_name)
-        else:
-            step1_orig_list.append(o_name)
-    # step 2: match initals
-    step2_orig_list = step1_orig_list[:]
+    potential_last_name =orig_default[-1]
+    if len(potential_last_name) > 5:
+        if potential_last_name not in comp_default:
+            return False
 
-    for sim_name in init_comp_list:
-        match = None
-        for comp_name in step1_orig_list:
-            if (len(sim_name)==1 and comp_name.startswith(sim_name)) or \
-                    (len(comp_name)==1 and sim_name.startswith(comp_name)):
-                try:
-                    match = comp_name
-                    step2_orig_list.remove(comp_name)
-                except:
-                    pass
-                break
+    result1 = similarity_helper(orig_default, comp_default)
+    result2 = similarity_helper(comp_default,orig_default)
 
-        if match is not None:
-            step1_orig_list.remove(match)
-    # step 3: see what's left
-    if len(step2_orig_list) == 0 or len(step1_orig_list) == 0:
+    #heuristic: if last name has more than 5 characters it is probably not chinese--> use western order
+    if result1 is True or result2 is True:
         return True
+
+
+    # move last name to front
+    orig_lshift = list_shift(orig_default,1,True)
+    result3 = similarity_helper(orig_lshift, comp_default)
+    result4 = similarity_helper(comp_default,orig_lshift)
+    if result3 is True or result4 is True:
+        return True
+
+    # move first name to back
+    orig_rshift = list_shift(orig_default,1,False)
+    result5 = similarity_helper(orig_rshift, comp_default)
+    result6 = similarity_helper(comp_default,orig_rshift)
+    if result5 is True or result6 is True:
+        return True
+
     return False
 
 
-def calculate_author_similarity(orig_name, compare_name):
-    init_orig_list = orig_name.split(" ")
-    init_comp_list = compare_name.split(" ")
+
+def list_shift(seq, n, right=True):
+    if right is True:
+        n = n % len(seq)
+    else:
+        n= (len(seq)-n) % len(seq)
+    return seq[n:] + seq[:n]
+
+
+
+
+def gen_helper(l):
+    """
+    generator to make a list loop continuable
+    :param l:
+    :return:
+    """
+    for element in l:
+        yield element
+
+def similarity_helper(init_orig_list, init_comp_list):
 
     orig_obj = [{"name": name, "match": None} for name in init_orig_list]
     comp_obj = [{"name": name, "match": None} for name in init_comp_list]
-    # step 1: match equal items
+    comp_generator = gen_helper(comp_obj)
     for x in orig_obj:
-        for y in comp_obj:
-            # match from x to y EXACT MATCH
+        for y in comp_generator:
             if (x['name'] == y['name']) and (x['match'] is None and y['match'] is None):
                 x["match"] = "EXACT_MATCH"
                 y["match"] = "EXACT_MATCH"
-    # step 2: match abbreviations
-    for x in orig_obj:
-        for y in comp_obj:
-            # x name is abbreviation from y name
-            if len(x['name']) == 1 and y['name'].startswith(x['name']) and \
+                break;
+            elif len(x['name']) == 1 and y['name'].startswith(x['name']) and \
                             x['match'] is None and y['match'] is None:
                 x['match'] = "ABBR_FROM"
                 y['match'] = "ABBR_TO"
                 break
-            # y name is abbreviation from x name
-            if len(y['name']) == 1 and x['name'].startswith(y['name']) and \
+                # y name is abbreviation from x name
+            elif len(y['name']) == 1 and x['name'].startswith(y['name']) and \
                             y['match'] is None and x['match'] is None:
                 y['match'] = "ABBR_FROM"
                 x['match'] = "ABBR_TO"
@@ -258,4 +272,3 @@ def calculate_author_similarity(orig_name, compare_name):
         return False
 
     return True
-
