@@ -31,7 +31,7 @@ def ingest_task(package, class_name, config_id):
             log_dir = os.path.join(os.path.dirname(PROJECT_DIR), "logs")
             log_name = config.name.strip().replace(" ", "_")
             log_file = os.path.join(log_dir, "ingester.{}.log").format(log_name)
-            logger.setLevel(logging.ERROR)
+            logger.setLevel(logging.INFO)
             # create the logging file handler
             fh = logging.FileHandler(log_file)
             formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -59,7 +59,6 @@ def ingest_task(package, class_name, config_id):
             source = imported_class(name)
             if isinstance(source, Iingester) is False:
                 raise IIngester_Exception(class_name + " is not an instance of IIngest")
-            print("Starting ingestion of ", name)
             # check enable status
             if config.enabled is False:
                 raise IIngester_Disabled()
@@ -67,7 +66,7 @@ def ingest_task(package, class_name, config_id):
             source.set_limit(config.limit)
             logger.info("Initialize custom ingester %s", name)
             result = ingest_data(source)
-            print(result)
+            logger.info(result)
             logger.info("Included %s", result)
             logger.info("Ingestion finished %s", name)
             return True
