@@ -107,7 +107,8 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
 
         try:
             # include into database
-            sql_connector.execute(tup)
+            #sql_connector.execute(tup)
+            pass
         except Exception as e:
             logger.error("%s MariaDB error: %s",dataset['key'], e)
         else:
@@ -125,3 +126,24 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
     logger.info("Final Count %s/%s", success_count, overall_count)
     sql_connector.close_connection()
     return success_count
+
+"""
+if __name__ == "__main__":
+    import logging
+    main_dir = os.path.dirname(os.path.dirname(__file__))
+    data_dir = os.path.join(main_dir,"analysis","data")
+    connector = MariaDb()
+    xml_dir = os.path.join(data_dir,"dblp.xml")
+    dtd_dir = os.path.join(data_dir, "dblp.dtd")
+    tags= ("article", "inproceedings", "phdthesis", "mastersthesis")
+    logger = logging.getLogger("TESTDBLP")
+    log_dir = os.path.join(data_dir, "TESTDBLP.log")
+    logger.setLevel(logging.INFO)
+    # create the logging file handler
+    fh = logging.FileHandler(log_dir)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    # add handler to logger object
+    logger.addHandler(fh)
+    parse_xml(xml_dir,dtd_dir,connector,logger,tags)
+"""
