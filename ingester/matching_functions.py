@@ -98,7 +98,7 @@ def match_title(title):
     return result
 
 
-def search_title(title, threshold=0.5, limit=5):
+def search_title(title, threshold=0.5, limit=5, testmode=False):
     """
     search for a given title in the db.
     Use levenshtein algorithm on results and calculate similarity percentage.
@@ -111,7 +111,10 @@ def search_title(title, threshold=0.5, limit=5):
     search_query = get_search_query(normal_title)
     results = [element for element in cluster.objects.search(search_query)[:limit]]
     similarity = [int((1-distance(normal_title,tit.name)/max(len(normal_title),len(tit.name)))*100) for tit in results]
-    ret_val = [val for sim, val in zip(similarity,results) if sim >= threshold]
+    if testmode is False:
+        ret_val = [val for sim, val in zip(similarity,results) if sim >= threshold]
+    else:
+        ret_val = [val for val in results if val.name ==normal_title]
     return ret_val
 
 

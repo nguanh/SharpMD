@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env pythonmig
 import os
 import sys
 

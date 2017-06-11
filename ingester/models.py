@@ -330,6 +330,8 @@ class PubReference(models.Model):
     """
     source = models.ForeignKey(local_url)
     reference = models.ForeignKey(cluster)
+    original_title = models.TextField(null=True,default=None)
+    original_key = models.IntegerField(null=True,default=None)
 
     class Meta:
         unique_together = ('source', 'reference')
@@ -338,7 +340,7 @@ class PubReference(models.Model):
         return "{}->{}".format(self.source.id, self.reference.id)
 
     def test(self):
-        return [self.source.id, self.reference.id]
+        return [self.source.id, self.reference.id, self.original_title]
 
 
 def delete_task(sender, instance, using, **kwargs):

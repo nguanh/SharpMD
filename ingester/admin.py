@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from .ingest_task import ingest_task
 from datetime import  date
-
+from analysis.create_references import create_clusters
 
 class ConfigForm(forms.ModelForm):
 
@@ -39,6 +39,11 @@ def test(modeladmin, request, queryset):
     for config in queryset.all():
         ingest_task(config.module_path,config.module_name,config.id)
     test.short_description = 'test'
+
+
+def insert_test_cluster(modeladmin, request, queryset):
+    create_clusters()
+
 
 
 def create_test_dataset(modeladmin,requst,queryset):
@@ -177,7 +182,7 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
         }),
     )
 
-    actions = [test,create_test_dataset]
+    actions = [test,create_test_dataset, insert_test_cluster]
 
 
 

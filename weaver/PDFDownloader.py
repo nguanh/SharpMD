@@ -124,7 +124,6 @@ class PdfDownloader:
             try:
                 reference["pubyear"] = datetime.date(int(reference["pubyear"]),1,1)
             except:
-                print("Invalid year",reference["pubyear"])
                 reference["pubyear"] = None
         return reference
 
@@ -172,7 +171,8 @@ class PdfDownloader:
                                                authors=author_list,
                                                date = reference["pubyear"])
 
-    def process_pdf(self):
+
+    def process_pdf(self, user_agent=None):
         while True:
             # get first entry in downloadqueue
             url_object = PDFDownloadQueue.objects.filter(Q(last_try__lt=self.now) | Q(last_try=None)).first()
@@ -193,7 +193,12 @@ class PdfDownloader:
                 self.skipped += 1
 
             # TODO alternating header and cookies
-            file_request = requests.get(url_dict["url"].strip())
+            if user_agent is None:
+                file_request = requests.get(url_dict["url"].strip())
+            else:
+                file_request = requests.get(url_dict["url"].strip(), headers={
+                    "User-Agent": user_agent
+                })
             if file_request.status_code == 404:
                 # file does not exist, keep it deleted
                 self.logger.error("Error: file not found {}".format(filename))

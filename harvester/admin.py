@@ -145,5 +145,7 @@ class ConfigAdmin(AdminRowActionsMixin, admin.ModelAdmin):
         }),
     )
 
+
+
 admin.site.register(Schedule, ScheduleAdmin)
 admin.site.register(Config, ConfigAdmin)

@@ -212,6 +212,8 @@ class TestPDFDownloader(TransactionTestCase):
         self.assertEqual(result["invalid"], 1)
         self.assertEqual(PDFDownloadQueue.objects.count(), 0)
 
+
+
     @patch("weaver.PDFDownloader.requests.get")
     def test_false(self, req):
         req.return_value.ok = False
@@ -242,6 +244,63 @@ class TestPDFDownloader(TransactionTestCase):
         x = PdfDownloader(path, self.grobid_url)
         x.parse_references(file_path, self.source)
 
+    def test_regression1(self):
+        file_path = os.path.join(path, "reg1.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    def test_regression2(self):
+        file_path = os.path.join(path, "reg2.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    def test_regression3(self):
+        file_path = os.path.join(path, "reg3.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    def test_regression4(self):
+        file_path = os.path.join(path, "reg4.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    def test_regression5(self):
+        file_path = os.path.join(path, "reg5.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    def test_regression6(self):
+        file_path = os.path.join(path, "reg6.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    def test_regression7(self):
+        file_path = os.path.join(path, "reg7.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    def test_regression8(self):
+        file_path = os.path.join(path, "reg8.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    def test_regression9(self):
+        file_path = os.path.join(path, "reg9.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    def test_regression10(self):
+        file_path = os.path.join(path, "reg10.pdf")
+        x = PdfDownloader(path, self.grobid_url)
+        x.parse_references(file_path, self.source)
+
+    @patch("weaver.PDFDownloader.requests.get")
+    def test_pdf_downloader_regression1(self, req):
+        req.return_value.status_code = 403
+        PDFDownloadQueue.objects.all().delete()
+        PDFDownloadQueue.objects.create(url="http://europepmc.org/backend/ptpmcrender.fcgi?accid=PMC4656104&blobtype=pdf", tries=0)
+        result = self.obj.process_pdf(user_agent='Mozilla/5.0')
+        self.assertEqual(result["skipped"], 0)
 
 
 

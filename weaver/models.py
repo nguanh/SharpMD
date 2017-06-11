@@ -28,7 +28,7 @@ class OpenReferences(models.Model):
 
 class SingleReference(models.Model):
     source = models.ForeignKey(OpenReferences)
-    title = models.CharField(max_length=200)
+    title = models.TextField()
     date = models.DateField(default= None, null=True)
     # authors are serialized
     authors = models.BinaryField()

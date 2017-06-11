@@ -66,7 +66,7 @@ def referencertask(limit=None):
     logger = logging.getLogger("Referencer")
     logger.setLevel(logging.INFO)
     # create the logging file handler
-    log_file = os.path.join(log_dir, "pdf_downloader.log")
+    log_file = os.path.join(log_dir, "referencer.log")
     fh = logging.FileHandler(log_file)
     formatter = logging.Formatter('%(levelname)s - %(message)s')
     fh.setFormatter(formatter)

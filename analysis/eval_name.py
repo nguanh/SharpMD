@@ -70,8 +70,8 @@ def start(attribute,transformation_function=default_func):
                 print(counter)
                 #break
 
-    result_id.to_csv(os.path.join(file_path,"test_id7.csv"))
-    #result_names.to_csv(os.path.join(file_path, "test_names6.csv"))
+    result_id.to_csv(os.path.join(file_path,"test_id12.csv"))
+    #result_names.to_csv(os.path.join(file_path, "test_names12.csv"))
     read_connector.close()
 
 

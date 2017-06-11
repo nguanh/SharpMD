@@ -107,8 +107,7 @@ def parse_xml(xmlPath, dtdPath, sql_connector, logger,
 
         try:
             # include into database
-            #sql_connector.execute(tup)
-            pass
+            sql_connector.execute(tup)
         except Exception as e:
             logger.error("%s MariaDB error: %s",dataset['key'], e)
         else:

@@ -53,7 +53,7 @@ class TestAuthorHelper(TestCase):
 
     def test_similarity_5(self):
         result = calculate_author_similarity("chin a j","anton j b chin")
-        self.assertEqual(result, True)
+        self.assertEqual(result, False)
 
     def test_similarity_6(self):
         result = calculate_author_similarity("chin a bing jin","anton j lin chin")
@@ -65,7 +65,7 @@ class TestAuthorHelper(TestCase):
 
     def test_similarity_regression_2(self):
         result = calculate_author_similarity("x", "xin xin")
-        self.assertEqual(result, True)
+        self.assertEqual(result,False)
 
     def test_similarity_regression_3(self):
         result = calculate_author_similarity("ernest j", "john e")
@@ -87,7 +87,7 @@ class TestAuthorHelper(TestCase):
         result2 = calculate_author_similarity("dah ming chiu", "chiu dah ming")
         self.assertEqual(result2, True)
 
-    def test_similarity_regression_5(self):
+    def test_similarity_regression_8(self):
         self.assertEqual(calculate_author_similarity("howard ottensen", "howard o meyer"), False)
         self.assertEqual(calculate_author_similarity("howard ottensen", "h ottensen"), True)
 
@@ -102,12 +102,17 @@ class TestAuthorHelper(TestCase):
         self.assertEqual(similarity_helper("la lu mu".split(" "),"la le lu mu".split(" ")),True)
         self.assertEqual(similarity_helper("la le lu mu".split(" "), "la lu mu".split(" ")), False)
 
-    """
-    #TODO gute heuristik für diesen namen entwickeln
-    def test_similarity_regression_4(self):
+    def test_similarity_regression_7(self):
         result = calculate_author_similarity("j p olivier dex sardan", "olivier peulen")
         self.assertEqual(result, False)
-    """
+
+    def test_similarity_regression_9(self):
+        self.assertEqual(calculate_author_similarity("zhang xiu", "zhang xiu"), True)
+        self.assertEqual(calculate_author_similarity("zhang xiu", "xiu zhang"), True)
+
+        self.assertEqual(calculate_author_similarity("zhang xiu", "zhang x"), True)
+        self.assertEqual(calculate_author_similarity("zhang xiu", "x zhang"), True)
+
 
 
 
