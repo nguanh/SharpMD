@@ -113,9 +113,15 @@ def search_title(title, threshold=0.5, limit=5, testmode=False):
     similarity = [int((1-distance(normal_title,tit.name)/max(len(normal_title),len(tit.name)))*100) for tit in results]
     if testmode is False:
         ret_val = [val for sim, val in zip(similarity,results) if sim >= threshold]
+        tmp_val = [element for element in ret_val if element.name == normal_title]
+        if len(tmp_val) > 0:
+            return tmp_val[0]
+
+        return ret_val
+
     else:
         ret_val = [val for val in results if val.name ==normal_title]
-    return ret_val
+        return ret_val
 
 
 def search_author(author_name):

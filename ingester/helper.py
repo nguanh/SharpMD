@@ -242,14 +242,17 @@ def get_name_score(name_list):
 def classify_order(name_list):
     total = len(name_list)
     sum = 0
+
     for name in name_list:
         if len(name) == 1:
             return Nameorder.WESTERN
         else:
             sum += len(name)
 
+    if len(name_list[-1]) <=3:
+        return Nameorder.ASIAN
     average = sum//total
-    if average > 4:
+    if average >= 4:
         return Nameorder.WESTERN
 
     return Nameorder.ASIAN
@@ -259,6 +262,8 @@ def calculate_author_similarity(orig_name, compare_name):
 
     orig_default = orig_name.split(" ")
     comp_default = compare_name.split(" ")
+    if orig_default == comp_default:
+        return True
     # try to classify original name
     name_order = classify_order(orig_default)
     if name_order == Nameorder.WESTERN:
@@ -268,6 +273,12 @@ def calculate_author_similarity(orig_name, compare_name):
         comp_lshift = list_shift(comp_default, 1, False)
         # last names have to match
         if orig_lshift[0] != comp_lshift[0]:
+            return False
+        # first name have match, exactly or abbrviated
+        if len(orig_lshift) < 2 or len(comp_lshift) < 2:
+            return False
+        # if first name is not equal
+        if orig_lshift[1] != comp_lshift[1] and orig_lshift[1].startswith(comp_lshift[1]) is False and comp_lshift[1].startswith(orig_lshift[1]) is False:
             return False
         if orig_lshift[0] in AMBIGUOUS_NAMES:
             max_words = 0
@@ -366,6 +377,9 @@ def similarity_helper(init_orig_list, init_comp_list, MAX_EXTRA_NAMES=1, ALLOW_A
         return False
 
     if no_matches_orig > MAX_EXTRA_NAMES or no_matches_comp > MAX_EXTRA_NAMES:
+        return False
+
+    if no_matches_orig > 0 or no_matches_comp > 0:
         additional_names = True
 
 

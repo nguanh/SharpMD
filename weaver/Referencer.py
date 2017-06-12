@@ -33,7 +33,7 @@ class Referencer:
             single_ref_list = SingleReference.objects.filter(source=open_ref).filter(Q(status='OP')| Q(status='INC')).only('tries', 'title', 'status').all()
 
             for single_ref in single_ref_list:
-                title_matches = search_title(single_ref.title, threshold=0.4)
+                title_matches = search_title(single_ref.title, threshold=0.8)
                 if len(title_matches) == 1:
                     # single match: create reference for only match
                     PubReference.objects.get_or_create(reference =title_matches[0], source=open_ref.ingester_key,

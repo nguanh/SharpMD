@@ -75,7 +75,7 @@ class TestMatchTitle2(TransactionTestCase):
         cluster.objects.create(id=5, name="lorem ipsum dor")
         cluster.objects.create(id=6, name="lorem ipsum dolor")
         result = [obj.name for obj in search_title("lorem ipsum dolor")]
-        self.assertEqual(result, ["lorem ipsum dolor title", "lorem ipsum dolor","lorem ipsum dor"])
+        self.assertEqual(result, ["lorem ipsum dolor"])
 
     def test_match2_no_results(self):
         cluster.objects.create(id=1, name="lorem ipsum dolor title")
@@ -86,6 +86,9 @@ class TestMatchTitle2(TransactionTestCase):
         cluster.objects.create(id=6, name="lorem ipsum dolor")
         result = [obj.name for obj in search_title("funny bunny")]
         self.assertEqual(result, [])
+
+
+
 
     def test_regression(self):
         cluster.objects.create(id=1, name="shrec10 track nonrigid 3d shape retrieval")
@@ -99,6 +102,21 @@ class TestMatchTitle2(TransactionTestCase):
         cluster.objects.create(id=1, name="high temperature bonding solutions enabling thin wafer process and handling on 3dic manufacturing")
         result = search_title("TSV process solution for 3D-IC.")
         print(result)
+
+    def test_regression_3(self):
+        title = normalize_title("Physical activity 153 and incidence of coronary heart disease in middle-aged women Relative weight gain and obesity as a child predict metabolic and men")
+        cluster.objects.create(id=1, name=title)
+        result = search_title("Physical activity and incidence of coronary heart disease in middle-aged women and men.")
+        # test fails so far
+        self.assertEqual(len(result), 1)
+
+    def test_regression_4(self):
+        title = normalize_title("Beneficial effects of quercetin on sperm parameters in streptozotocin induced diabetic male rats")
+        cluster.objects.create(id=1, name=title)
+        result = search_title("Beneficial effects of quercetin on sperm parameters in streptozotocin‐induced diabetic male rats")
+        # test fails so far
+        self.assertEqual(len(result), 1)
+
 
     def test_match_limit(self):
         cluster.objects.create(id=1, name="lorem ipsum dolor title")

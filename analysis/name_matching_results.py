@@ -48,14 +48,14 @@ data = pandas.DataFrame([
 )
 
 data.set_index('Threshold', inplace=True)
-overall = 78
-"""
+overall = 78-15
+
 for key, value in data.iterrows():
     p = float(value['True Positive']) /float(value['False Positive'] +value['True Positive'])
     r = float(value['True Positive']) /float(value['True Positive'] +overall)
     F1=2*float((p*r)/(p+r))
-    print(value["Threshold"],F1)
-"""
+    print(key,F1)
+
 
 data.plot()
 plt.show()

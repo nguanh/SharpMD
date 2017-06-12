@@ -113,7 +113,11 @@ class TestAuthorHelper(TestCase):
         self.assertEqual(calculate_author_similarity("zhang xiu", "zhang x"), True)
         self.assertEqual(calculate_author_similarity("zhang xiu", "x zhang"), True)
 
-
+    def test_regression_10(self):
+        self.assertEqual(calculate_author_similarity("John Michael", "John Meyer Michael"), True)
+        self.assertEqual(calculate_author_similarity("Mohn Michael", "John Michael"), False)
+        self.assertEqual(calculate_author_similarity("rhys hill", "donna r hill"), False)
+        self.assertEqual(calculate_author_similarity("jose pereira", "jose m g torres pereira"), False)
 
 
 

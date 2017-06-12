@@ -68,10 +68,9 @@ def start(attribute,transformation_function=default_func):
             counter += 1
             if counter % 5000 == 0:
                 print(counter)
-                #break
 
-    result_id.to_csv(os.path.join(file_path,"test_id12.csv"))
-    #result_names.to_csv(os.path.join(file_path, "test_names12.csv"))
+    result_id.to_csv(os.path.join(file_path,"test_id15.csv"))
+    #result_names.to_csv(os.path.join(file_path, "test_names15.csv"))
     read_connector.close()
 
 
