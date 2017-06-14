@@ -350,3 +350,22 @@ def delete_task(sender, instance, using, **kwargs):
         print(e)
 
 pre_delete.connect(delete_task, sender=Config)
+
+
+
+
+class MultiProxy(models.Model):
+    common = models.IntegerField(db_index=True, default=None)
+    attribute = models.CharField(max_length=10)
+    value = models.CharField(max_length=250, default=None, null=True)
+
+
+class MultiAlias(models.Model):
+    alias = models.CharField(max_length=250, db_index=True)
+    proxy = models.ForeignKey(MultiProxy)
+    vote = models.IntegerField(default=0)
+
+
+class MultiSource(models.Model):
+    source = models.CharField(max_length=250)
+    alias = models.ForeignKey(MultiAlias)

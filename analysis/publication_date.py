@@ -11,13 +11,13 @@ pub_date_citeseerx = pandas.read_csv(os.path.join(data_path, "pub_year_citeseerx
 
 
 
-fig, axes = plt.subplots(nrows=1, ncols=3)
+fig, axes = plt.subplots(nrows=1, ncols=2)
 
-axis = pub_date_dblp.plot(ax=axes[2])
+axis = pub_date_dblp.plot(ax=axes[0])
 axis2 = pub_date_arxiv.plot(ax=axes[1])
-axis3 = pub_date_citeseerx.plot(ax=axes[0])
-axis.set_ylim(0, 100000)
-axes[0].set_title('CiteseerX')
+#axis3 = pub_date_citeseerx.plot(ax=axes[0])
+
+#axes[0].set_title('CiteseerX')
 axes[1].set_title('ArXiv')
-axes[2].set_title('DBLP')
+axes[0].set_title('DBLP')
 plt.show()

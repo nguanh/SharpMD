@@ -21,7 +21,10 @@ for absolut,relativ in zip(career_dblp,career_mean_dblp):
 
 
 for absolut,relativ in zip(career_arxiv,career_mean_arxiv):
-    mean_arxiv.append(absolut/relativ)
+    if relativ == 0:
+        mean_arxiv.append(absolut /1)
+    else:
+        mean_arxiv.append(absolut/relativ)
 
 mean_series_dblp = pandas.Series(mean_dblp)
 mean_series_arxiv = pandas.Series(mean_arxiv)
@@ -29,21 +32,21 @@ mean_series_arxiv = pandas.Series(mean_arxiv)
 fig, axes = plt.subplots(nrows=1, ncols=2)
 
 
-"""
+
 axis1 = mean_series_dblp.plot(ax=axes[0])
 axis1.set_xlabel("Years of Work")
 axis1.set_ylabel("Mean Publications")
-axis1.set_xlim(0, 80)
+axis1.set_xlim(0, 60)
 
 axis1 = mean_series_arxiv.plot(ax=axes[1])
 axis1.set_xlabel("Years of Work")
 axis1.set_ylabel("Mean Publications")
-axis1.set_xlim(0, 80)
+axis1.set_xlim(0, 60)
 
 axes[0].set_title('DBLP')
 axes[1].set_title('ArXiv')
 plt.suptitle("Mean Publications Per Year of Work")
-"""
+
 """
 axis = career_length_dblp.plot(ax=axes[0])
 axis.set_xlabel("Years of Work")
@@ -59,7 +62,7 @@ axis2.set_ylim(0, 200000)
 axes[0].set_title('DBLP')
 axes[1].set_title('ArXiv')
 plt.suptitle("Author Career Duration")
-"""
+
 axis = career_dblp.plot(ax=axes[0])
 axis.set_xlabel("Years of Work")
 axis.set_ylabel("Authors")
@@ -72,4 +75,5 @@ axis2.set_ylabel("Authors")
 axes[0].set_title('DBLP')
 axes[1].set_title('ArXiv')
 plt.suptitle("Author Career Duration")
+"""
 plt.show()

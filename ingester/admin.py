@@ -10,6 +10,7 @@ from .ingest_task import ingest_task
 from datetime import  date
 from analysis.create_references import create_clusters
 from analysis.eval_diff_tree import benchmark
+from analysis.eval_other_diff_tree import benchmark_other
 
 class ConfigForm(forms.ModelForm):
 
@@ -183,7 +184,7 @@ class ConfigAdmin(AdminRowActionsMixin,admin.ModelAdmin):
         }),
     )
 
-    actions = [test,create_test_dataset, insert_test_cluster,benchmark]
+    actions = [test,create_test_dataset, insert_test_cluster,benchmark, benchmark_other]
 
 
 
