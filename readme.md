@@ -45,7 +45,7 @@ Dies muss jedes mal eingegeben werden, wenn SharpMD skript ausgeführt werden so
 
 4. Anpassen der globalen config
 in SharpMD/conf/global_config.ini unter MARIADB und MARIADBX username und passwort eintragen
-optional nochmal die daten unter my.cnf eintragen
+und nochmal die daten unter SharpMD/my.cnf eintragen
 
 5. django starten
 Hierzu gibt es einige aliases, die hinzugefügt werden können. Dabei wird ausgegangen, dass
