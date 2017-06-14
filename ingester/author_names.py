@@ -23,6 +23,7 @@ AMBIGUOUS_NAMES=[
     'richard',
     'robert',
     'schmidt',
+    'stx'
     'stephen',
     'thomas',
     'van',

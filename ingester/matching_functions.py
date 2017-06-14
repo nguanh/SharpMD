@@ -115,7 +115,7 @@ def search_title(title, threshold=0.5, limit=5, testmode=False):
         ret_val = [val for sim, val in zip(similarity,results) if sim >= threshold]
         tmp_val = [element for element in ret_val if element.name == normal_title]
         if len(tmp_val) > 0:
-            return tmp_val[0]
+            return tmp_val
 
         return ret_val
 

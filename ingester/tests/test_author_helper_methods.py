@@ -29,7 +29,7 @@ class TestAuthorHelper(TestCase):
 
     def test_search_query_2(self):
         result = get_author_search_query(normalize_authors("Richard Dawson A. St. Louis"))
-        self.assertEqual(result,"+richard +dawson +louis")
+        self.assertEqual(result,"+richard +dawson +louis +stx")
 
     def test_search_query_3(self):
         result = get_author_search_query(normalize_authors("kim lee  lu Meyers A. Bueno"))

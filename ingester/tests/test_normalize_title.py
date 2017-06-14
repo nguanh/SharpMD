@@ -9,7 +9,7 @@ class TestNormalize_title(TestCase):
 
     def test_punctuation(self):
         title = normalize_title("O`Really? What's the, iss-ue?  .")
-        self.assertEqual(title,"oreally whats the issue")
+        self.assertEqual(title,"oreally whats the iss ue")
 
     def test_whitespace(self):
         title = normalize_title("O`Rea\tlly?\n\n Wha\\t's t\nhe, iss\rue?  .")

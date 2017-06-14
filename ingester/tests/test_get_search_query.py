@@ -16,7 +16,7 @@ class TestGet_search_query(TestCase):
     def test_get_search_query_3(self):
         title = "using deep learning and google street view to estimate the demographic makeup of the us"
         result = get_search_query(title)
-        self.assertEqual(result, "demographic* estimate* learning*")
+        self.assertEqual(result, "demographic estimate learning")
 
     def test_short_title(self):
         title= "this is a sho rt tit le"
