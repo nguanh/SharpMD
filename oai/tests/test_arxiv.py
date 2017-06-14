@@ -2,6 +2,8 @@ from unittest import TestCase
 from lxml import etree
 from oai.arxiv_handler import ArXivRecord
 import datetime
+import os
+
 
 def get_record(path):
     tree = etree.parse(path)
@@ -12,9 +14,9 @@ def get_record(path):
 
 
 class Test_Arxiv(TestCase):
-
+    local_path = os.path.dirname(__name__)
     def test_valid(self):
-        record = get_record("arxiv_file_valid.xml")
+        record = get_record(os.path.join(self.local_path,"arxiv_file_valid.xml"))
         result = ArXivRecord(record)
         self.assertEqual(result.metadata, {'authors': 'Balázs,C.;Berger,E. L.;Nadolsky,P. M.;Yuan,C. -P.;',
                                           'doi': '10.1103/PhysRevD.76.013009',
@@ -33,13 +35,13 @@ class Test_Arxiv(TestCase):
                         )
 
     def test_deleted(self):
-        record = get_record("arxiv_file_deleted.xml")
+        record = get_record(os.path.join(self.local_path,"arxiv_file_deleted.xml"))
         result = ArXivRecord(record)
         self.assertEqual(result.deleted, True)
 
     def test_regression(self):
         # university instance don't have a name and use ; instead
-        record = get_record("regression_1.xml")
+        record = get_record(os.path.join(self.local_path,"regression_1.xml"))
         result = ArXivRecord(record)
         print(result.metadata['authors'])
         self.assertEqual(result.metadata['authors'],'Wisniewski,John P.;Bjorkman,Karen S.;Magalhaes,Antonio M.;Pereyra,Antonio;')

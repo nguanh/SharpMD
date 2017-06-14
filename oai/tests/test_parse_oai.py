@@ -33,3 +33,4 @@ class TestParseOai(TestCase):
         self.assertEqual(result, 1)
         self.assertEqual((test_db.getList()[0]), 'http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.251.2812;')
 
+

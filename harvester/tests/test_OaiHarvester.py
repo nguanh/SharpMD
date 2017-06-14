@@ -7,7 +7,7 @@ from django.test import TestCase, mock
 
 
 
-class TestIHarvest(TestCase):
+class TestOAIHarvest(TestCase):
     def setUp(self):
         # create IntervalSchedule
         self.config_id = 100
@@ -37,6 +37,7 @@ class TestIHarvest(TestCase):
             module_path="oai.oaiharvester",
             module_name="oaiHarvester",
             schedule= self.schedule,
+            limit=1
         )
 
     def test_success(self):
@@ -51,6 +52,11 @@ class TestIHarvest(TestCase):
     def test_cleanup(self):
         x = OaiHarvester(self.config_id)
         x.cleanup()
+
+    def test_run(self):
+        x = OaiHarvester(self.config_id)
+        x.run()
+
 
 
 
