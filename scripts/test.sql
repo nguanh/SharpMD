@@ -1,1 +1,0 @@
-SELECT * FROM harvester.dblp_article LIMIT 10;
