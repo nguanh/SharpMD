@@ -70,9 +70,7 @@ def harvestOAI(link, sql_connector, logger,
             met_tuple = processing_function(metadata)
 
             try:
-                logger.error(met_tuple)
-                print(met_tuple)
-                #sql_connector.execute(met_tuple)
+                sql_connector.execute(met_tuple)
                 success_count += 1
                 logger.debug("%s: %s", success_count, metadata['identifier'])
             except Exception as e:
