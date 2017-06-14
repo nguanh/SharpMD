@@ -165,7 +165,7 @@ class TestIngesterCiteseer(TransactionTestCase):
         self.assertEqual(diff["doi"], [{"bitvector": 1, "votes": 0, "value": "http://google.com"},
                                        {"bitvector": 2, "votes": 0, "value": "http://google.de"}])
         self.assertEqual(diff["copyright"], [])
-        self.assertEqual(diff["type_ids"], [{"bitvector": 5, "votes": 0, "value": 2}, # arxiv and citeseer share value
+        self.assertEqual(diff["type_ids"], [{"bitvector": 5, "votes": 1, "value": 2}, # arxiv and citeseer share value
                                             {"bitvector": 2, "votes": 0, "value": 1}])
         self.assertEqual(diff["pages"], [{"bitvector": 2, "votes": 0, "value": "10-14"}])
 

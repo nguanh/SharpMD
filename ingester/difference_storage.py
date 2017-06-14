@@ -32,6 +32,8 @@ def append_node(value,index, store):
             has_changed = True
             # value already exists in tree --> set bitvector
             store[i]["bitvector"] |= 1 << index
+            # increment popularity if sources share a value
+            store[i]['votes'] += 1
     if has_changed is False:
         store.append(generate_node(value, index))
 

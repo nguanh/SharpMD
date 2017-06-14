@@ -39,7 +39,7 @@ class TestDifferenceStorage(TransactionTestCase):
                                     abstract="Test Text")
         insert_diff_store(added_values,result)
         self.assertEqual(result["url_id"], [5,2])
-        self.assertEqual(result["title"], [{"value": "Hello World", "votes": 0, "bitvector": 3}])
+        self.assertEqual(result["title"], [{"value": "Hello World", "votes": 1, "bitvector": 3}])
         self.assertEqual(result["date_published"],
                          [{"value": "1990-01-01 01:01:01", "votes": 0, "bitvector": 1},
                           {"value": "1990-02-02 02:02:02", "votes": 0, "bitvector": 2}
@@ -151,7 +151,7 @@ class TestDifferenceStorage(TransactionTestCase):
             },
             "abstract": {
                 "value": "Common Text",
-                "votes": 0,
+                "votes": 1,
             },
             'author_values': [4, 5, 6],
             'author_votes': [0, 0, 0],
@@ -185,7 +185,7 @@ class TestDifferenceStorage(TransactionTestCase):
             },
             "abstract": {
                 "value": "Common Text",
-                "votes": 0,
+                "votes": 1,
             },
             'author_values': [6],
             'author_votes': [0],
@@ -226,7 +226,7 @@ class TestDifferenceStorage(TransactionTestCase):
                     "Hello World3": 0,
                 },
                 "abstract": {
-                    "Common Text": 0,
+                    "Common Text": 1,
                     "Unique Text": 0,
                 },
             })
