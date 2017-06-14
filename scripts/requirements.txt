@@ -22,3 +22,6 @@ django-filter
 django-bootstrap3
 django-jquery
 pympler
+metaphone
+django-silk
+sshtunnel
