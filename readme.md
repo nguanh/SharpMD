@@ -75,7 +75,16 @@ alias grobid='cd /home/nguyen/grobid/grobid-service; mvn -Dmaven.test.skip=true 
 
 7. Zugriff auf backend:
 Das front end ist erreichbar unter localhost:8000, wenn es gestartet wurde.
-Das backend unter localhost:8000/admin
+Das backend unter localhost:8000/admin/
+
+
+8. Weaver starten
+Für den Weaver müssen PDF und Referenz modul jeweils als task gespeichert werden.
+Dazu im Django Backend--> Django-Celery_Beat-->Periodic Tasks  Add Periodic Task auswählen.
+
+Als task weaver.tasks.pdfdownloader und bei interval ein intervall von mindestens 10 minute auswählen und task anlegen.
+Das Gleiche nochmal für das Referenzierungsmodul mit weaver.tasks.referencertask
+
 
 
 
